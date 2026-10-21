@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0e16">
+<title>局域网测速 · WiFi 墙体衰减对照</title>
+<style>
+  :root{
+    --bg:#080b11; --card:#111826; --card2:#0c121d; --line:#1e2a3d; --text:#dbe6f5;
+    --dim:#7789a3; --accent:#38d6ff; --accent2:#ffb84d; --ok:#4ade80; --bad:#f87171;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--text);min-height:100%;
+    font:15px/1.55 ui-sans-serif,system-ui,-apple-system,"Noto Sans SC","PingFang SC",sans-serif}
+  body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+  header{padding:18px 18px 6px;max-width:720px;margin:0 auto}
+  h1{margin:0;font-size:19px;font-weight:650;letter-spacing:.02em}
+  h1 b{color:var(--accent);font-weight:650}
+  .sub{color:var(--dim);font-size:12.5px;margin-top:3px}
+  main{max-width:720px;margin:0 auto;padding:12px 14px 60px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .hero{text-align:center}
+  .gauge{position:relative;height:190px;margin:4px 0 6px}
+  #chart{position:absolute;inset:0;width:100%;height:100%}
+  .speedwrap{position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;pointer-events:none}
+  .speednum{font-size:56px;font-weight:250;line-height:1;letter-spacing:-.03em;
+    font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 0 26px rgba(56,214,255,.28)}
+  .speedunit{font-size:13px;color:var(--dim);letter-spacing:.16em;margin-top:6px}
+  .phase{position:absolute;left:0;right:0;bottom:2px;font-size:12.5px;color:var(--dim);letter-spacing:.04em}
+  .bar{height:4px;border-radius:3px;background:#18222f;overflow:hidden;margin:14px 0 16px}
+  .bar>i{display:block;height:100%;width:0;border-radius:3px;
+    background:linear-gradient(90deg,var(--accent),#7c8cff);transition:width .18s linear}
+  button{border:0;border-radius:12px;font:inherit;font-weight:600;cursor:pointer;transition:.16s}
+  #start{width:100%;padding:15px;font-size:16px;letter-spacing:.04em;color:#04121a;
+    background:linear-gradient(135deg,#4ee0ff,#22b8e6);box-shadow:0 6px 22px rgba(34,184,230,.22)}
+  #start:disabled{opacity:.45;cursor:default;box-shadow:none}
+  #start:active:not(:disabled){transform:scale(.985)}
+  .addr{margin-top:12px;font-size:11.5px;color:var(--dim)}
+  .addr code{color:var(--accent);background:#0a1522;padding:2px 7px;border-radius:6px;
+    font-size:11.5px;word-break:break-all}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px}
+  .stat{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:11px 8px;text-align:center}
+  .stat b{display:block;font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.25}
+  .stat i{font-style:normal;display:block;color:var(--dim);font-size:10px;margin-top:3px;letter-spacing:.05em}
+  .k-ping b{color:var(--accent)} .k-down b{color:var(--ok)} .k-up b{color:var(--accent2)}
+  .savebox{display:flex;gap:8px;margin-top:14px}
+  .savebox input{flex:1;min-width:0;background:#0a121e;border:1px solid var(--line);
+    border-radius:11px;padding:11px 13px;color:var(--text);font:inherit;font-size:14px}
+  .savebox input::placeholder{color:#4d5c72}
+  .savebox input:focus{outline:none;border-color:#2b6d86}
+  .savebox button{padding:0 18px;background:#173247;color:var(--accent);border:1px solid #245069}
+  .savebox button:active{background:#1d4059}
+  .sec{margin-top:22px}
+  .sec h2{font-size:12px;color:var(--dim);font-weight:600;letter-spacing:.12em;
+    text-transform:uppercase;margin:0 0 10px 4px}
+  .list{display:flex;flex-direction:column;gap:8px}
+  .item{background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:12px 14px;position:relative}
+  .item .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding-right:20px}
+  .item .name{font-weight:600;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .item .when{color:var(--dim);font-size:11px;white-space:nowrap}
+  .item .nums{display:flex;gap:14px;margin-top:6px;font-size:12.5px;color:var(--dim);
+    font-variant-numeric:tabular-nums}
+  .item .nums b{color:var(--text);font-weight:600}
+  .item .track{height:3px;background:#16212e;border-radius:2px;margin-top:9px;overflow:hidden}
+  .item .track>i{display:block;height:100%;border-radius:2px;background:var(--ok)}
+  .item .del{position:absolute;right:8px;top:8px;background:none;border:0;color:#41536b;
+    font-size:17px;line-height:1;padding:6px;cursor:pointer}
+  .item .del:active{color:var(--bad)}
+  .empty{color:var(--dim);font-size:12.5px;text-align:center;padding:22px 0 8px;line-height:1.8}
+  .hidden{display:none!important}
+  .note{color:var(--dim);font-size:11.5px;line-height:1.75;margin:10px 2px 0}
+  @media (max-width:390px){
+    .grid{grid-template-columns:repeat(2,1fr)}
+    .speednum{font-size:46px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>局域网 <b>测速</b> · 墙体衰减对照</h1>
+  <div class="sub">同一热点下，换不同房间/隔墙位置各测一次并标注墙体材质</div>
+</header>
+<main>
+  <section class="card hero">
+    <div class="gauge">
+      <canvas id="chart"></canvas>
+      <div class="speedwrap">
+        <div class="speednum" id="speedVal">0</div>
+        <div class="speedunit">Mbps</div>
+      </div>
+      <div class="phase" id="phase">准备就绪</div>
+    </div>
+    <div class="bar"><i id="prog"></i></div>
+    <button id="start">开始测试</button>
+    <div class="addr">手机请访问 <code id="addr">—</code></div>
+  </section>
+
+  <section class="card sec hidden" id="resultCard">
+    <h2 style="margin:2px 0 10px 0">本次结果</h2>
+    <div class="grid">
+      <div class="stat k-ping"><b id="rPing">—</b><i>PING ms</i></div>
+      <div class="stat"><b id="rJit">—</b><i>抖动 ms</i></div>
+      <div class="stat k-down"><b id="rDown">—</b><i>下载 Mbps</i></div>
+      <div class="stat k-up"><b id="rUp">—</b><i>上传 Mbps</i></div>
+    </div>
+    <div class="savebox">
+      <input id="label" maxlength="40" placeholder="标注位置/墙体，如：卧室·混凝土墙">
+      <button id="save">保存</button>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>历史对比</h2>
+    <div class="list" id="history"></div>
+    <div class="empty hidden" id="empty">还没有记录。测完后填个标签保存，<br>就能对比各位置的速率保留率。</div>
+    <div class="note">条形长度为下载速率相对最快一次的占比。多径与穿墙损耗会让速率和延迟同时劣化，建议同一位置连测 3 次取中位数。</div>
+  </section>
+</main>
+
+<script>
+'use strict';
+const $ = (s) => document.querySelector(s);
+
+const el = {
+  chart: $('#chart'), speed: $('#speedVal'), phase: $('#phase'), prog: $('#prog'),
+  start: $('#start'), addr: $('#addr'), result: $('#resultCard'),
+  rPing: $('#rPing'), rJit: $('#rJit'), rDown: $('#rDown'), rUp: $('#rUp'),
+  label: $('#label'), save: $('#save'), history: $('#history'), empty: $('#empty'),
+};
+const cx = el.chart.getContext('2d');
+
+const state = {
+  running: false, bytes: 0, firstMs: 0, lastMs: 0,
+  samples: [], chartData: [], lastResult: null, wake: null,
+};
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function resetCounter() {
+  state.bytes = 0; state.firstMs = 0; state.lastMs = 0;
+  state.samples = []; state.chartData = [];
+}
+function noteBytes(n) {
+  const t = performance.now();
+  if (!state.firstMs) state.firstMs = t;
+  state.bytes += n;
+  state.lastMs = t;
+  state.samples.push({ t, b: state.bytes });
+  if (state.samples.length > 200) state.samples.shift();
+}
+function windowedMbps() {
+  const s = state.samples;
+  if (s.length < 2) return 0;
+  const now = s[s.length - 1];
+  let i = s.length - 1;
+  while (i > 0 && now.t - s[i - 1].t < 800) i--;
+  const a = s[i];
+  const dt = (now.t - a.t) / 1000;
+  if (dt <= 0.02) return 0;
+  return ((now.b - a.b) * 8) / dt / 1e6;
+}
+function finalMbps() {
+  const dt = (state.lastMs - state.firstMs) / 1000;
+  if (dt <= 0.05) return 0;
+  return (state.bytes * 8) / dt / 1e6;
+}
+
+function setSpeed(v) {
+  el.speed.textContent = v < 10 ? v.toFixed(2) : v < 100 ? v.toFixed(1) : v.toFixed(0);
+}
+function setPhase(t) { el.phase.textContent = t; }
+function setProgress(p) { el.prog.style.width = Math.max(0, Math.min(1, p)) * 100 + '%'; }
+
+// ---------- 曲线 ----------
+function sizeChart() {
+  const r = el.chart.getBoundingClientRect();
+  const d = Math.min(window.devicePixelRatio || 1, 2);
+  el.chart.width = Math.max(1, Math.round(r.width * d));
+  el.chart.height = Math.max(1, Math.round(r.height * d));
+  drawChart();
+}
+function drawChart() {
+  const w = el.chart.width, h = el.chart.height;
+  cx.clearRect(0, 0, w, h);
+  const data = state.chartData;
+  if (data.length < 2) return;
+  const max = Math.max(10, ...data.map((p) => p.v));
+  const t0 = data[0].t, t1 = data[data.length - 1].t;
+  const span = Math.max(t1 - t0, 1);
+  const g = cx.createLinearGradient(0, 0, 0, h);
+  g.addColorStop(0, 'rgba(56,214,255,.30)');
+  g.addColorStop(1, 'rgba(56,214,255,0)');
+  cx.beginPath();
+  data.forEach((p, i) => {
+    const x = ((p.t - t0) / span) * w;
+    const y = h - 6 - (p.v / max) * (h - 26);
+    i ? cx.lineTo(x, y) : cx.moveTo(x, y);
+  });
+  cx.lineWidth = Math.max(1.5, 2 * (w / 320));
+  cx.strokeStyle = '#38d6ff';
+  cx.stroke();
+  cx.lineTo(w, h); cx.lineTo(0, h); cx.closePath();
+  cx.fillStyle = g; cx.fill();
+}
+
+let sampler = null;
+function startSampler() {
+  stopSampler();
+  let lastChart = 0;
+  sampler = setInterval(() => {
+    const v = windowedMbps();
+    setSpeed(v);
+    const now = performance.now();
+    if (now - lastChart > 120) {
+      state.chartData.push({ t: now, v });
+      if (state.chartData.length > 600) state.chartData.shift();
+      lastChart = now;
+      drawChart();
+    }
+  }, 100);
+}
+function stopSampler() {
+  if (sampler) clearInterval(sampler);
+  sampler = null;
+}
+
+// ---------- 延迟 ----------
+async function measurePing() {
+  const rtts = [];
+  for (let i = 0; i < 16; i++) {
+    const t0 = performance.now();
+    await fetch(`/api/ping?i=${i}`, { cache: 'no-store' });
+    rtts.push(performance.now() - t0);
+    setProgress((i + 1) / 16);
+    await sleep(25);
+  }
+  const s = rtts.slice(3).sort((a, b) => a - b);
+  const median = s[s.length >> 1] || 0;
+  const mean = s.reduce((a, b) => a + b, 0) / Math.max(s.length, 1);
+  const jitter = Math.sqrt(s.reduce((a, b) => a + (b - mean) ** 2, 0) / Math.max(s.length, 1));
+  return { median, jitter };
+}
+
+// ---------- 下载 ----------
+async function measureDownload(seconds, conns) {
+  resetCounter();
+  const start = performance.now();
+  const end = start + seconds * 1000;
+  const reqBytes = 4 * 1024 * 1024;
+  const worker = async () => {
+    while (performance.now() < end) {
+      try {
+        const res = await fetch(`/api/download?bytes=${reqBytes}&n=${Math.random()}`, { cache: 'no-store' });
+        if (!res.ok) return;
+        if (!res.body) {
+          const buf = await res.arrayBuffer();
+          noteBytes(buf.byteLength);
+          continue;
+        }
+        const reader = res.body.getReader();
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          noteBytes(value.length);
+        }
+      } catch { return; }
+    }
+  };
+  const prog = setInterval(() => setProgress((performance.now() - start) / (seconds * 1000)), 100);
+  await Promise.all(Array.from({ length: conns }, worker));
+  clearInterval(prog);
+  setProgress(1);
+  return finalMbps();
+}
+
+// ---------- 上传 ----------
+const UP_BLOB = new Blob([new Uint8Array(4 * 1024 * 1024)]);
+async function measureUpload(seconds, conns) {
+  resetCounter();
+  const start = performance.now();
+  const end = start + seconds * 1000;
+  const worker = () => new Promise((resolve) => {
+    const tick = () => {
+      if (performance.now() >= end) return resolve();
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/upload');
+      let sent = 0;
+      xhr.upload.onprogress = (e) => {
+        const d = e.loaded - sent;
+        sent = e.loaded;
+        if (d > 0) noteBytes(d);
+      };
+      xhr.onloadend = () => tick();
+      xhr.onerror = () => resolve();
+      xhr.send(UP_BLOB);
+    };
+    tick();
+  });
+  const prog = setInterval(() => setProgress((performance.now() - start) / (seconds * 1000)), 100);
+  await Promise.all(Array.from({ length: conns }, worker));
+  clearInterval(prog);
+  setProgress(1);
+  return finalMbps();
+}
+
+// ---------- 流程 ----------
+async function keepAwake() {
+  try {
+    if ('wakeLock' in navigator) state.wake = await navigator.wakeLock.request('screen');
+  } catch {}
+}
+
+async function startTest() {
+  if (state.running) return;
+  state.running = true;
+  resetCounter();
+  setSpeed(0);
+  drawChart();
+  el.start.disabled = true;
+  el.start.textContent = '测试中…';
+  el.result.classList.add('hidden');
+  await keepAwake();
+  try {
+    setPhase('① 测量延迟…');
+    const p = await measurePing();
+
+    setPhase('② 测量下载…');
+    const down = await measureDownload(8, 4);
+
+    setPhase('③ 测量上传…');
+    const up = await measureUpload(8, 4);
+
+    state.lastResult = { ping_ms: p.median, jitter_ms: p.jitter, down_mbps: down, up_mbps: up };
+    showResult(state.lastResult);
+    setPhase('完成');
+    setSpeed(0);
+  } catch (e) {
+    setPhase('测试失败：' + (e?.message || e));
+  } finally {
+    stopSampler();
+    state.running = false;
+    el.start.disabled = false;
+    el.start.textContent = '重新测试';
+    try { state.wake?.release(); } catch {}
+  }
+}
+
+function showResult(r) {
+  el.rPing.textContent = r.ping_ms.toFixed(1);
+  el.rJit.textContent = r.jitter_ms.toFixed(1);
+  el.rDown.textContent = r.down_mbps.toFixed(1);
+  el.rUp.textContent = r.up_mbps.toFixed(1);
+  el.result.classList.remove('hidden');
+  drawChart();
+}
+
+function startSamplerOnce() {
+  if (!sampler) startSampler();
+}
+
+// ---------- 历史 ----------
+function fmtTime(ts) {
+  const d = new Date(ts);
+  const p = (n) => String(n).padStart(2, '0');
+  return `${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+function renderHistory(items) {
+  el.history.innerHTML = '';
+  el.empty.classList.toggle('hidden', items.length > 0);
+  const maxDown = Math.max(...items.map((x) => x.down_mbps), 1);
+  for (const it of items.slice().reverse()) {
+    const pct = Math.round((it.down_mbps / maxDown) * 100);
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `
+      <div class="top"><span class="name"></span><span class="when"></span></div>
+      <div class="nums">
+        <span>Ping <b>${it.ping_ms.toFixed(1)}</b> ms</span>
+        <span>下载 <b>${it.down_mbps.toFixed(1)}</b></span>
+        <span>上传 <b>${it.up_mbps.toFixed(1)}</b></span>
+        <span style="margin-left:auto;color:#4ade80">${pct}%</span>
+      </div>
+      <div class="track"><i style="width:${pct}%"></i></div>
+      <button class="del" title="删除">×</button>`;
+    row.querySelector('.name').textContent = it.label || '未标注';
+    row.querySelector('.when').textContent = fmtTime(it.ts);
+    row.querySelector('.del').addEventListener('click', async () => {
+      await fetch(`/api/results/${it.id}`, { method: 'DELETE' });
+      loadHistory();
+    });
+    el.history.appendChild(row);
+  }
+}
+
+async function loadHistory() {
+  try {
+    const items = await fetch('/api/results', { cache: 'no-store' }).then((r) => r.json());
+    renderHistory(items);
+  } catch {}
+}
+
+async function saveResult() {
+  const r = state.lastResult;
+  if (!r) return;
+  const label = el.label.value.trim() || '未标注';
+  await fetch('/api/results', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      label,
+      ping_ms: r.ping_ms, jitter_ms: r.jitter_ms,
+      down_mbps: r.down_mbps, up_mbps: r.up_mbps,
+    }),
+  });
+  el.label.value = '';
+  el.save.textContent = '已保存';
+  setTimeout(() => (el.save.textContent = '保存'), 1200);
+  loadHistory();
+}
+
+// ---------- 事件 ----------
+el.start.addEventListener('click', () => { startSamplerOnce(); startTest(); });
+el.save.addEventListener('click', saveResult);
+el.label.addEventListener('keydown', (e) => { if (e.key === 'Enter') saveResult(); });
+window.addEventListener('resize', sizeChart);
+
+fetch('/api/info')
+  .then((r) => r.json())
+  .then((i) => {
+    const port = location.port ? ':' + location.port : '';
+    const local = /^(127\.|localhost$|::1$)/.test(location.hostname);
+    const addrs = (i.addrs || []).map((a) => `http://${a}${port}`);
+    el.addr.textContent = local && addrs.length ? addrs.join('  ·  ') : location.host;
+  })
+  .catch(() => { el.addr.textContent = location.host || '—'; });
+sizeChart();
+loadHistory();
+</script>
+</body>
+</html>
