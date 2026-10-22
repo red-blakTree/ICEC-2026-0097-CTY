@@ -40,7 +40,7 @@
   .addr{margin-top:12px;font-size:11.5px;color:var(--dim)}
   .addr code{color:var(--accent);background:#0a1522;padding:2px 7px;border-radius:6px;
     font-size:11.5px;word-break:break-all}
-  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
   .stat{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:11px 8px;text-align:center}
   .stat b{display:block;font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.25}
   .stat i{font-style:normal;display:block;color:var(--dim);font-size:10px;margin-top:3px;letter-spacing:.05em}
@@ -61,7 +61,8 @@
   .item .name{font-weight:600;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .item .when{color:var(--dim);font-size:11px;white-space:nowrap}
   .item .nums{display:flex;gap:14px;margin-top:6px;font-size:12.5px;color:var(--dim);
-    font-variant-numeric:tabular-nums}
+    flex-wrap:wrap;row-gap:2px;font-variant-numeric:tabular-nums}
+  .item .nums+.nums{margin-top:2px}
   .item .nums b{color:var(--text);font-weight:600}
   .item .track{height:3px;background:#16212e;border-radius:2px;margin-top:9px;overflow:hidden}
   .item .track>i{display:block;height:100%;border-radius:2px;background:var(--ok)}
@@ -80,7 +81,7 @@
 <body>
 <header>
   <h1>局域网 <b>测速</b> · 墙体衰减对照</h1>
-  <div class="sub">同一热点下，换不同房间/隔墙位置各测一次并标注墙体材质</div>
+  <div class="sub">同一热点下按点位-轮次测延迟：中位数 / P95 / 抖动 / 丢包，并附下载与上传速率</div>
 </header>
 <main>
   <section class="card hero">
@@ -101,21 +102,24 @@
     <h2 style="margin:2px 0 10px 0">本次结果</h2>
     <div class="grid">
       <div class="stat k-ping"><b id="rPing">—</b><i>PING ms</i></div>
+      <div class="stat"><b id="rP95">—</b><i>P95 ms</i></div>
       <div class="stat"><b id="rJit">—</b><i>抖动 ms</i></div>
+      <div class="stat"><b id="rLoss">—</b><i>丢包 %</i></div>
       <div class="stat k-down"><b id="rDown">—</b><i>下载 Mbps</i></div>
       <div class="stat k-up"><b id="rUp">—</b><i>上传 Mbps</i></div>
     </div>
     <div class="savebox">
-      <input id="label" maxlength="40" placeholder="标注位置/墙体，如：卧室·混凝土墙">
+      <input id="label" maxlength="40" placeholder="点位-轮次，如 P1-R2">
       <button id="save">保存</button>
     </div>
+    <div class="note">标签统一写「点位-轮次」（如 P1-R2）；延迟取 PING 中位数，P95 与丢包用于盲区判定参考。下载 / 上传仅供界面参考，不参与本实验分析。</div>
   </section>
 
   <section class="sec">
     <h2>历史对比</h2>
     <div class="list" id="history"></div>
-    <div class="empty hidden" id="empty">还没有记录。测完后填个标签保存，<br>就能对比各位置的速率保留率。</div>
-    <div class="note">条形长度为下载速率相对最快一次的占比。多径与穿墙损耗会让速率和延迟同时劣化，建议同一位置连测 3 次取中位数。</div>
+    <div class="empty hidden" id="empty">还没有记录。测完后按「点位-轮次」填标签保存，<br>就能对比各点位的延迟与速率。</div>
+    <div class="note">条形长度为下载速率相对最快一次的占比。同一位置连测 3 轮（R1–R3）后取延迟中位数，P95 与丢包同时变差即为盲区候选。</div>
   </section>
 </main>
 
@@ -126,7 +130,8 @@ const $ = (s) => document.querySelector(s);
 const el = {
   chart: $('#chart'), speed: $('#speedVal'), phase: $('#phase'), prog: $('#prog'),
   start: $('#start'), addr: $('#addr'), result: $('#resultCard'),
-  rPing: $('#rPing'), rJit: $('#rJit'), rDown: $('#rDown'), rUp: $('#rUp'),
+  rPing: $('#rPing'), rP95: $('#rP95'), rJit: $('#rJit'), rLoss: $('#rLoss'),
+  rDown: $('#rDown'), rUp: $('#rUp'),
   label: $('#label'), save: $('#save'), history: $('#history'), empty: $('#empty'),
 };
 const cx = el.chart.getContext('2d');
@@ -227,20 +232,42 @@ function stopSampler() {
 }
 
 // ---------- 延迟 ----------
+// 方案口径：32 次 GET /api/ping，丢弃前 3 次连接开销，输出中位数 / P95 / 抖动 / 丢包
+const PING_SAMPLES = 32;
+const PING_DISCARD = 3;
+const PING_KEPT = PING_SAMPLES - PING_DISCARD;
+
+// 最近秩百分位：sorted 升序，p ∈ (0,1]
+function percentile(sorted, p) {
+  if (!sorted.length) return 0;
+  const i = Math.min(sorted.length - 1, Math.max(0, Math.ceil(p * sorted.length) - 1));
+  return sorted[i];
+}
+
 async function measurePing() {
   const rtts = [];
-  for (let i = 0; i < 16; i++) {
+  let lost = 0;
+  for (let i = 0; i < PING_SAMPLES; i++) {
     const t0 = performance.now();
-    await fetch(`/api/ping?i=${i}`, { cache: 'no-store' });
-    rtts.push(performance.now() - t0);
-    setProgress((i + 1) / 16);
+    try {
+      const res = await fetch(`/api/ping?i=${i}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      if (i >= PING_DISCARD) rtts.push(performance.now() - t0);
+    } catch {
+      if (i >= PING_DISCARD) lost++;
+    }
+    setProgress((i + 1) / PING_SAMPLES);
     await sleep(25);
   }
-  const s = rtts.slice(3).sort((a, b) => a - b);
-  const median = s[s.length >> 1] || 0;
-  const mean = s.reduce((a, b) => a + b, 0) / Math.max(s.length, 1);
-  const jitter = Math.sqrt(s.reduce((a, b) => a + (b - mean) ** 2, 0) / Math.max(s.length, 1));
-  return { median, jitter };
+  const sorted = rtts.slice().sort((a, b) => a - b);
+  const mean = rtts.reduce((a, b) => a + b, 0) / Math.max(rtts.length, 1);
+  const jitter = Math.sqrt(rtts.reduce((a, b) => a + (b - mean) ** 2, 0) / Math.max(rtts.length, 1));
+  return {
+    median: percentile(sorted, 0.5),
+    p95: percentile(sorted, 0.95),
+    jitter,
+    loss: (lost / PING_KEPT) * 100,
+  };
 }
 
 // ---------- 下载 ----------
@@ -332,7 +359,10 @@ async function startTest() {
     setPhase('③ 测量上传…');
     const up = await measureUpload(8, 4);
 
-    state.lastResult = { ping_ms: p.median, jitter_ms: p.jitter, down_mbps: down, up_mbps: up };
+    state.lastResult = {
+      ping_ms: p.median, p95_ms: p.p95, jitter_ms: p.jitter, loss_pct: p.loss,
+      down_mbps: down, up_mbps: up,
+    };
     showResult(state.lastResult);
     setPhase('完成');
     setSpeed(0);
@@ -349,7 +379,9 @@ async function startTest() {
 
 function showResult(r) {
   el.rPing.textContent = r.ping_ms.toFixed(1);
+  el.rP95.textContent = r.p95_ms.toFixed(1);
   el.rJit.textContent = r.jitter_ms.toFixed(1);
+  el.rLoss.textContent = r.loss_pct.toFixed(1);
   el.rDown.textContent = r.down_mbps.toFixed(1);
   el.rUp.textContent = r.up_mbps.toFixed(1);
   el.result.classList.remove('hidden');
@@ -379,6 +411,11 @@ function renderHistory(items) {
       <div class="top"><span class="name"></span><span class="when"></span></div>
       <div class="nums">
         <span>Ping <b>${it.ping_ms.toFixed(1)}</b> ms</span>
+        <span>P95 <b>${(it.p95_ms ?? 0).toFixed(1)}</b> ms</span>
+        <span>抖动 <b>${it.jitter_ms.toFixed(1)}</b> ms</span>
+        <span>丢包 <b>${(it.loss_pct ?? 0).toFixed(1)}</b>%</span>
+      </div>
+      <div class="nums">
         <span>下载 <b>${it.down_mbps.toFixed(1)}</b></span>
         <span>上传 <b>${it.up_mbps.toFixed(1)}</b></span>
         <span style="margin-left:auto;color:#4ade80">${pct}%</span>
@@ -411,7 +448,8 @@ async function saveResult() {
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({
       label,
-      ping_ms: r.ping_ms, jitter_ms: r.jitter_ms,
+      ping_ms: r.ping_ms, p95_ms: r.p95_ms, jitter_ms: r.jitter_ms,
+      loss_pct: r.loss_pct,
       down_mbps: r.down_mbps, up_mbps: r.up_mbps,
     }),
   });

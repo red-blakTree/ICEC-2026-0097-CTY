@@ -35,7 +35,12 @@ struct UploadResponse {
 struct SaveRequest {
     label: String,
     ping_ms: f64,
+    /// 兼容旧前端：未带 P95 / 丢包时按 0 存
+    #[serde(default)]
+    p95_ms: f64,
     jitter_ms: f64,
+    #[serde(default)]
+    loss_pct: f64,
     down_mbps: f64,
     up_mbps: f64,
 }
@@ -122,7 +127,9 @@ async fn save_result(State(st): State<Shared>, Json(req): Json<SaveRequest>) -> 
         ts: 0,
         label: req.label.chars().take(80).collect(),
         ping_ms: req.ping_ms,
+        p95_ms: req.p95_ms,
         jitter_ms: req.jitter_ms,
+        loss_pct: req.loss_pct,
         down_mbps: req.down_mbps,
         up_mbps: req.up_mbps,
     }))

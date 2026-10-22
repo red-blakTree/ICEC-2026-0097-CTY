@@ -58,7 +58,9 @@ fn save_request(label: &str) -> Request<Body> {
             serde_json::json!({
                 "label": label,
                 "ping_ms": 1.5,
+                "p95_ms": 4.5,
                 "jitter_ms": 0.2,
+                "loss_pct": 3.4,
                 "down_mbps": 100.0,
                 "up_mbps": 50.0,
             })
@@ -166,6 +168,40 @@ async fn delete_removes_only_the_target_result() {
     let items = Arc::new(Store::load(t.file())).list();
     assert_eq!(items.len(), 1);
     assert_eq!(items[0].label, "隔墙");
+}
+
+/// 方案用 P95 与丢包率判定盲区，这两个字段必须原样落盘并可回读。
+#[tokio::test]
+async fn latency_percentile_and_loss_are_persisted() {
+    let t = TempDir::new();
+    let live = store_in(&t);
+
+    let saved = json_body(call(app(live.clone()), save_request("P1-R2")).await).await;
+    assert_eq!(saved["label"], "P1-R2");
+    assert_eq!(saved["p95_ms"], 4.5);
+    assert_eq!(saved["loss_pct"], 3.4);
+
+    let reloaded = Arc::new(Store::load(t.file())).list();
+    assert_eq!(reloaded.len(), 1);
+    assert_eq!(reloaded[0].p95_ms, 4.5);
+    assert_eq!(reloaded[0].loss_pct, 3.4);
+}
+
+/// 旧版本写下的结果没有 P95 / 丢包字段，升级后必须完整读出，不能被当成空数据重置。
+#[tokio::test]
+async fn legacy_results_without_new_fields_still_load() {
+    let t = TempDir::new();
+    std::fs::write(
+        t.file(),
+        r#"{"items":[{"id":1,"ts":1,"label":"卧室·混凝土墙","ping_ms":2.0,"jitter_ms":0.3,"down_mbps":90.0,"up_mbps":40.0}]}"#,
+    )
+    .unwrap();
+
+    let items = Arc::new(Store::load(t.file())).list();
+    assert_eq!(items.len(), 1);
+    assert_eq!(items[0].label, "卧室·混凝土墙");
+    assert_eq!(items[0].p95_ms, 0.0);
+    assert_eq!(items[0].loss_pct, 0.0);
 }
 
 /// 测试用内存实现：用来证明 HTTP 层只依赖 trait，换存储不改 handler。

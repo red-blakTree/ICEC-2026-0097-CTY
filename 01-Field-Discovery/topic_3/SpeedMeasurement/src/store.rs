@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -7,10 +7,15 @@ use std::time::{SystemTime, UNIX_EPOCH};
 pub struct Entry {
     pub id: u64,
     pub ts: u64,
-    /// 位置 / 墙体材质标注，例如「卧室 · 混凝土墙」
+    /// 点位-轮次标注，例如「P1-R2」；兼容旧的墙体材质标注
     pub label: String,
     pub ping_ms: f64,
+    /// 旧数据没有 P95 与丢包字段，缺省为 0，避免整份数据解析失败
+    #[serde(default)]
+    pub p95_ms: f64,
     pub jitter_ms: f64,
+    #[serde(default)]
+    pub loss_pct: f64,
     pub down_mbps: f64,
     pub up_mbps: f64,
 }
@@ -35,11 +40,7 @@ pub struct Store {
 impl Store {
     pub fn load(path: impl Into<PathBuf>) -> Self {
         let path = path.into();
-        let items = std::fs::read_to_string(&path)
-            .ok()
-            .and_then(|s| serde_json::from_str::<FileData>(&s).ok())
-            .map(|f| f.items)
-            .unwrap_or_default();
+        let items = read_items(&path);
         Self {
             path,
             items: Mutex::new(items),
@@ -92,4 +93,23 @@ fn now_ms() -> u64 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map_or(0, |d| u64::try_from(d.as_millis()).unwrap_or(u64::MAX))
+}
+
+/// 读取已有结果：文件不存在视为首次运行；解析失败必须告警，
+/// 否则下一次保存会用空列表覆盖掉整份实验数据。
+fn read_items(path: &Path) -> Vec<Entry> {
+    let text = match std::fs::read_to_string(path) {
+        Ok(text) => text,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Vec::new(),
+        Err(e) => {
+            eprintln!("警告: 无法读取 {}: {e}", path.display());
+            return Vec::new();
+        }
+    };
+    serde_json::from_str::<FileData>(&text)
+        .map(|f| f.items)
+        .unwrap_or_else(|e| {
+            eprintln!("警告: {} 解析失败: {e}，请先备份该文件", path.display());
+            Vec::new()
+        })
 }
