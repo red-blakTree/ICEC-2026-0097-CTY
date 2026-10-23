@@ -1,0 +1,14 @@
+walk-1           truth=walk   windows=211 correct=211 acc=1.000  votes={'walk': 211}  cleaned=0.6-110.2s
+walk-2           truth=walk   windows=226 correct=226 acc=1.000  votes={'walk': 226}  cleaned=0.7-117.7s
+walk-3           truth=walk   windows=210 correct=210 acc=1.000  votes={'walk': 210}  cleaned=0.7-109.7s
+run              truth=run    windows= 21 correct= 21 acc=1.000  votes={'run': 21}  cleaned=1.0-15.0s
+go_upstairs-1    truth=stairs windows= 59 correct= 59 acc=1.000  votes={'stairs': 59}  cleaned=0.5-34.0s
+go_upstairs-2    truth=stairs windows= 57 correct= 57 acc=1.000  votes={'stairs': 57}  cleaned=0.5-33.1s
+go_upstairs-3    truth=stairs windows= 53 correct= 53 acc=1.000  votes={'stairs': 53}  cleaned=0.5-30.7s
+go_downstairs-1  truth=stairs windows= 47 correct= 47 acc=1.000  votes={'stairs': 47}  cleaned=0.5-28.0s
+go_downstairs-2  truth=stairs windows= 49 correct= 49 acc=1.000  votes={'stairs': 49}  cleaned=0.5-28.6s
+go_downstairs-3  truth=stairs windows= 49 correct= 49 acc=1.000  votes={'stairs': 49}  cleaned=0.5-29.0s
+stand            truth=stand  windows= 76 correct= 67 acc=0.882  votes={'stand': 67, 'walk': 6, 'stairs': 3}  cleaned=2.7-44.4s
+
+窗口级总准确率: 1049/1058 = 0.9915
+记录级（多数票）准确率: 11/11
