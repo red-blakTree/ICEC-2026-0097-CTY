@@ -14,3 +14,15 @@ T5-08,picture/fireproof_door/fireproof_door.1.jpg,12:16,概览,-69,,2.4 GHz,7（
 T5-08,picture/fireproof_door/fireproof_door.2.jpg,12:16,扫描,-80,-21.5,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,
 L1-01,picture/glass/glass.1.jpg,12:36,扫描,-72,-9.2,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,
 L1-01,picture/glass/glass.2.jpg,12:37,概览,-72,,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,129,样本 30/30
+T5-01,picture/datum_mark/514-before.1.jpg,15:30,概览,-57,,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,258,仅 16/30 样本，测速前
+T5-01,picture/datum_mark/514-before.2.jpg,15:30,扫描,-56,-3.3,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,测速前；扫描页距离显示 ~6.2 m
+T5-01,picture/datum_mark/514-after.1.jpg,15:32,扫描,-64,-12.4,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,测速后；扫描页距离显示 ~15.5 m
+T5-01,picture/datum_mark/514-after.2.jpg,15:32,概览,-61,,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,258,仅 23/30 样本，测速后
+T5-04,picture/datum_mark/elevator-before.1.jpg,15:33,概览,-56,,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,258,样本 30/30；测速前
+T5-04,picture/datum_mark/elevator-before.2.jpg,15:33,扫描,-64,-12.4,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,测速前；扫描页距离显示 ~15.5 m
+T5-04,picture/datum_mark/elevator-after.1.jpg,15:35,扫描,-52,17.0,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,测速后；链路 229 Mbps
+T5-04,picture/datum_mark/elevator-after.2.jpg,15:36,概览,-57,,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,286,样本 30/30；测速后
+D-01,picture/dormitory/dormitory-before.1.jpg,20:18,概览,-59,,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,286,仅 2/30 样本，历史未刷新
+D-01,picture/dormitory/dormitory-before.2.jpg,20:18,扫描,-55,32.2,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,扫描页距离显示 ~5.5 m
+D-02,picture/dormitory/dormitory-after.1.jpg,20:20,扫描,-74,4.2,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,扫描页距离显示 ~49.0 m
+D-02,picture/dormitory/dormitory-after.2.jpg,20:20,概览,-57,,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,172,仅 11/30 样本，与扫描页差 17 dB
