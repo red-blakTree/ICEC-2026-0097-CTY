@@ -1,0 +1,18 @@
+2026-10-25 跨日盲测（704 窗 / 9 段）
+标定：v2/v3 = data_2；v4/v5 = data_2 + data/calib/2026-10-24
+
+v2       窗口 0.4276  记录 5/9  go_downstairs-1:OK  go_downstairs-2:OK  run-1:OK  run-2:OK  stand:OK  go_upstairs-1:X  go_upstairs-2:X  walk-1:X  walk-2:X
+v3+平滑    窗口 0.4531  记录 7/9  go_downstairs-1:OK  go_downstairs-2:OK  run-1:OK  run-2:OK  stand:OK  go_upstairs-1:OK  go_upstairs-2:OK  walk-1:X  walk-2:X
+v4+平滑    窗口 0.6861  记录 8/9  go_downstairs-1:OK  go_downstairs-2:OK  run-1:OK  run-2:OK  stand:OK  go_upstairs-1:OK  go_upstairs-2:OK  walk-1:OK  walk-2:X
+v5+平滑    窗口 0.7969  记录 9/9  go_downstairs-1:OK  go_downstairs-2:OK  run-1:OK  run-2:OK  stand:OK  go_upstairs-1:OK  go_upstairs-2:OK  walk-1:OK  walk-2:OK
+
+v5 窗口混淆（行=真值，列=判决）:
+              静止    平地慢走      快跑      上楼      下楼
+静止          39       0       0       0       0
+平地慢走         0     225       0      16      55
+快跑           0       0      38       0       0
+上楼           0       4       0      98      67
+下楼           0       0       0       1     161
+
+注：窗口级 79.7 % 是严格跨日盲测；记录级 9/9 说明每段的活动类型仍可由多数票判对，
+但窗口级受 ptn/acp 的跨日基线漂移影响，不能把同集 98.0 % 当泛化数字。

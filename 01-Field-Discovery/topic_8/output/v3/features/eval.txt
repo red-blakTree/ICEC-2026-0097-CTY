@@ -1,0 +1,26 @@
+v3 规则：f_dom 阶梯 + 竖向能量比 + ±2 窗多数票平滑
+训练集: data/calib/data_2
+阈值: stand=1.217, run_sd=5.566, run_peak=36.169, fd_up=1.687, fd_down=1.750, r_down=1.540
+
+== data/calib/data_2 ==
+窗数 302；原始准确率 0.9106；平滑后 0.9272
+
+go_downstairs    truth=down  raw  33/ 35  smooth  35/ 35  majority=下楼
+go_upstairs      truth=up    raw  32/ 56  smooth  34/ 56  majority=上楼
+run-1            truth=run   raw   2/  2  smooth   2/  2  majority=快跑
+run-2            truth=run   raw   7/  7  smooth   7/  7  majority=快跑
+stand            truth=stand raw  22/ 22  smooth  22/ 22  majority=静止
+walk-1           truth=walk  raw  84/ 85  smooth  85/ 85  majority=平地慢走
+walk-2           truth=walk  raw  95/ 95  smooth  95/ 95  majority=平地慢走
+记录级：原始 7/7，平滑 7/7
+
+混淆矩阵（平滑后；行=真值，列=判决）:
+           静止   平地慢走     快跑     上楼     下楼
+静止         22      0      0      0      0
+平地慢走        0    180      0      0      0
+快跑          0      0      9      0      0
+上楼          0     22      0     34      0
+下楼          0      0      0      0     35
+
+留一记录（run-1,run-2,walk-1,walk-2，重标定阈值，原始判决）: 141/189 = 0.7460
+

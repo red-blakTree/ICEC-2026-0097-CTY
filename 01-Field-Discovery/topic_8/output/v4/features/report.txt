@@ -1,0 +1,70 @@
+v4 波形检测：阈值在 data/calib/data_2 + data_routine（均为本人数据）上标定
+留一记录（data_2，run-1,run-2,walk-1,walk-2）: 181/189 = 0.9577
+
+== 本人 data_2 ==
+阈值: stand=1.134, run=4.411, pt=1.174, acp=0.720
+
+go_downstairs    truth=down  windows= 35 raw= 35/35  smooth= 35/35  majority=下楼
+go_upstairs      truth=up    windows= 56 raw= 56/56  smooth= 56/56  majority=上楼
+run-1            truth=run   windows=  2 raw=  2/2   smooth=  2/2   majority=快跑
+run-2            truth=run   windows=  7 raw=  7/7   smooth=  7/7   majority=快跑
+stand            truth=stand windows= 22 raw= 22/22  smooth= 22/22  majority=静止
+walk-1           truth=walk  windows= 85 raw= 81/85  smooth= 83/85  majority=平地慢走
+walk-2           truth=walk  windows= 95 raw= 89/95  smooth= 89/95  majority=平地慢走
+窗口级: raw 292/302 = 0.9669; 平滑 294/302 = 0.9735
+记录级（平滑）: 7/7
+混淆矩阵（平滑后，行=真值，列=判决）:
+           静止   平地慢走     快跑     上楼     下楼
+静止         22      0      0      0      0
+平地慢走        0    172      0      6      2
+快跑          0      0      9      0      0
+上楼          0      0      0     56      0
+下楼          0      0      0      0     35
+
+== 本人 data_routine ==
+阈值: stand=1.134, run=4.411, pt=1.174, acp=0.720
+
+go_downstairs-1  truth=down  windows= 78 raw= 77/78  smooth= 78/78  majority=下楼
+go_downstairs-2  truth=down  windows= 86 raw= 86/86  smooth= 86/86  majority=下楼
+go_upstairs-2    truth=up    windows= 94 raw= 93/94  smooth= 94/94  majority=上楼
+jogging          truth=run   windows=138 raw=138/138 smooth=138/138 majority=快跑
+sprint           truth=run   windows= 10 raw= 10/10  smooth= 10/10  majority=快跑
+stand-2          truth=stand windows= 38 raw= 38/38  smooth= 38/38  majority=静止
+walk-3           truth=walk  windows= 38 raw= 33/38  smooth= 35/38  majority=平地慢走
+walk-4           truth=walk  windows= 63 raw= 59/63  smooth= 60/63  majority=平地慢走
+walk-5           truth=walk  windows= 95 raw= 92/95  smooth= 94/95  majority=平地慢走
+窗口级: raw 626/640 = 0.9781; 平滑 633/640 = 0.9891
+记录级（平滑）: 9/9
+混淆矩阵（平滑后，行=真值，列=判决）:
+           静止   平地慢走     快跑     上楼     下楼
+静止         38      0      0      0      0
+平地慢走        0    189      0      3      4
+快跑          0      0    148      0      0
+上楼          0      0      0     94      0
+下楼          0      0      0      0    164
+
+== 跨日 2026-10-25（盲测） ==
+阈值: stand=1.134, run=4.411, pt=1.174, acp=0.720
+
+go_downstairs-1  truth=down  windows= 77 raw= 71/77  smooth= 71/77  majority=下楼
+go_downstairs-2  truth=down  windows= 85 raw= 85/85  smooth= 85/85  majority=下楼
+go_upstairs-1    truth=up    windows= 81 raw= 43/81  smooth= 46/81  majority=上楼
+go_upstairs-2    truth=up    windows= 88 raw= 32/88  smooth= 38/88  majority=上楼
+run-1            truth=run   windows= 15 raw= 15/15  smooth= 15/15  majority=快跑
+run-2            truth=run   windows= 23 raw= 23/23  smooth= 23/23  majority=快跑
+stand            truth=stand windows= 39 raw= 39/39  smooth= 39/39  majority=静止
+walk-1           truth=walk  windows=128 raw= 87/128 smooth= 92/128 majority=平地慢走
+walk-2           truth=walk  windows=168 raw= 78/168 smooth= 74/168 majority=下楼
+窗口级: raw 473/704 = 0.6719; 平滑 483/704 = 0.6861
+记录级（平滑）: 8/9
+混淆矩阵（平滑后，行=真值，列=判决）:
+           静止   平地慢走     快跑     上楼     下楼
+静止         39      0      0      0      0
+平地慢走        0    166      0      1    129
+快跑          0      0     38      0      0
+上楼          0     14      0     84     71
+下楼          0      0      0      6    156
+
+跨数据集（同日另一时段）→ data_routine: 0.9313
+跨数据集（同日另一时段）→ data_2: 0.9702
+

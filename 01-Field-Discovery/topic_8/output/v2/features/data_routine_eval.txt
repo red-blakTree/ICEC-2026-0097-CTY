@@ -1,0 +1,23 @@
+独立测试集: data_routine（640 个窗）
+阈值来源: stand=1.217, run_sd=5.566, run_peak=36.169, down_sv=4.214, up_p99=10.322
+
+2026-10-24/go_downstairs-1 truth=down  windows= 78 correct= 52 acc=0.667  votes={'下楼': 52, '上楼': 1, '平地慢走': 25}          majority=下楼
+2026-10-24/go_downstairs-2 truth=down  windows= 86 correct= 83 acc=0.965  votes={'下楼': 83, '平地慢走': 3}                    majority=下楼
+2026-10-24/go_upstairs-2 truth=up    windows= 94 correct= 57 acc=0.606  votes={'下楼': 6, '上楼': 57, '平地慢走': 31}          majority=上楼
+2026-10-24/jogging truth=run   windows=138 correct=115 acc=0.833  votes={'下楼': 23, '快跑': 115}                    majority=快跑
+2026-10-24/sprint truth=run   windows= 10 correct= 10 acc=1.000  votes={'快跑': 10}                               majority=快跑
+2026-10-24/stand-2 truth=stand windows= 38 correct= 38 acc=1.000  votes={'静止': 38}                               majority=静止
+2026-10-24/walk-3 truth=walk  windows= 38 correct= 31 acc=0.816  votes={'下楼': 7, '平地慢走': 31}                    majority=平地慢走
+2026-10-24/walk-4 truth=walk  windows= 63 correct= 45 acc=0.714  votes={'上楼': 18, '平地慢走': 45}                   majority=平地慢走
+2026-10-24/walk-5 truth=walk  windows= 95 correct= 42 acc=0.442  votes={'下楼': 43, '上楼': 10, '平地慢走': 42}         majority=下楼
+
+窗口级总准确率: 473/640 = 0.7391
+记录级（多数票）: 8/9
+
+混淆矩阵（行=真值，列=判决）:
+           静止   平地慢走     快跑     上楼     下楼
+静止         38      0      0      0      0
+平地慢走        0    118      0     28     50
+快跑          0      0    125      0     23
+上楼          0     31      0     57      6
+下楼          0     28      0      1    135

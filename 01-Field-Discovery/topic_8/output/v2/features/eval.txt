@@ -1,0 +1,26 @@
+阈值 (data/calib/data_2, 8 s 窗 / 1.0 s 步长):
+  stand     =    1.217
+  run_sd    =    5.566
+  run_peak  =   36.169
+  down_sv   =    4.214
+  up_p99    =   10.322
+
+go_downstairs  truth=down  windows= 35 correct= 35 acc=1.000  votes={'下楼': 35}                               majority=下楼
+go_upstairs    truth=up    windows= 56 correct= 56 acc=1.000  votes={'上楼': 56}                               majority=上楼
+run-1          truth=run   windows=  2 correct=  2 acc=1.000  votes={'快跑': 2}                                majority=快跑
+run-2          truth=run   windows=  7 correct=  7 acc=1.000  votes={'快跑': 7}                                majority=快跑
+stand          truth=stand windows= 22 correct= 22 acc=1.000  votes={'静止': 22}                               majority=静止
+walk-1         truth=walk  windows= 85 correct= 79 acc=0.929  votes={'下楼': 6, '平地慢走': 79}                    majority=平地慢走
+walk-2         truth=walk  windows= 95 correct= 93 acc=0.979  votes={'上楼': 2, '平地慢走': 93}                    majority=平地慢走
+
+窗口级总准确率: 294/302 = 0.9735
+记录级（多数票）: 7/7
+留一记录（run-1,run-2,walk-1,walk-2；重新标定阈值）: 171/189 = 0.9048
+
+混淆矩阵（行=真值，列=判决）:
+           静止   平地慢走     快跑     上楼     下楼
+静止         22      0      0      0      0
+平地慢走        0    172      0      2      6
+快跑          0      0      9      0      0
+上楼          0      0      0     56      0
+下楼          0      0      0      0     35

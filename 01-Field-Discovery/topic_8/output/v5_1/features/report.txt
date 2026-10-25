@@ -1,0 +1,84 @@
+v5.1 零偏校正 + 分位标定 + acp/zcr 等权打分
+下楼/非下楼判决量: rob_skew
+标定集: data/calib/data_2 + data/calib/2026-10-24（本人 PKG110）；盲测: 2026-10-25
+分位标定 q=0.02；up 打分权重固定 1（不在测试集上调）
+
+特征间隔（2 %/98 % 分位，越大越稳）:
+  sigma : stand q98=0.784 | motion q2=1.545 | 阈值 1.100
+  sigma : non-run q98=3.354 | run q2=5.064 | 阈值 4.121
+  rob_skew: walk/up q98=0.069 | down q2=0.153 | 阈值 0.111
+  pt_raw: walk/up max=1.309 | down min=1.053（v4 口径，极值标定；重叠说明它不稳）
+
+== 本人 data_2（in-sample） ==
+阈值: stand=1.100, run=4.121, down=0.111, up=0.633
+打分归一化: acp (0.729, 0.129), zcr (3.796, 0.512)
+
+go_downstairs      truth=down  windows= 35 raw= 35/35  smooth= 35/35  majority=下楼
+go_upstairs        truth=up    windows= 56 raw= 52/56  smooth= 53/56  majority=上楼
+run-1              truth=run   windows=  2 raw=  2/2   smooth=  2/2   majority=快跑
+run-2              truth=run   windows=  7 raw=  7/7   smooth=  7/7   majority=快跑
+stand              truth=stand windows= 22 raw= 22/22  smooth= 22/22  majority=静止
+walk-1             truth=walk  windows= 85 raw= 85/85  smooth= 85/85  majority=平地慢走
+walk-2             truth=walk  windows= 95 raw= 92/95  smooth= 92/95  majority=平地慢走
+窗口级: raw 295/302 = 0.9768; 平滑 296/302 = 0.9801
+记录级（平滑）: 7/7
+混淆矩阵（平滑后，行=真值，列=判决）:
+           静止   平地慢走     快跑     上楼     下楼
+静止         22      0      0      0      0
+平地慢走        0    177      0      3      0
+快跑          0      0      9      0      0
+上楼          0      3      0     53      0
+下楼          0      0      0      0     35
+
+== 本人 data/calib/2026-10-24（in-sample） ==
+阈值: stand=1.100, run=4.121, down=0.111, up=0.633
+打分归一化: acp (0.729, 0.129), zcr (3.796, 0.512)
+
+go_downstairs-1    truth=down  windows= 78 raw= 76/78  smooth= 77/78  majority=下楼
+go_downstairs-2    truth=down  windows= 86 raw= 85/86  smooth= 86/86  majority=下楼
+go_upstairs-2      truth=up    windows= 94 raw= 93/94  smooth= 94/94  majority=上楼
+jogging            truth=run   windows=138 raw=138/138 smooth=138/138 majority=快跑
+sprint             truth=run   windows= 10 raw= 10/10  smooth= 10/10  majority=快跑
+stand-2            truth=stand windows= 38 raw= 38/38  smooth= 38/38  majority=静止
+walk-3             truth=walk  windows= 38 raw= 34/38  smooth= 34/38  majority=平地慢走
+walk-4             truth=walk  windows= 63 raw= 62/63  smooth= 63/63  majority=平地慢走
+walk-5             truth=walk  windows= 95 raw= 92/95  smooth= 94/95  majority=平地慢走
+窗口级: raw 628/640 = 0.9812; 平滑 634/640 = 0.9906
+记录级（平滑）: 9/9
+混淆矩阵（平滑后，行=真值，列=判决）:
+           静止   平地慢走     快跑     上楼     下楼
+静止         38      0      0      0      0
+平地慢走        0    191      0      5      0
+快跑          0      0    148      0      0
+上楼          0      0      0     94      0
+下楼          0      0      0      1    163
+
+== 盲测 2026-10-25 ==
+阈值: stand=1.100, run=4.121, down=0.111, up=0.633
+打分归一化: acp (0.729, 0.129), zcr (3.796, 0.512)
+
+go_downstairs-1    truth=down  windows= 77 raw= 69/77  smooth= 77/77  majority=下楼
+go_downstairs-2    truth=down  windows= 85 raw= 84/85  smooth= 85/85  majority=下楼
+go_upstairs-1      truth=up    windows= 81 raw= 76/81  smooth= 78/81  majority=上楼
+go_upstairs-2      truth=up    windows= 88 raw= 71/88  smooth= 76/88  majority=上楼
+run-1              truth=run   windows= 15 raw= 15/15  smooth= 15/15  majority=快跑
+run-2              truth=run   windows= 23 raw= 23/23  smooth= 23/23  majority=快跑
+stand              truth=stand windows= 39 raw= 39/39  smooth= 39/39  majority=静止
+walk-1             truth=walk  windows=128 raw=118/128 smooth=120/128 majority=平地慢走
+walk-2             truth=walk  windows=168 raw=150/168 smooth=153/168 majority=平地慢走
+窗口级: raw 645/704 = 0.9162; 平滑 666/704 = 0.9460
+记录级（平滑）: 9/9
+混淆矩阵（平滑后，行=真值，列=判决）:
+           静止   平地慢走     快跑     上楼     下楼
+静止         39      0      0      0      0
+平地慢走        0    273      0     19      4
+快跑          0      0     38      0      0
+上楼          0      5      0    154     10
+下楼          0      0      0      0    162
+
+留一记录（全部 16 段，含上/下楼/静止）: 900/942 = 0.9554
+留一逐类: 静止 59/60  平地慢走 368/376  快跑 137/157  上楼 139/150  下楼 197/199
+留一记录（仅 data_2 walk/run，与 v4 协议一致）: 186/189 = 0.9841
+跨数据集（本人另一天）→ data_routine: 0.9484
+跨数据集（本人另一天）→ data_2: 0.9437
+
