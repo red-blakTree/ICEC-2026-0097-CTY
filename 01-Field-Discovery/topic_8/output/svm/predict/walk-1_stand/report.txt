@@ -1,0 +1,18 @@
+v7 RBF-SVM 预测（v6 特征，8 s 窗 / 1 s 步长）
+模型：output/svm/model_rbf.joblib
+  训练：2026-10-30、2026-10-31、2026-11-01，36 段 2785 窗；sklearn 1.9.1
+输入：
+  /home/binarytree/.fedora/ICEC-2026-0097-CTY/01-Field-Discovery/topic_8/data/blind/2026-10-30/walk-1
+  /home/binarytree/.fedora/ICEC-2026-0097-CTY/01-Field-Discovery/topic_8/data/blind/2026-10-31/stand
+段数 2，窗数 149
+测试时无真值；段级判决 = 每段窗级多数票；概率为 Platt 校准（probability=True，内部 5 折），仅作参考。
+
+逐段：
+日期           记录                    窗数     段级判决     平均概率   票型
+2026-10-30   walk-1                98       慢走    0.928   慢走 93 / 上楼 3 / 下楼 2
+2026-10-31   stand                 51       静止    0.987   静止 51
+
+汇总（段级，按多数票）：静止 1 段，慢走 1 段
+汇总（窗级）：慢走 93 窗（62.4%），静止 51 窗（34.2%），上楼 3 窗（2.0%），下楼 2 窗（1.3%）
+
+注：相邻窗重叠 7/8，记录级比窗口级可信。
