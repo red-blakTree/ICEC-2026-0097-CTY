@@ -26,3 +26,19 @@ D-01,picture/dormitory/dormitory-before.1.jpg,20:18,概览,-59,,2.4 GHz,7（2442
 D-01,picture/dormitory/dormitory-before.2.jpg,20:18,扫描,-55,32.2,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,扫描页距离显示 ~5.5 m
 D-02,picture/dormitory/dormitory-after.1.jpg,20:20,扫描,-74,4.2,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,扫描页距离显示 ~49.0 m
 D-02,picture/dormitory/dormitory-after.2.jpg,20:20,概览,-57,,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,172,仅 11/30 样本，与扫描页差 17 dB
+T5-01,picture/supplementary_data/514-nearfield.1.jpg,14:45,扫描,-52,-1.8,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,229,1 cm 近场；列表行 -50
+T5-01,picture/supplementary_data/514-nearfield.2.jpg,14:46,扫描,-41,13.7,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,286,1 cm 近场；列表行 -43
+T5-01,picture/supplementary_data/514-nearfield.3.jpg,14:46,扫描,-40,12.8,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,229,1 cm 近场；列表行 -42
+T5-02,picture/supplementary_data/514-513.1.jpg,14:46,概览,-67,,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,229,约 8.5 m；样本 30/30
+T5-02,picture/supplementary_data/514-513.2.jpg,14:47,扫描,-72,-15.6,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,约 8.5 m；与上一行概览差 5 dB
+,picture/supplementary_data/514-511.jpg,14:47,扫描,-75,-19.0,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,距离阶梯：514→511 前门约 17 m，非正式点位
+,picture/supplementary_data/514-509.jpg,14:48,扫描,-77,-47.8,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,距离阶梯：514→509 前门约 25.5 m；房间号已确认 509；单次扫描 SIR −47.8 异常、RSSI 存疑
+T5-03,picture/supplementary_data/514-507.jpg,14:49,扫描,-77,-35.8,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,约 34 m；列表行 -75
+T5-03,picture/supplementary_data/514-507(retest).2.jpg,14:57,扫描,-74,-33.8,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,约 34 m；列表行 -75
+T5-03,picture/supplementary_data/514-507(retest).3.jpg,14:58,扫描,-75,-29.9,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,约 34 m；列表行 -77
+T5-03,picture/supplementary_data/514-507(retest).4.jpg,14:58,扫描,-76,-29.8,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,约 34 m；列表行 -76
+T5-06,picture/supplementary_data/512(corner).jpg,15:10,扫描,-81,-29.0,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,重测，与 10-24 的 -80/-82 一致
+T5-08,picture/supplementary_data/fireproof_door.jpg,15:02,扫描,-73,-7.0,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,重测，落在 10-24 的 -69/-80 之间
+T5-05,picture/supplementary_data/in_elevator.jpg,15:10,扫描,-75,,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,重测；同屏列表把 wireless_2.4G 显示为 -52，与主卡片差 23 dB
+T5-07,picture/supplementary_data/stairs.1.jpg,15:04,扫描,-75,-3.7,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,重测；列表行 -73
+T5-07,picture/supplementary_data/stairs.2.jpg,15:04,扫描,-78,-2.0,2.4 GHz,7（2442 MHz）,a2:1e:09:30:b6:a3,,重测；列表行 -79
