@@ -1,0 +1,5 @@
+# 本地下载的 arduino-cli 二进制（36 MB，不入库）
+/02-20Days-Challenge/arduino-cli
+
+# arduino-cli 编译产物
+02-20Days-Challenge/**/build/
