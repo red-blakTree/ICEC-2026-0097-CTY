@@ -7,7 +7,7 @@
 - 上电立即拍一张，之后每小时一张，JPEG 存 SD 卡，串口打印耗时
 
 后续所有省电方案的电流/续航，都应该和这个版本对比（见
-[ESP32-CAM-极致省电方案.md](../ESP32-CAM-极致省电方案.md) 的 P0 阶段）。
+[ESP32-CAM-Ultra-Low-Power-Solution.md](../ESP32-CAM-Ultra-Low-Power-Solution.md) 的 P0 阶段）。
 
 ## 目录
 
