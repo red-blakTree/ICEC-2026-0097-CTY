@@ -70,9 +70,11 @@ arduino-cli monitor -p /dev/ttyUSB0 --config baudrate=115200
 采集周期: 3600 s
 [OK] 摄像头初始化完成
 [OK] SD 卡初始化完成
+[INFO] 功耗日志 /POWER.CSV：每 300 s 一行（电流为模型推算，非实测）
 [OK] 从 IMG_00001.jpg 开始编号
 [INFO] 上电立即拍一张，随后每小时一张
-[CAP] /IMG_00001.jpg size=48321B capture=312ms save=45ms uptime=5s
+[CAP] /IMG_00001.jpg size=48321B capture=0ms save=57ms uptime=0s
+[PWR] 0,CAPTURE,3600,-1,45.1,225.3,0.0000
 ```
 
 ## 上板验证（建议先改短周期）
@@ -87,15 +89,56 @@ arduino-cli monitor -p /dev/ttyUSB0 --config baudrate=115200
 
 ## 怎么用它测基线
 
-1. 摄像头和 SD 卡都装好，串口接上（基线测量允许串口常连）
-2. USB 电流表串在 5V 供电线上
-3. 读取 10–30 分钟的平均电流，记作 `I_avg(基线)`
-4. 连续跑满 24 小时，用电压记录仪或定时读数记下电压/电流时序
-5. 这些数据就是后续 Deep-Sleep、断电控制、降频版本的对比基准
+2. 连续跑满 24 小时，固件会同时产出 `IMG_*.jpg` 和 `/POWER.CSV`
+3. 用 `POWER.CSV` 的 `i_ma` / `e_mwh` 画电流与累计能耗时序
+4. 这些数据就是后续 Deep-Sleep、断电控制、降频版本的对比基准
 
+> **口径说明**：本版本没有电流表，`i_ma` 是「实测耗时 × 模型电流」推算出来的，
+> 未接分压时 `v5_mv` 恒为 `-1`。要拿到真正的实测电流，必须串电流表或 INA219。
 注意：本版本测的是「一直通电、CPU 全速、WiFi 关闭」的平均电流，**不含 AMS1117
 静态电流之外任何睡眠贡献**——它的 `I_sleep` 实际上就是 CPU 空转电流，这正是
 优化要打掉的量。
+
+## 功耗日志（SD 卡 `/POWER.CSV`）
+
+每 5 分钟追加一行，同时通过串口打印 `[PWR]`，不拔卡也能远程观察：
+
+| 列 | 含义 |
+|---|---|
+| `uptime_s` | 开机秒数 |
+| `event` | `SAMPLE`（5 分钟定时）/ `CAPTURE`（一次拍照） |
+| `window_s` | 该行统计的时间窗口 |
+| `v5_mv` | 5V 母线电压实测值，**未接分压时为 -1** |
+| `i_ma` | 窗口内平均电流，**模型推算值** |
+| `p_mw` | `i_ma × 电压`（未接分压时按 5000 mV 算） |
+| `e_mwh` | 累计能耗，按空转电流积分（拍照瞬间的额外能耗未计入） |
+
+模型常量在草图顶部，都是**典型值、未标定**，有电流表后按实测替换：
+
+```cpp
+static const float kModelIdleMa = 45.0f;   // 240 MHz 空转 + AMS1117 静态
+static const float kModelShotMa = 180.0f;  // 摄像头 init + JPEG 捕获
+static const float kModelSaveMa = 50.0f;   // SD 卡写入
+```
+
+### 接上分压后测电压
+
+ESP32 的 ADC 引脚只能吃 3.3V，量 5V 必须分压：
+
+```
+5V ──[100k]──┬── IO16
+             │
+          [100k]
+             │
+            GND
+```
+
+改两个常量即可启用（`kDividerRatio = (R1 + R2) / R2`）：
+
+```cpp
+static const bool  kHasVbatDivider = true;
+static const float kDividerRatio   = 2.0f;
+```
 
 ## 已知限制
 
@@ -104,5 +147,6 @@ arduino-cli monitor -p /dev/ttyUSB0 --config baudrate=115200
 - **不上传**：只存 SD 卡；需要 WiFi 上传的话另加
 - **重启会续号**：靠扫描 SD 根目录 `IMG_*.jpg` 的最大编号 +1
 - **SD 卡未插**：会每 5 秒重试初始化，不会崩溃，但也不会拍照
-- **未实测验证**：本文档与代码尚未在目标硬件上编译运行，编译命令与
-  `esp32-camera` 库版本字段（`pin_sccb_sda` 需要 2.x）均需首次上板时确认
+- **电压/电流不是实测**：没接分压就没有电压采样，`i_ma` 是模型推算值；
+  24 小时 CSV 只能算「模型推算时序」，评分要的「实测」必须靠外接电流表
+- **只在 AI-Thinker 板 + esp32 核心 3.3.12 上验证过**：换核心版本后需重新确认 FQBN 与库版本
