@@ -41,8 +41,26 @@ static const int kSdClk = 14;
 static const int kSdCmd = 15;
 static const int kSdD0  = 2;
 
+// ── 功耗日志（5V 输入端的模型电流，典型值，未标定）──
+static const float kModelIdleMa = 45.0f;   // 240 MHz 空转 + AMS1117 静态电流
+static const float kModelShotMa = 180.0f;  // 摄像头 init + JPEG 捕获
+static const float kModelSaveMa = 50.0f;   // SD 卡写入
+
+// 电压采样需要外接分压：5V ──100k── IO16 ──100k── GND
+static const bool  kHasVbatDivider = false;
+static const int   kPinVbat        = 16;
+static const float kDividerRatio   = 2.0f;
+
+static const uint32_t kPowerLogIntervalMs = 5UL * 60UL * 1000UL;
+static const char *kPowerLogPath = "/POWER.CSV";
+
+// 跑正式数据集前临时改为 true 烧一次：删除 SD 上的 IMG_*.jpg 与 POWER.CSV
+static const bool kClearDataOnBoot = false;
 static uint32_t s_next_index = 1;
 static uint32_t s_next_capture_ms = 0;
+static uint32_t s_next_log_ms = 0;
+static uint32_t s_last_sample_ms = 0;
+static float    s_energy_mwh = 0.0f;
 
 static WebServer server(80);
 
@@ -112,12 +130,110 @@ static uint32_t nextIndexFromSd() {
   return max_idx + 1;
 }
 
+static int readV5Mv() {
+  if (!kHasVbatDivider) {
+    return -1;
+  }
+  return (int)(analogReadMilliVolts(kPinVbat) * kDividerRatio + 0.5f);
+}
+
+static void accumulateEnergy() {
+  uint32_t now = millis();
+  uint32_t dt_ms = now - s_last_sample_ms;
+  s_last_sample_ms = now;
+  int mv = readV5Mv();
+  float v = (mv > 0) ? mv / 1000.0f : 5.0f;
+  s_energy_mwh += kModelIdleMa * v * ((float)dt_ms / 3600000.0f);
+}
+
+static void powerLogHeaderIfNeeded() {
+  if (SD_MMC.exists(kPowerLogPath)) {
+    return;
+  }
+  File f = SD_MMC.open(kPowerLogPath, FILE_WRITE);
+  if (!f) {
+    Serial.printf("[WARN] 无法创建 %s\n", kPowerLogPath);
+    return;
+  }
+  f.print("uptime_s,event,window_s,v5_mv,i_ma,p_mw,e_mwh\n");
+  f.close();
+}
+
+// i_ma 是 window_s 窗口内的平均电流，由模型推算，不是实测值
+static void powerLogAppend(const char *event, uint32_t window_s, float i_ma) {
+  int mv = readV5Mv();
+  float v = (mv > 0) ? mv / 1000.0f : 5.0f;
+  char line[128];
+  snprintf(line, sizeof(line), "%lu,%s,%lu,%d,%.1f,%.1f,%.4f\n",
+           (unsigned long)(millis() / 1000), event, (unsigned long)window_s,
+           mv, i_ma, i_ma * v, s_energy_mwh);
+  File f = SD_MMC.open(kPowerLogPath, FILE_APPEND);
+  if (!f) {
+    return;
+  }
+  f.print(line);
+  f.close();
+  Serial.printf("[PWR] %s", line);
+}
+
+static void powerLogSample() {
+  accumulateEnergy();
+  powerLogAppend("SAMPLE", kPowerLogIntervalMs / 1000, kModelIdleMa);
+}
+
+static float cycleAverageMa(uint32_t shot_ms, uint32_t save_ms) {
+  float period_s = kCaptureIntervalMs / 1000.0f;
+  float shot_s = shot_ms / 1000.0f;
+  float save_s = save_ms / 1000.0f;
+  float idle_s = period_s - shot_s - save_s;
+  if (idle_s < 0) {
+    idle_s = 0;
+  }
+  return (kModelShotMa * shot_s + kModelSaveMa * save_s + kModelIdleMa * idle_s) / period_s;
+}
+
+// 删一个数据文件（IMG_*.jpg 或 POWER.CSV），每次重新遍历目录，避免边遍历边删
+static bool deleteOneDataFile() {
+  File root = SD_MMC.open("/");
+  if (!root) {
+    return false;
+  }
+  bool deleted = false;
+  for (File f = root.openNextFile(); f; f = root.openNextFile()) {
+    const char *name = f.name();
+    const char *base = strrchr(name, '/');
+    base = base ? base + 1 : name;
+    bool match = (strncmp(base, "IMG_", 4) == 0) || (strcmp(base, "POWER.CSV") == 0);
+    f.close();
+    if (match) {
+      SD_MMC.remove(String("/") + base);
+      deleted = true;
+      break;
+    }
+  }
+  root.close();
+  return deleted;
+}
+
+static void clearDataIfRequested() {
+  if (!kClearDataOnBoot) {
+    return;
+  }
+  uint32_t removed = 0;
+  while (deleteOneDataFile()) {
+    removed++;
+  }
+  Serial.printf("[CLEAN] 已删除 %lu 个文件，编号从 IMG_00001.jpg 重新开始\n",
+                (unsigned long)removed);
+}
 static bool captureOnce() {
+  uint32_t t_start = millis();
   camera_fb_t *fb = esp_camera_fb_get();
   if (!fb) {
     Serial.println("[ERR] 拍照失败（esp_camera_fb_get 返回 NULL）");
     return false;
   }
+  uint32_t t_shot = millis();
 
   char path[32];
   snprintf(path, sizeof(path), "/IMG_%05lu.jpg", (unsigned long)s_next_index);
@@ -129,6 +245,7 @@ static bool captureOnce() {
   }
   size_t written = f.write(fb->buf, fb->len);
   f.close();
+  uint32_t t_saved = millis();
   size_t size = fb->len;
   esp_camera_fb_return(fb);
 
@@ -136,8 +253,13 @@ static bool captureOnce() {
     Serial.printf("[ERR] %s 写入不完整 %u/%u\n", path, (unsigned)written, (unsigned)size);
     return false;
   }
-  Serial.printf("[CAP] %s size=%luB %s\n", path, (unsigned long)size,
-                fmtTime(time(nullptr)).c_str());
+
+  uint32_t shot_ms = t_shot - t_start;
+  uint32_t save_ms = t_saved - t_shot;
+  Serial.printf("[CAP] %s size=%luB %s capture=%lums save=%lums\n", path,
+                (unsigned long)size, fmtTime(time(nullptr)).c_str(),
+                (unsigned long)shot_ms, (unsigned long)save_ms);
+  powerLogAppend("CAPTURE", kCaptureIntervalMs / 1000, cycleAverageMa(shot_ms, save_ms));
   s_next_index++;
   return true;
 }
@@ -270,6 +392,11 @@ void setup() {
   s_next_index = nextIndexFromSd();
   Serial.printf("[OK] 下一张编号 IMG_%05lu.jpg\n", (unsigned long)s_next_index);
 
+  clearDataIfRequested();
+  powerLogHeaderIfNeeded();
+  s_last_sample_ms = millis();
+  s_next_log_ms = millis() + kPowerLogIntervalMs;
+
   connectWifi();
   syncClock();
   captureOnce();
@@ -285,6 +412,11 @@ void setup() {
 
 void loop() {
   server.handleClient();
+
+  if ((int32_t)(millis() - s_next_log_ms) >= 0) {
+    powerLogSample();
+    s_next_log_ms += kPowerLogIntervalMs;
+  }
 
   if ((int32_t)(millis() - s_next_capture_ms) < 0) {
     return;

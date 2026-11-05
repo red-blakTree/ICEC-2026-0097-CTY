@@ -7,6 +7,9 @@
 > 干完就睡），所以对比的是「同样开着 WiFi，谁更省」。
 > WiFi 完全关闭的版本是 [esp32cam-baseline](../esp32cam-baseline/README.md)，只作为下限参考。
 
+- 每 5 分钟向 SD 卡 `/POWER.CSV` 追加一行功耗日志（模型推算，电压需外接分压才可测）
+- 跑正式数据集前，把 `kClearDataOnBoot` 临时改 `true` 烧一次清卡，再改回
+
 ## 凭据
 
 WiFi 账号密码放 `viewer/secrets.h`（已 gitignore，不会进仓库）：
