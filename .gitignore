@@ -3,3 +3,6 @@
 
 # arduino-cli 编译产物
 02-20Days-Challenge/**/build/
+
+# arduino-cli 本地数据目录（沙箱内重定向到工作区）
+/02-20Days-Challenge/.arduino/
