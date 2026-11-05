@@ -6,3 +6,6 @@
 
 # arduino-cli 本地数据目录（沙箱内重定向到工作区）
 /02-20Days-Challenge/.arduino/
+
+# 本地 WiFi 凭据
+**/secrets.h
