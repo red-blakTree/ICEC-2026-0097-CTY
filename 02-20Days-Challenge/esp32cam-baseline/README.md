@@ -1,13 +1,18 @@
-# ESP32-CAM 基础采集（P0 功耗基线）
+# ESP32-CAM 基础采集（WiFi 关闭，下限参考）
 
-项目一「智能终端极致省电」的**对照基线**：一小时拍一张照，存 SD 卡，其余什么都不做。
+项目一「智能终端极致省电」的**下限参考**：一小时拍一张照，存 SD 卡，其余什么都不做。
+
+> **这不是主基线**。主基线是 [esp32cam-viewer](../esp32cam-viewer/README.md)（WiFi 常开 +
+> 网页可查），因为后续省电方案仍会保留 WiFi。本固件只关掉 WiFi，用来标出
+> 「WiFi 完全不开」时能到多低，作为下限参考。
 
 - 不降频、不进任何睡眠、不做外设断电、WiFi 全程关闭
 - CPU 240 MHz 空转，`millis()` 轮询等一小时
 - 上电立即拍一张，之后每小时一张，JPEG 存 SD 卡，串口打印耗时
+- 每 5 分钟向 SD 卡 `/POWER.CSV` 追加一行功耗日志（电压需外接分压才可测）
 
-后续所有省电方案的电流/续航，都应该和这个版本对比（见
-[ESP32-CAM-Ultra-Low-Power-Solution.md](../ESP32-CAM-Ultra-Low-Power-Solution.md) 的 P0 阶段）。
+对比口径见 [ESP32-CAM-Ultra-Low-Power-Solution.md](../ESP32-CAM-Ultra-Low-Power-Solution.md)
+的第五章 P0 段。
 
 ## 目录
 
