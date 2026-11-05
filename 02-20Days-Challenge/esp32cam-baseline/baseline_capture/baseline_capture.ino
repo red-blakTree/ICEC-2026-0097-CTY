@@ -55,6 +55,9 @@ static const float kDividerRatio   = 2.0f;  // (R1 + R2) / R2
 static const uint32_t kPowerLogIntervalMs = 5UL * 60UL * 1000UL;
 static const char *kPowerLogPath = "/POWER.CSV";
 
+// 跑正式数据集前临时改为 true 烧一次：删除 SD 上的 IMG_*.jpg 与 POWER.CSV
+static const bool kClearDataOnBoot = false;
+
 static uint32_t s_next_index = 1;       // 下一张照片的编号，启动时从 SD 卡已有文件续号
 static uint32_t s_next_capture_ms = 0;  // 下一张照片的毫秒时刻
 static uint32_t s_next_log_ms = 0;      // 下一次功耗采样的毫秒时刻
@@ -195,6 +198,40 @@ static float cycleAverageMa(uint32_t shot_ms, uint32_t save_ms) {
   }
   return (kModelShotMa * shot_s + kModelSaveMa * save_s + kModelIdleMa * idle_s) / period_s;
 }
+// 删一个数据文件（IMG_*.jpg 或 POWER.CSV），每次重新遍历目录，避免边遍历边删
+static bool deleteOneDataFile() {
+  File root = SD_MMC.open("/");
+  if (!root) {
+    return false;
+  }
+  bool deleted = false;
+  for (File f = root.openNextFile(); f; f = root.openNextFile()) {
+    const char *name = f.name();
+    const char *base = strrchr(name, '/');
+    base = base ? base + 1 : name;
+    bool match = (strncmp(base, "IMG_", 4) == 0) || (strcmp(base, "POWER.CSV") == 0);
+    f.close();
+    if (match) {
+      SD_MMC.remove(String("/") + base);
+      deleted = true;
+      break;
+    }
+  }
+  root.close();
+  return deleted;
+}
+
+static void clearDataIfRequested() {
+  if (!kClearDataOnBoot) {
+    return;
+  }
+  uint32_t removed = 0;
+  while (deleteOneDataFile()) {
+    removed++;
+  }
+  Serial.printf("[CLEAN] 已删除 %lu 个文件，编号从 IMG_00001.jpg 重新开始\n",
+                (unsigned long)removed);
+}
 
 static void captureOnce() {
   uint32_t t_start = millis();
@@ -262,6 +299,8 @@ void setup() {
     }
   }
   Serial.println("[OK] SD 卡初始化完成");
+
+  clearDataIfRequested();
 
   powerLogHeaderIfNeeded();
   s_last_sample_ms = millis();
