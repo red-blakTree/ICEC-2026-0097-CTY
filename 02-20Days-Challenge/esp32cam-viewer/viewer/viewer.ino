@@ -333,6 +333,29 @@ static void handleCapture() {
               ok ? "{\"ok\":true}" : "{\"ok\":false}");
 }
 
+// 清空 SD 卡数据并重新开始一轮测试（POST，避免被误触发）
+static void handleReset() {
+  uint32_t removed = 0;
+  while (deleteOneDataFile()) {
+    removed++;
+  }
+  powerLogHeaderIfNeeded();
+
+  s_next_index = 1;
+  s_energy_mwh = 0.0f;
+  s_last_sample_ms = millis();
+  s_next_log_ms = millis() + kPowerLogIntervalMs;
+  Serial.printf("[RESET] 已清空 %lu 个文件，测试从 IMG_00001 重新开始\n",
+                (unsigned long)removed);
+
+  captureOnce();
+  s_next_capture_ms = millis() + kCaptureIntervalMs;
+
+  char body[64];
+  snprintf(body, sizeof(body), "{\"ok\":true,\"removed\":%lu}", (unsigned long)removed);
+  server.send(200, "application/json", body);
+}
+
 // 其余路径按 SD 卡上的文件流式返回（照片、POWER.CSV）
 static void handleFile() {
   String path = server.uri();
@@ -392,6 +415,7 @@ void setup() {
   server.on("/", handleRoot);
   server.on("/api.json", handleApi);
   server.on("/capture", handleCapture);
+  server.on("/reset", HTTP_POST, handleReset);
   server.onNotFound(handleFile);
   server.begin();
   Serial.printf("[WEB] http://%s/\n", WiFi.localIP().toString().c_str());

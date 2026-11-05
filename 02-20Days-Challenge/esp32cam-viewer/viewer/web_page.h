@@ -21,6 +21,7 @@ h1{margin:0;font-size:15px;font-weight:650;letter-spacing:.4px;display:flex;alig
 .btn{color:var(--text);text-decoration:none;border:1px solid var(--line);padding:6px 12px;
   border-radius:8px;font-size:13px;transition:.15s}
 .btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.danger:hover{border-color:#e55353;color:#e55353}
 main{padding:20px;display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;
   transition:transform .15s,border-color .15s;animation:in .25s ease-out}
@@ -42,6 +43,7 @@ main{padding:20px;display:grid;gap:16px;grid-template-columns:repeat(auto-fill,m
   <span class="spacer"></span>
   <a class="btn" href="/POWER.CSV">下载 POWER.CSV</a>
   <a class="btn" id="shot" href="/capture">立即拍一张</a>
+  <a class="btn danger" id="reset" href="#">重置测试</a>
 </header>
 <main id="grid"><div class="empty">加载中…</div></main>
 <script>
@@ -81,6 +83,14 @@ document.getElementById('shot').onclick=async e=>{
   try{ await fetch('/capture',{cache:'no-store'}); }catch(err){}
   await tick();
   b.textContent='立即拍一张'; delete b.dataset.busy;
+};
+document.getElementById('reset').onclick=async e=>{
+  e.preventDefault();
+  if(!confirm('删除 SD 卡上所有照片和 POWER.CSV，并从 IMG_00001 重新开始？\n此操作不可撤销。'))return;
+  const b=e.currentTarget;
+  b.textContent='重置中…'; b.style.pointerEvents='none';
+  try{ await fetch('/reset',{method:'POST',cache:'no-store'}); }catch(err){}
+  location.reload();
 };
 tick(); setInterval(tick,1000);
 </script>
