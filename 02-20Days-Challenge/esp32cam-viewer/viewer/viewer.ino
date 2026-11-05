@@ -286,23 +286,103 @@ static void syncClock() {
   Serial.printf("[TIME] %s\n", fmtTime(time(nullptr)).c_str());
 }
 
-static void handleRoot() {
-  static const int kMaxListed = 32;
-  String names[kMaxListed];
-  size_t sizes[kMaxListed];
-  time_t shots[kMaxListed];
-  int count = 0;
+static const char kIndexHtml[] PROGMEM = R"HTML(<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ESP32-CAM 采集</title>
+<style>
+:root{--bg:#0e1014;--card:#161a21;--line:#252a34;--text:#e7eaf0;--muted:#8b93a5;--accent:#4f8cff;--ok:#3ecf8e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+  font:14px/1.55 system-ui,-apple-system,"Segoe UI","Noto Sans SC",sans-serif;
+  background-image:radial-gradient(1200px 600px at 80% -10%,rgba(79,140,255,.10),transparent)}
+header{position:sticky;top:0;z-index:9;display:flex;flex-wrap:wrap;gap:14px;align-items:center;
+  padding:14px 20px;border-bottom:1px solid var(--line);
+  background:rgba(14,16,20,.82);backdrop-filter:blur(10px)}
+h1{margin:0;font-size:15px;font-weight:650;letter-spacing:.4px;display:flex;align-items:center;gap:8px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(62,207,142,.16)}
+.stat{color:var(--muted);font-size:13px;white-space:nowrap}
+.stat b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums;margin-left:4px}
+.spacer{flex:1}
+.btn{color:var(--text);text-decoration:none;border:1px solid var(--line);padding:6px 12px;
+  border-radius:8px;font-size:13px;transition:.15s}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+main{padding:20px;display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;
+  transition:transform .15s,border-color .15s;animation:in .25s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card:hover{transform:translateY(-2px);border-color:var(--accent)}
+.card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#0a0c0f}
+.meta{padding:10px 12px}
+.name{font-size:13px;font-weight:600}
+.sub{color:var(--muted);font-size:12px;margin-top:2px;font-variant-numeric:tabular-nums}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:48px}
+</style>
+</head><body>
+<header>
+  <h1><span class="dot"></span>ESP32-CAM 采集</h1>
+  <div class="stat">IP<b id="ip">-</b></div>
+  <div class="stat">现在<b id="now">-</b></div>
+  <div class="stat">运行<b id="up">-</b></div>
+  <div class="stat">照片<b id="cnt">-</b></div>
+  <span class="spacer"></span>
+  <a class="btn" href="/POWER.CSV">下载 POWER.CSV</a>
+  <a class="btn" href="/capture">立即拍一张</a>
+</header>
+<main id="grid"><div class="empty">加载中…</div></main>
+<script>
+const grid=document.getElementById('grid');
+const el=id=>document.getElementById(id);
+let ready=false;
+const fmtUp=s=>{const h=(s/3600)|0,m=((s%3600)/60)|0;return h?h+'h '+m+'m':m+'m '+(s%60)+'s';};
+async function tick(){
+  try{
+    const d=await (await fetch('/api.json',{cache:'no-store'})).json();
+    el('ip').textContent=d.ip; el('now').textContent=d.now;
+    el('up').textContent=fmtUp(d.uptime); el('cnt').textContent=d.count;
+    if(!ready){grid.innerHTML='';ready=true;}
+    if(!d.count){grid.innerHTML='<div class="empty">还没有照片</div>';return;}
+    for(const f of d.files){
+      let c=document.getElementById(f.name);
+      const sub=f.time+' · '+(f.size/1024).toFixed(1)+' KB';
+      if(!c){
+        c=document.createElement('div'); c.className='card'; c.id=f.name;
+        c.innerHTML='<a href="/'+f.name+'"><img loading="lazy" src="/'+f.name+'"></a>'+
+          '<div class="meta"><div class="name">'+f.name+'</div><div class="sub">'+sub+'</div></div>';
+        grid.prepend(c);
+      }else{
+        c.querySelector('.sub').textContent=sub;
+      }
+    }
+  }catch(e){}
+}
+tick(); setInterval(tick,8000);
+</script>
+</body></html>)HTML";
 
+// 状态 + 照片列表，供网页每 8 秒拉取一次；按目录顺序返回，新图由前端插到最前
+static void handleApi() {
+  String json;
+  json.reserve(3072);
+  json += "{\"ip\":\"" + WiFi.localIP().toString() + "\",\"now\":\"" +
+          fmtTime(time(nullptr)) + "\",\"uptime\":" + String(millis() / 1000) +
+          ",\"files\":[";
+
+  int count = 0;
   File root = SD_MMC.open("/");
   if (root) {
-    for (File f = root.openNextFile(); f && count < kMaxListed; f = root.openNextFile()) {
+    for (File f = root.openNextFile(); f; f = root.openNextFile()) {
       const char *name = f.name();
       const char *base = strrchr(name, '/');
       base = base ? base + 1 : name;
       if (strncmp(base, "IMG_", 4) == 0) {
-        names[count] = String(base);
-        sizes[count] = f.size();
-        shots[count] = f.getLastWrite();
+        if (count) {
+          json += ",";
+        }
+        json += "{\"name\":\"" + String(base) + "\",\"size\":" +
+                String((unsigned long)f.size()) + ",\"time\":\"" +
+                fmtTime(f.getLastWrite()) + "\"}";
         count++;
       }
       f.close();
@@ -310,32 +390,12 @@ static void handleRoot() {
     root.close();
   }
 
-  String page;
-  page.reserve(6144);
-  page += F("<!doctype html><meta charset=utf-8><title>ESP32-CAM 采集</title>");
-  page += F("<style>body{font-family:sans-serif;margin:16px}"
-            "table{border-collapse:collapse}"
-            "td,th{padding:4px 10px;border-bottom:1px solid #ddd;font-size:14px}"
-            "img{display:block;border:1px solid #ccc}</style>");
-  page += F("<h2>ESP32-CAM 采集查看</h2>");
-  page += "<p>IP " + WiFi.localIP().toString() + " ｜ 现在 " +
-          fmtTime(time(nullptr)) + " ｜ 运行 " + String(millis() / 1000) + " s</p>";
-  page += F("<p><a href=\"/POWER.CSV\">下载 POWER.CSV</a> ｜ "
-            "<a href=\"/capture\">立即拍一张</a></p>");
+  json += "],\"count\":" + String(count) + "}";
+  server.send(200, "application/json", json);
+}
 
-  if (count == 0) {
-    page += F("<p>还没有照片。</p>");
-  } else {
-    page += F("<table><tr><th>文件</th><th>大小</th><th>拍摄时间</th><th>预览</th></tr>");
-    for (int i = count - 1; i >= 0; i--) {
-      page += "<tr><td><a href=\"/" + names[i] + "\">" + names[i] + "</a></td><td>" +
-              String((unsigned long)sizes[i]) + " B</td><td>" + fmtTime(shots[i]) +
-              "</td><td><a href=\"/" + names[i] + "\"><img src=\"/" + names[i] +
-              "\" width=\"200\"></a></td></tr>";
-    }
-    page += F("</table>");
-  }
-  server.send(200, "text/html; charset=utf-8", page);
+static void handleRoot() {
+  server.send_P(200, "text/html; charset=utf-8", kIndexHtml);
 }
 
 static void handleCapture() {
@@ -402,6 +462,7 @@ void setup() {
   captureOnce();
 
   server.on("/", handleRoot);
+  server.on("/api.json", handleApi);
   server.on("/capture", handleCapture);
   server.onNotFound(handleFile);
   server.begin();
