@@ -336,7 +336,10 @@ const grid=document.getElementById('grid');
 const el=id=>document.getElementById(id);
 let ready=false;
 const fmtUp=s=>{const h=(s/3600)|0,m=((s%3600)/60)|0;return h?h+'h '+m+'m':m+'m '+(s%60)+'s';};
+let busy=false;
 async function tick(){
+  if(busy)return;
+  busy=true;
   try{
     const d=await (await fetch('/api.json',{cache:'no-store'})).json();
     el('ip').textContent=d.ip; el('now').textContent=d.now;
@@ -355,9 +358,9 @@ async function tick(){
         c.querySelector('.sub').textContent=sub;
       }
     }
-  }catch(e){}
+  }catch(e){}finally{busy=false;}
 }
-tick(); setInterval(tick,8000);
+tick(); setInterval(tick,1000);
 </script>
 </body></html>)HTML";
 
