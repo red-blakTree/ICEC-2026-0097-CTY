@@ -40,7 +40,7 @@ main{padding:20px;display:grid;gap:16px;grid-template-columns:repeat(auto-fill,m
   <div class="stat">照片<b id="cnt">-</b></div>
   <span class="spacer"></span>
   <a class="btn" href="/POWER.CSV">下载 POWER.CSV</a>
-  <a class="btn" href="/capture">立即拍一张</a>
+  <a class="btn" id="shot" href="/capture">立即拍一张</a>
 </header>
 <main id="grid"><div class="empty">加载中…</div></main>
 <script>
@@ -72,6 +72,15 @@ async function tick(){
     }
   }catch(e){}finally{busy=false;}
 }
+document.getElementById('shot').onclick=async e=>{
+  e.preventDefault();
+  const b=e.currentTarget;
+  if(b.dataset.busy)return;
+  b.dataset.busy='1'; b.textContent='拍摄中…';
+  try{ await fetch('/capture',{cache:'no-store'}); }catch(err){}
+  await tick();
+  b.textContent='立即拍一张'; delete b.dataset.busy;
+};
 tick(); setInterval(tick,1000);
 </script>
 </body></html>

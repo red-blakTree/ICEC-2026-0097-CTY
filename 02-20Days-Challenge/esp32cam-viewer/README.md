@@ -64,7 +64,7 @@ arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32cam esp32cam-viewer/v
 | `/api.json` | 状态 + 照片列表（JSON），网页每 1 秒拉一次 |
 | `/IMG_xxxxx.jpg` | 原图 |
 | `/POWER.CSV` | 下载功耗日志 |
-| `/capture` | 立即拍一张（不用等一小时） |
+| `/capture` | 立即拍一张，返回 `{"ok":true}`；页面上点按钮是原地刷新，不跳转 |
 
 页面不整页刷新：每 1 秒请求一次 `/api.json`，新照片才建卡片插到最前，
 已有的卡片只更新时间与大小，所以看图过程中不会闪、也不会重复下载图片。

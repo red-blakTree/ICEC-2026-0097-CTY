@@ -328,9 +328,9 @@ static void handleRoot() {
 
 static void handleCapture() {
   bool ok = captureOnce();
-  server.send(200, "text/html; charset=utf-8",
-              ok ? "<meta charset=utf-8><p>已拍一张，<a href=\"/\">回去看</a></p>"
-                 : "<meta charset=utf-8><p>拍照失败，看串口日志</p>");
+  // 前端点按钮后 fetch 这个地址，拍完直接刷新当前页，不跳转
+  server.send(ok ? 200 : 500, "application/json",
+              ok ? "{\"ok\":true}" : "{\"ok\":false}");
 }
 
 // 其余路径按 SD 卡上的文件流式返回（照片、POWER.CSV）
