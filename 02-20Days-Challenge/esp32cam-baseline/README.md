@@ -34,8 +34,8 @@ arduino-cli lib install "esp32-camera"
 ```bash
 cd 02-20Days-Challenge/esp32cam-baseline
 
-# 注意 PSRAM=enabled 不能省：AI-Thinker 板默认关闭 PSRAM，不开则 SVGA 存图会失败
-arduino-cli compile --fqbn esp32:esp32:esp32cam:PSRAM=enabled baseline_capture
+# esp32 核心 3.3.x 的 esp32cam 板已硬编码 -DBOARD_HAS_PSRAM，没有 PSRAM 菜单项，不需要额外参数
+arduino-cli compile --fqbn esp32:esp32:esp32cam baseline_capture
 ```
 
 ## 烧录
@@ -54,7 +54,7 @@ ESP32-CAM 没有板载 USB 口，需要用 USB-TTL 转接板：
 
 ```bash
 arduino-cli upload -p /dev/ttyUSB0 \
-  --fqbn esp32:esp32:esp32cam:PSRAM=enabled baseline_capture
+  --fqbn esp32:esp32:esp32cam baseline_capture
 ```
 
 3. 拔掉 GPIO0 的 GND，按一下 RST，串口监视器看日志：
