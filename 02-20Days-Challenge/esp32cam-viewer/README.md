@@ -19,6 +19,25 @@ static const char *kWifiSsid = "...";
 static const char *kWifiPass = "...";
 ```
 
+## 目录
+
+```
+esp32cam-viewer/viewer/
+├─ viewer.ino          # 采集 + Web 服务器逻辑
+├─ web/
+│   ├─ index.html      # 网页源码（改这个）
+│   └─ build_header.py # 把 index.html 打包成 web_page.h
+├─ web_page.h          # 由脚本生成，别手改
+└─ secrets.h           # WiFi 凭据（已 gitignore）
+```
+
+网页是普通 HTML/CSS/JS，改完跑一次：
+
+```bash
+cd 02-20Days-Challenge/esp32cam-viewer/viewer
+python3 web/build_header.py     # → 生成 web_page.h
+```
+
 ## 编译与烧录
 
 ```bash
