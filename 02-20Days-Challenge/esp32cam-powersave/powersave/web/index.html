@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ESP32-CAM 省电版</title>
+<style>
+:root{--bg:#0e1014;--card:#161a21;--line:#252a34;--text:#e7eaf0;--muted:#8b93a5;--accent:#4f8cff;--ok:#3ecf8e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+  font:14px/1.55 system-ui,-apple-system,"Segoe UI","Noto Sans SC",sans-serif;
+  background-image:radial-gradient(1200px 600px at 80% -10%,rgba(79,140,255,.10),transparent)}
+header{position:sticky;top:0;z-index:9;display:flex;flex-wrap:wrap;gap:14px;align-items:center;
+  padding:14px 20px;border-bottom:1px solid var(--line);
+  background:rgba(14,16,20,.82);backdrop-filter:blur(10px)}
+h1{margin:0;font-size:15px;font-weight:650;letter-spacing:.4px;display:flex;align-items:center;gap:8px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(62,207,142,.16)}
+.stat{color:var(--muted);font-size:13px;white-space:nowrap}
+.stat b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums;margin-left:4px}
+.spacer{flex:1}
+.btn{color:var(--text);text-decoration:none;border:1px solid var(--line);padding:6px 12px;
+  border-radius:8px;font-size:13px;transition:.15s}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.danger:hover{border-color:#e55353;color:#e55353}
+main{padding:20px;display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;
+  transition:transform .15s,border-color .15s;animation:in .25s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card:hover{transform:translateY(-2px);border-color:var(--accent)}
+.card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#0a0c0f}
+.meta{padding:10px 12px}
+.name{font-size:13px;font-weight:600}
+.sub{color:var(--muted);font-size:12px;margin-top:2px;font-variant-numeric:tabular-nums}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:48px}
+</style>
+</head><body>
+<header>
+  <h1><span class="dot"></span>ESP32-CAM 省电版</h1>
+  <div class="stat">IP<b id="ip">-</b></div>
+  <div class="stat">WiFi 剩余<b id="left">-</b></div>
+  <div class="stat">现在<b id="now">-</b></div>
+  <div class="stat">运行<b id="up">-</b></div>
+  <div class="stat">照片<b id="cnt">-</b></div>
+  <span class="spacer"></span>
+  <a class="btn" href="/POWER.CSV">下载 POWER.CSV</a>
+  <a class="btn" id="shot" href="/capture">立即拍一张</a>
+  <a class="btn danger" id="reset" href="#">重置测试</a>
+</header>
+<main id="grid"><div class="empty">加载中…</div></main>
+<script>
+const grid=document.getElementById('grid');
+const el=id=>document.getElementById(id);
+let ready=false;
+const fmtUp=s=>{const h=(s/3600)|0,m=((s%3600)/60)|0;return h?h+'h '+m+'m':m+'m '+(s%60)+'s';};
+const fmtLeft=s=>{const m=(s/60)|0,ss=s%60;return m+'m '+String(ss).padStart(2,'0')+'s';};
+let busy=false;
+async function tick(){
+  if(busy)return;
+  busy=true;
+  try{
+    const d=await (await fetch('/api.json',{cache:'no-store'})).json();
+    el('ip').textContent=d.ip; el('now').textContent=d.now;
+    el('left').textContent=fmtLeft(d.window_left);
+    el('up').textContent=fmtUp(d.uptime); el('cnt').textContent=d.count;
+    if(!ready){grid.innerHTML='';ready=true;}
+    if(!d.count){grid.innerHTML='<div class="empty">还没有照片</div>';return;}
+    for(const f of d.files){
+      let c=document.getElementById(f.name);
+      const sub=f.time+' · '+(f.size/1024).toFixed(1)+' KB';
+      if(!c){
+        c=document.createElement('div'); c.className='card'; c.id=f.name;
+        c.innerHTML='<a href="/'+f.name+'"><img loading="lazy" src="/'+f.name+'"></a>'+
+          '<div class="meta"><div class="name">'+f.name+'</div><div class="sub">'+sub+'</div></div>';
+        grid.prepend(c);
+      }else{
+        c.querySelector('.sub').textContent=sub;
+      }
+    }
+  }catch(e){
+    // 15 分钟窗口结束后设备会关掉 WiFi，页面自然会请求失败
+    el('ip').textContent='已断开'; el('left').textContent='窗口已关闭';
+  }finally{busy=false;}
+}
+document.getElementById('shot').onclick=async e=>{
+  e.preventDefault();
+  const b=e.currentTarget;
+  if(b.dataset.busy)return;
+  b.dataset.busy='1'; b.textContent='拍摄中…';
+  try{ await fetch('/capture',{cache:'no-store'}); }catch(err){}
+  await tick();
+  b.textContent='立即拍一张'; delete b.dataset.busy;
+};
+document.getElementById('reset').onclick=async e=>{
+  e.preventDefault();
+  if(!confirm('删除 SD 卡上所有照片和 POWER.CSV，并从 IMG_00001 重新开始？\n此操作不可撤销。'))return;
+  const b=e.currentTarget;
+  b.textContent='重置中…'; b.style.pointerEvents='none';
+  try{ await fetch('/reset',{method:'POST',cache:'no-store'}); }catch(err){}
+  location.reload();
+};
+tick(); setInterval(tick,1000);
+</script>
+</body></html>
