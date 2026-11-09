@@ -9,7 +9,7 @@
  *   恢复时间 → 初始化摄像头/SD → 拍一张存 SD → 继续深睡，不连 WiFi
  *
  * 重新上电（EN 复位 / 断电再上电）：
- *   自动清空 SD 数据后复位一次，复位后按冷启动流程从 IMG_00001 重新开始
+ *   自动复位一次，不清空 SD 数据，复位后按已有编号继续采集
  *
  * 相对 esp32cam-viewer 多了：深睡占空比、摄像头 PWDN 断电保持、睡眠前卸载 SD、
  * 睡眠能耗计入 POWER.CSV。采集逻辑与网页不变。
@@ -252,19 +252,6 @@ static bool deleteOneDataFile() {
   return deleted;
 }
 
-// 重新上电（EN 复位 / 断电再上电）自动重置测试：清空 SD 数据后复位一次。
-// 复位后的复位原因是软复位，不会再次进入这里，因此不会死循环。
-static void resetTestOnPowerOn() {
-  uint32_t removed = 0;
-  while (deleteOneDataFile()) {
-    removed++;
-  }
-  Serial.printf("[RESET] 重新上电，已清空 %lu 个文件，自动复位开始新测试\n",
-                (unsigned long)removed);
-  Serial.flush();
-  ESP.restart();
-}
-
 static bool captureOnce() {
   uint32_t t_start = millis();
   camera_fb_t *fb = esp_camera_fb_get();
@@ -505,6 +492,13 @@ void setup() {
   delay(200);
   applyTimeZone();
 
+  // 重新上电只复位一次，不清空 SD 数据；复位后按冷启动流程继续采集
+  if (esp_reset_reason() == ESP_RST_POWERON) {
+    Serial.println("[RESET] 重新上电，自动复位（保留 SD 数据）");
+    Serial.flush();
+    ESP.restart();
+  }
+
   pinMode(CAM_PIN_FLASH, OUTPUT);
   digitalWrite(CAM_PIN_FLASH, LOW);
 
@@ -525,10 +519,6 @@ void setup() {
   }
   Serial.println("[OK] SD 卡初始化完成");
 
-  // 重新上电（EN 复位 / 断电再上电）：自动清空 SD 数据并复位一次
-  if (esp_reset_reason() == ESP_RST_POWERON) {
-    resetTestOnPowerOn();  // 不返回
-  }
   s_next_index = nextIndexFromSd();
   Serial.printf("[OK] 下一张编号 IMG_%05lu.jpg\n", (unsigned long)s_next_index);
 
