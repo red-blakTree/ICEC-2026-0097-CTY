@@ -11,7 +11,8 @@
  * 相对 esp32cam-viewer 多了：深睡占空比、摄像头 PWDN 断电保持、睡眠前卸载 SD、
  * 睡眠能耗计入 POWER.CSV。采集逻辑与网页不变。
  *
- * 窗口结束后网页不可用；要再看网页必须断电重启（重启会重新开 15 分钟窗口）。
+ * 窗口结束后网页不可用；要再看网页必须重启（断电或点网页「重置测试」都会重开 15 分钟窗口，
+ * 后者会先清空 SD 数据并自动复位）。
  *
  * 板卡：AI-Thinker ESP32-CAM
  * FQBN：esp32:esp32:esp32cam:PSRAM=enabled（PSRAM 必须开启）
@@ -428,27 +429,20 @@ static void handleCapture() {
               ok ? "{\"ok\":true}" : "{\"ok\":false}");
 }
 
-// 清空 SD 卡数据并重新开始一轮测试（POST，避免被误触发）
+// 清空 SD 卡数据后自动复位（POST，避免被误触发）：冷启动会重新连 WiFi/NTP 并重开 15 分钟窗口
 static void handleReset() {
   uint32_t removed = 0;
   while (deleteOneDataFile()) {
     removed++;
   }
-  powerLogHeaderIfNeeded();
-
-  s_next_index = 1;
-  s_energy_mwh = 0.0f;
-  s_last_sample_ms = millis();
-  s_next_log_ms = millis() + kPowerLogIntervalMs;
-  Serial.printf("[RESET] 已清空 %lu 个文件，测试从 IMG_00001 重新开始\n",
-                (unsigned long)removed);
-
-  captureOnce();
-  s_next_capture_ms = millis() + kCaptureIntervalMs;
+  Serial.printf("[RESET] 已清空 %lu 个文件，复位重新开始测试\n", (unsigned long)removed);
 
   char body[64];
   snprintf(body, sizeof(body), "{\"ok\":true,\"removed\":%lu}", (unsigned long)removed);
   server.send(200, "application/json", body);
+
+  delay(500);  // 等 HTTP 响应发出去再复位
+  ESP.restart();
 }
 
 // 其余路径按 SD 卡上的文件流式返回（照片、POWER.CSV）

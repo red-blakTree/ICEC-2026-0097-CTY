@@ -91,11 +91,20 @@ document.getElementById('shot').onclick=async e=>{
 };
 document.getElementById('reset').onclick=async e=>{
   e.preventDefault();
-  if(!confirm('删除 SD 卡上所有照片和 POWER.CSV，并从 IMG_00001 重新开始？\n此操作不可撤销。'))return;
+  if(!confirm('删除 SD 卡上所有照片和 POWER.CSV，设备随即复位并重新开始测试？\n复位后 WiFi 会断开重连，此操作不可撤销。'))return;
   const b=e.currentTarget;
-  b.textContent='重置中…'; b.style.pointerEvents='none';
+  b.textContent='复位中…'; b.style.pointerEvents='none';
   try{ await fetch('/reset',{method:'POST',cache:'no-store'}); }catch(err){}
-  location.reload();
+  // 复位后 WiFi 先断再重连，轮询到设备回来再刷新
+  const t0=Date.now();
+  while(Date.now()-t0<60000){
+    await new Promise(r=>setTimeout(r,2000));
+    try{
+      const r=await fetch('/api.json',{cache:'no-store'});
+      if(r.ok){location.reload();return;}
+    }catch(err){}
+  }
+  b.textContent='设备未恢复，请手动刷新'; b.style.pointerEvents='';
 };
 tick(); setInterval(tick,1000);
 </script>
