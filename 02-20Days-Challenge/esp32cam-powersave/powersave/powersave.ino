@@ -8,6 +8,9 @@
  * 定时唤醒（deep sleep 计时器，每小时一次）：
  *   恢复时间 → 初始化摄像头/SD → 拍一张存 SD → 继续深睡，不连 WiFi
  *
+ * 重新上电（EN 复位 / 断电再上电）：
+ *   自动清空 SD 数据后复位一次，复位后按冷启动流程从 IMG_00001 重新开始
+ *
  * 相对 esp32cam-viewer 多了：深睡占空比、摄像头 PWDN 断电保持、睡眠前卸载 SD、
  * 睡眠能耗计入 POWER.CSV。采集逻辑与网页不变。
  *
@@ -74,8 +77,6 @@ static const float kDividerRatio   = 2.0f;
 static const uint32_t kPowerLogIntervalMs = 5UL * 60UL * 1000UL;
 static const char *kPowerLogPath = "/POWER.CSV";
 
-// 跑正式数据集前临时改为 true 烧一次：删除 SD 上的 IMG_*.jpg 与 POWER.CSV（仅冷启动生效）
-static const bool kClearDataOnBoot = false;
 static uint32_t s_next_index = 1;
 static uint32_t s_next_capture_ms = 0;
 static uint32_t s_next_log_ms = 0;
@@ -251,16 +252,17 @@ static bool deleteOneDataFile() {
   return deleted;
 }
 
-static void clearDataIfRequested() {
-  if (!kClearDataOnBoot) {
-    return;
-  }
+// 重新上电（EN 复位 / 断电再上电）自动重置测试：清空 SD 数据后复位一次。
+// 复位后的复位原因是软复位，不会再次进入这里，因此不会死循环。
+static void resetTestOnPowerOn() {
   uint32_t removed = 0;
   while (deleteOneDataFile()) {
     removed++;
   }
-  Serial.printf("[CLEAN] 已删除 %lu 个文件，编号从 IMG_00001.jpg 重新开始\n",
+  Serial.printf("[RESET] 重新上电，已清空 %lu 个文件，自动复位开始新测试\n",
                 (unsigned long)removed);
+  Serial.flush();
+  ESP.restart();
 }
 
 static bool captureOnce() {
@@ -523,12 +525,13 @@ void setup() {
   }
   Serial.println("[OK] SD 卡初始化完成");
 
+  // 重新上电（EN 复位 / 断电再上电）：自动清空 SD 数据并复位一次
+  if (esp_reset_reason() == ESP_RST_POWERON) {
+    resetTestOnPowerOn();  // 不返回
+  }
   s_next_index = nextIndexFromSd();
   Serial.printf("[OK] 下一张编号 IMG_%05lu.jpg\n", (unsigned long)s_next_index);
 
-  if (cold_boot) {
-    clearDataIfRequested();  // 只在冷启动清卡，避免每小时唤醒都把数据删光
-  }
   powerLogHeaderIfNeeded();
   s_last_sample_ms = millis();
   s_next_log_ms = millis() + kPowerLogIntervalMs;
