@@ -39,6 +39,13 @@ static const uint32_t kWebWindowMs = 15UL * 60UL * 1000UL;
 // 网页时间与 NTP 都用东八区；deep sleep 后 TZ 会丢，需要每次启动重设
 static const char *kTzString = "CST-8";
 
+// 固定 IP：网关 192.168.16.1；DNS 用于解析 NTP 域名
+static const IPAddress kStaticIp(192, 168, 16, 10);
+static const IPAddress kGateway(192, 168, 16, 1);
+static const IPAddress kSubnet(255, 255, 255, 0);
+static const IPAddress kDns1(192, 168, 16, 1);
+static const IPAddress kDns2(223, 5, 5, 5);
+
 // AI-Thinker ESP32-CAM 引脚定义
 #define CAM_PIN_PWDN   32
 #define CAM_PIN_RESET  -1
@@ -293,6 +300,7 @@ static bool captureOnce() {
 static bool connectWifi() {
   Serial.printf("[WIFI] 连接 %s ...\n", kWifiSsid);
   WiFi.mode(WIFI_STA);
+  WiFi.config(kStaticIp, kGateway, kSubnet, kDns1, kDns2);
   WiFi.begin(kWifiSsid, kWifiPass);
   for (int i = 0; i < 40 && WiFi.status() != WL_CONNECTED; i++) {
     delay(500);
