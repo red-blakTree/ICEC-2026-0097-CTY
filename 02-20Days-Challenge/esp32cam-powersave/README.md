@@ -97,13 +97,30 @@ arduino-cli compile --fqbn esp32:esp32:esp32cam esp32cam-powersave/powersave
 # 确认后再烧（本次未执行）：
 # arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32cam esp32cam-powersave/powersave
 ```
-
 可调参数都在 `powersave.ino` 顶部：
 
 ```cpp
-static const uint32_t kCaptureIntervalMs = 60UL * 60UL * 1000UL;  // 拍照周期
-static const uint32_t kWebWindowMs = 15UL * 60UL * 1000UL;        // WiFi 窗口
+#ifndef CAPTURE_INTERVAL_MS
+#define CAPTURE_INTERVAL_MS (60UL * 60UL * 1000UL)  // 拍照周期（含深睡）
+#endif
+static const uint32_t kWebWindowMs = 15UL * 60UL * 1000UL;  // WiFi 窗口
 ```
+
+拍照周期可以用编译宏覆盖。功耗测量时烧 30 s 短周期版本（为什么需要它见
+[power-measure README](../power-measure-2026-11-10/README.md)）：
+
+```bash
+cd 02-20Days-Challenge
+export ARDUINO_DIRECTORIES_DATA=$PWD/.arduino/data ARDUINO_DIRECTORIES_USER=$PWD/.arduino/user
+./arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-30s \
+  --build-property compiler.cpp.extra_flags=-DCAPTURE_INTERVAL_MS=30000 \
+  esp32cam-powersave/powersave
+./arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32cam \
+  --build-path .arduino/build-30s esp32cam-powersave/powersave
+```
+
+⚠ 不要用 `--build-property build.extra_flags=...` 传宏：那会覆盖核心的 PSRAM / 板级宏，
+镜像能烧但启动后串口无任何输出。要用 `compiler.cpp.extra_flags` 追加。
 
 ## 串口预期输出
 

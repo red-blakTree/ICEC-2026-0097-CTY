@@ -33,7 +33,11 @@
 #include "secrets.h"
 #include "web_page.h"
 
-static const uint32_t kCaptureIntervalMs = 60UL * 60UL * 1000UL;
+// 拍照周期（含深睡），默认 1 小时；功耗测量档用 -DCAPTURE_INTERVAL_MS=30000 编 30 s 版本
+#ifndef CAPTURE_INTERVAL_MS
+#define CAPTURE_INTERVAL_MS (60UL * 60UL * 1000UL)
+#endif
+static const uint32_t kCaptureIntervalMs = CAPTURE_INTERVAL_MS;
 // 开机后 WiFi + 网页的存活时长：15 分钟
 static const uint32_t kWebWindowMs = 15UL * 60UL * 1000UL;
 // 网页时间与 NTP 都用东八区；deep sleep 后 TZ 会丢，需要每次启动重设
