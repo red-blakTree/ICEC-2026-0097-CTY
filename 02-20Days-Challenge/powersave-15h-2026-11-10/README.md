@@ -42,3 +42,5 @@
 ## 与 24 h 基线的关系
 
 [`baseline-24h-2026-11-09`](../baseline-24h-2026-11-09/README.md) 是 viewer 固件的 24 h 主基线（WiFi 常开，平均 ~17 mA 量级）；本目录是省电版固件的运行片段，两者口径不同，`POWER.CSV` 事件集也不同（省电版多 `WEB_ON` / `WEB_CLOSE`，深睡期间不写 `SAMPLE`）。
+
+本机的电流表实测证据（30 s 深睡档读数、深睡↔拍照变化不可分辨、照片抽样与录屏）见 [`powersave-meter-2026-11-10`](../powersave-meter-2026-11-10/README.md)。
