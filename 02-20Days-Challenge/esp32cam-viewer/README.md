@@ -8,6 +8,7 @@
 > WiFi 完全关闭的版本是 [esp32cam-baseline](../esp32cam-baseline/README.md)，只作为下限参考。
 
 - 每 5 分钟向 SD 卡 `/POWER.CSV` 追加一行功耗日志（模型推算，电压需外接分压才可测）
+- **口径注意**：本固件的功耗模型只按 `kModelIdleMa = 45 mA` 记账，**不含 WiFi 电流**；2026-11-10 实测「WiFi 关联空闲」就有 95 mA（见 [powersave-meter-2026-11-10](../powersave-meter-2026-11-10/README.md)）。所以本固件 24 h 的 `POWER.CSV` 是低估值，跨固件比较时不能直接拿两边的 `POWER.CSV` 相加或相减。
 - 跑正式数据集前，把 `kClearDataOnBoot` 临时改 `true` 烧一次清卡，再改回
 
 ## 凭据
