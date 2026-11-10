@@ -7,18 +7,31 @@
 
 输出格式: 2026-11-10 12:35:47.123|原始行
 这样以后 phases.py 能按行时间切分阶段；TTL 只接 TX/RX/GND，不供电。
+
+板子若带 DTR/RTS 自动复位电路（本套件就是），打开串口本身会把 GPIO0 拉低、
+芯片停在下载模式且串口无输出。本脚本打开后先释放两根控制线（DTR/RTS 拉低电平），
+--reset 再脉冲一次 RTS 让芯片从 flash 正常启动。
 """
 import argparse
+import fcntl
 import os
 import select
+import struct
 import sys
 import termios
 import time
 
 TS_FMT = "%Y-%m-%d %H:%M:%S"
+TIOCMSET = 0x5418
+TIOCM_DTR, TIOCM_RTS = 0x002, 0x004
 
 
-def open_port(port, baud):
+def set_lines(fd, dtr, rts):
+    bits = (TIOCM_DTR if dtr else 0) | (TIOCM_RTS if rts else 0)
+    fcntl.ioctl(fd, TIOCMSET, struct.pack("i", bits))
+
+
+def open_port(port, baud, reset=False):
     fd = os.open(port, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
     attrs = termios.tcgetattr(fd)
     attrs[0] = 0
@@ -30,11 +43,17 @@ def open_port(port, baud):
     attrs[5] = speed
     termios.tcsetattr(fd, termios.TCSANOW, attrs)
     termios.tcflush(fd, termios.TCIOFLUSH)
+    set_lines(fd, dtr=False, rts=False)
+    if reset:
+        set_lines(fd, dtr=False, rts=True)
+        time.sleep(0.2)
+        set_lines(fd, dtr=False, rts=False)
     return fd
 
 
-def emit(stream, stamp, line):
-    text = "%s.%03d|%s\n" % (stamp.strftime(TS_FMT), stamp.microsecond // 1000, line)
+def emit(stream, now, line):
+    stamp = time.strftime(TS_FMT, time.localtime(now))
+    text = "%s.%03d|%s\n" % (stamp, int((now % 1) * 1000), line)
     stream.write(text)
     stream.flush()
 
@@ -45,9 +64,10 @@ def main():
     ap.add_argument("--baud", type=int, default=115200)
     ap.add_argument("--seconds", type=float, default=0, help="0 = 一直读")
     ap.add_argument("--out", default=None, help="同时写入该文件")
+    ap.add_argument("--reset", action="store_true", help="打开后脉冲 RTS，让芯片从 flash 启动")
     args = ap.parse_args()
 
-    fd = open_port(args.port, args.baud)
+    fd = open_port(args.port, args.baud, args.reset)
     out = open(args.out, "w") if args.out else None
     end = time.time() + args.seconds if args.seconds > 0 else None
     buf = bytearray()
@@ -69,18 +89,17 @@ def main():
                 raw, _, rest = buf.partition(b"\n")
                 buf = bytearray(rest)
                 line = raw.decode("utf-8", "replace").rstrip("\r")
-                stamp = time.localtime(now)
-                emit(sys.stdout, stamp, line)
+                emit(sys.stdout, now, line)
                 if out:
-                    emit(out, stamp, line)
+                    emit(out, now, line)
     except KeyboardInterrupt:
         pass
     finally:
         if buf:
-            stamp = time.localtime(time.time())
-            emit(sys.stdout, stamp, buf.decode("utf-8", "replace"))
+            now = time.time()
+            emit(sys.stdout, now, buf.decode("utf-8", "replace"))
             if out:
-                emit(out, stamp, buf.decode("utf-8", "replace"))
+                emit(out, now, buf.decode("utf-8", "replace"))
         os.close(fd)
         if out:
             out.close()
