@@ -25,25 +25,32 @@ USB-TTL ── 只接 TX / RX / GND（不接 5V、不接 3V3）
 
 | 段 | 24 h 里占多久 | 表能不能测 | 怎么处理 |
 |---|---|---|---|
-| 窗口段：冷启动后 WiFi + 网页 | 15 min | 能（实测 0.09–0.10 A） | 直接读 V / I / P，记成 `P2 窗口空闲` |
-| 唤醒拍照段 | 24 次 × 约 1.4 s（复位→入睡，实测） | 能（0.13–0.16 A 级），但脉冲太短 | 烧 30 s 短周期固件放大脉冲频率，记成 `P3 拍照瞬间` |
+| 窗口段：冷启动后 WiFi + 网页 | 15 min | 能（实测 0.09–0.10 A） | 直接读 V / I / P，记成 `P2 窗口空闲`（1 h 正式固件或测量档 A） |
+| 唤醒拍照段 | 24 次 × 1.4–2.1 s（复位→入睡，实测） | 能（0.13–0.16 A 级），但脉冲太短 | 烧 30 s 短周期固件（档 B）放大脉冲频率，记成 `P3 拍照瞬间` |
 | 深睡段 | 其余约 23.7 h | 不能（<0.01 A，且会停表） | 只记表上界（读数 0.00 / 0.01 A），推算时按区间 [5 mA 模型, 10 mA 上界] |
 
 ## 省电版专用的 30 s 短周期固件
 
-冷启动流程不变（15 分钟 WiFi 窗口），窗口结束后**每次深睡 30 s 就唤醒拍一张存 SD**：
-表每 30 s 看到一次电流脉冲，不会停表；串口每个周期打 `[CAP]` / `[SLEEP]`，用来和表的读数对齐。
+两种档，按要测的段选：
 
-正式运行固件仍是默认的 1 h 周期，30 s 只用于测量（一天 2880 次抓拍，别拿来做正式采集）。
+| 档 | 编译宏 | 行为 | 用途 |
+|---|---|---|---|
+| A 带窗口 | `-DCAPTURE_INTERVAL_MS=30000` | 冷启动先开 15 分钟 WiFi 窗口，窗口结束后每 30 s 深睡→拍照 | 一次跑里同时复核窗口段和循环段 |
+| B 不开网页 | `-DCAPTURE_INTERVAL_MS=30000 -DWEB_WINDOW_MS=0` | 上电直接进深睡 30 s → 拍照循环，不连 WiFi、不开网页 | 只测「深睡 + 唤醒拍照」，表上不会被 0.09 A 的窗口段盖住 |
+
+档 B 的代价：没有 NTP，照片和串口里的时间显示「无时间戳」，对齐用宿主机时间戳（`serial_capture.py`）。
+串口每个周期还是会打 `[CAP]` / `[SLEEP] 深睡 30s`，拿来和表读数对齐。
+
+正式固件仍是默认 1 h（不带宏）；两种测量档都是一天 2880 次抓拍，别拿来做正式采集。
 
 ```bash
 cd 02-20Days-Challenge
 export ARDUINO_DIRECTORIES_DATA=$PWD/.arduino/data ARDUINO_DIRECTORIES_USER=$PWD/.arduino/user
-./arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-30s \
-  --build-property compiler.cpp.extra_flags=-DCAPTURE_INTERVAL_MS=30000 \
+./arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-30s-noweb \
+  --build-property "compiler.cpp.extra_flags=-DCAPTURE_INTERVAL_MS=30000 -DWEB_WINDOW_MS=0" \
   esp32cam-powersave/powersave
 ./arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32cam \
-  --build-path .arduino/build-30s esp32cam-powersave/powersave
+  --build-path .arduino/build-30s-noweb esp32cam-powersave/powersave
 ```
 
 两个坑：
@@ -118,6 +125,7 @@ python3 power-measure-2026-11-10/theory.py
 - 0.01 A 量化对 0.09–0.10 A 的窗口段是 ±5 %，对 0.13–0.16 A 的拍照段是 ±4 %。
 - 深睡项只能给上界：`0.01 A` 这条上界让 24 h 平均电流在 5.99–10.94 mA 之间浮动，**结论必须写成区间**，不能报成单值。
 - 30 s 固件把唤醒次数从 24 次/天放大到 2880 次/天，测的是「同一次唤醒的电流和时长」，不是 24 h 的真实占空比；`t_wake` 必须用 `[CAP]` / `[SLEEP]` 的时间戳取，不能拿周期长度代替。
+- 唤醒时长会随 SD 上的照片数变长（每次开机都扫目录取下一个编号）：约 40 张时复位→入睡 1.4 s，约 110 张时 2.1 s。按 24 次/天算这一项只占 1–2 mAh，但报 `t_wake` 时要说明是在多少张照片下测的。
 - USB 表测的是表后整条路径（含板载 AMS1117 与 SD），不等于芯片电流；表本身有压降，深睡电压偏低会让功率偏高估。
 
 ## 记录
