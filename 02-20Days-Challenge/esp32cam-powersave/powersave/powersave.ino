@@ -76,12 +76,16 @@ static const int kSdClk = 14;
 static const int kSdCmd = 15;
 static const int kSdD0  = 2;
 
-// ── 功耗日志（5V 输入端的模型电流，典型值，未标定）──
-static const float kModelIdleMa   = 45.0f;   // 240 MHz 空转 + AMS1117 静态电流（WiFi 关）
+// ── 功耗日志（5 V 输入端的电流）──
+// 实测（2026-11-10，USB 表直读 + 视频复核，见 power-measure-2026-11-10/README.md）
+static const float kModelWindowMa = 95.0f;   // 窗口段：实测 0.09–0.10 A（刷页面 0.12–0.19 A、峰值 0.22 A）
+// 以下仍是模型值（未实测，有待万用表补测）
+static const float kModelIdleMa   = 45.0f;   // 醒着但 WiFi 关：240 MHz 空转 + AMS1117 静态电流
 static const float kModelShotMa   = 180.0f;  // 摄像头 init + JPEG 捕获
 static const float kModelSaveMa   = 50.0f;   // SD 卡写入
-static const float kModelWifiMa  = 120.0f;  // STA 已连接、无流量时的平均电流
-static const float kModelSleepMa  = 5.0f;    // 深睡电流：AMS1117 静态电流主导（未改硬件）
+static const float kModelSleepMa  = 5.0f;    // 深睡：表测不出，只能给上界 0.01 A
+// 电压：没接分压电阻时按实测值算（2026-11-10 USB 表读 4.90 V，含表自身压降）
+static const float kFallbackV = 4.90f;
 
 // 电压采样需要外接分压：5V ──100k── IO16 ──100k── GND
 static const bool  kHasVbatDivider = false;
@@ -190,8 +194,8 @@ static void accumulateEnergy() {
   uint32_t dt_ms = now - s_last_sample_ms;
   s_last_sample_ms = now;
   int mv = readV5Mv();
-  float v = (mv > 0) ? mv / 1000.0f : 5.0f;
-  float i_ma = s_web_on ? (kModelIdleMa + kModelWifiMa) : kModelIdleMa;
+  float v = (mv > 0) ? mv / 1000.0f : kFallbackV;
+  float i_ma = s_web_on ? kModelWindowMa : kModelIdleMa;
   s_energy_mwh += i_ma * v * ((float)dt_ms / 3600000.0f);
 }
 
@@ -211,7 +215,7 @@ static void powerLogHeaderIfNeeded() {
 // i_ma 是 window_s 窗口内的平均电流，由模型推算，不是实测值；window_s=0 表示瞬时事件
 static void powerLogAppend(const char *event, uint32_t window_s, float i_ma) {
   int mv = readV5Mv();
-  float v = (mv > 0) ? mv / 1000.0f : 5.0f;
+  float v = (mv > 0) ? mv / 1000.0f : kFallbackV;
   char line[128];
   snprintf(line, sizeof(line), "%lu,%s,%lu,%d,%.1f,%.1f,%.4f\n",
            (unsigned long)(millis() / 1000), event, (unsigned long)window_s,
@@ -227,7 +231,7 @@ static void powerLogAppend(const char *event, uint32_t window_s, float i_ma) {
 
 static void powerLogSample() {
   accumulateEnergy();
-  float i_ma = s_web_on ? (kModelIdleMa + kModelWifiMa) : kModelIdleMa;
+  float i_ma = s_web_on ? kModelWindowMa : kModelIdleMa;
   powerLogAppend("SAMPLE", kPowerLogIntervalMs / 1000, i_ma);
 }
 
@@ -363,7 +367,7 @@ static void sleepUntil(uint32_t at_ms) {
   }
 
   int mv = readV5Mv();
-  float v = (mv > 0) ? mv / 1000.0f : 5.0f;
+  float v = (mv > 0) ? mv / 1000.0f : kFallbackV;
   s_energy_mwh += kModelSleepMa * v * ((float)remain_ms / 3600000.0f);
   s_energy_mwh_rtc = s_energy_mwh;
 
@@ -481,7 +485,7 @@ static void startWeb() {
   s_web_on = true;
   Serial.printf("[WEB] http://%s/  窗口 %lu 分钟\n", WiFi.localIP().toString().c_str(),
                 (unsigned long)(kWebWindowMs / 60000UL));
-  powerLogAppend("WEB_ON", 0, kModelIdleMa + kModelWifiMa);
+  powerLogAppend("WEB_ON", 0, kModelWindowMa);
 }
 
 static void stopWeb() {
@@ -490,7 +494,7 @@ static void stopWeb() {
   WiFi.mode(WIFI_OFF);
   s_web_on = false;
   Serial.println("[WEB] 窗口结束，已关闭网页服务与 WiFi");
-  powerLogAppend("WEB_CLOSE", kWebWindowMs / 1000, kModelIdleMa + kModelWifiMa);
+  powerLogAppend("WEB_CLOSE", kWebWindowMs / 1000, kModelWindowMa);
 }
 
 void setup() {
