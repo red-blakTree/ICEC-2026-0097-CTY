@@ -45,3 +45,16 @@
 - 所以视频支持的是「**变化小到看不出**」这一定性结论；深睡电流的定量值仍然只能给上界 ≤ 0.01 A。要补可定量的证据，需要：近距离特写（表占满画面）或把表的累计 mAh 读数拍下来，或者用 INA219 这类能记录/高分辨率的方案。
 
 画面偏暗偏绿是 OV2640 室内弱光下的正常表现（无补光），与本结论无关。
+
+## 复现（核对视频本身）
+
+```bash
+ffprobe -show_format -show_streams meter_sleep_vs_capture.mp4
+# 抽帧（坐标按本视频调过：显示区在 720×1280 画面里的 x240 y395 附近）
+ffmpeg -ss 48 -i meter_sleep_vs_capture.mp4 -frames:v 1 \
+  -vf "crop=110:100:240:395,scale=990:-1:flags=lanczos" frame_meter_zoom.jpg
+```
+
+注意：openSUSE 自带的 `libopenh264-8` 是 `~noopenh264` 桩库，用它解码会报 `Unable to create decoder`。
+要么改用 Cisco 官方的 `libopenh264-<ver>-linux64.7.so`（重命名为 `libopenh264.so.8` 后用 `LD_LIBRARY_PATH` 指过去），
+要么装 Packman 源的 ffmpeg（带原生 h264 解码器和 libx264）。
