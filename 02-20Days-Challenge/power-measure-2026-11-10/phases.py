@@ -68,8 +68,6 @@ def parse(path):
                 kind = "cold" if "冷启动" in body else "wake"
             elif "=== ESP32-CAM 采集查看器" in body:
                 kind = "viewer"
-            elif "=== ESP32-CAM 基础采集" in body:
-                kind = "baseline"
 
             if kind:
                 cur = Session(kind=kind, t0=ts, t_last=ts)
@@ -148,9 +146,9 @@ def rows_for(sessions):
             else:
                 add("powersave", "P5 定时唤醒", s.t0, s.sleep_t or (nxt or s.t_last), "无 [CAP] 行")
 
-        elif s.kind in ("viewer", "baseline"):
-            fw = "viewer" if s.kind == "viewer" else "baseline"
-            gap = "P6 WiFi常开空闲" if s.kind == "viewer" else "P6 空转(WiFi关)"
+        elif s.kind == "viewer":
+            fw = "viewer"
+            gap = "P6 WiFi常开空闲"
             if not s.caps:
                 add(fw, "P1 冷启动", s.t0, s.t_last, "无 [CAP] 行")
                 continue
