@@ -150,7 +150,7 @@ python3 power-measure-2026-11-10/theory.py
 | P1 冷启动能量 | ❌ 只有时长 | `约 6 s`（init + WiFi + NTP），没有对应电流 |
 | 主基线 viewer 的 P6 | ❌ 模型值 | `baseline-24h-2026-11-09` 的 `POWER.CSV` 全部按 `45/180/50 mA` 模型记 |
 | 下限基线 baseline | ❌ 未测 | 只有固件能跑通，没有实机电流 |
-| 固件模型常量回填 | ❌ 未做 | `kModel*` 仍是 45/180/50/120/5 mA；`POWER.CSV` 仍写模型数 |
+| 固件模型常量回填 | 🟡 部分 | 窗口段 `kModelWindowMa = 95 mA`、电压 `4.90 V` 已回填并烧录（`POWER.CSV` 的 `WEB_ON` 行已写 95 / 465.5）；`kModelIdleMa` / `kModelShotMa` / `kModelSaveMa` / `kModelSleepMa` 仍待万用表补测 |
 | 实测参数下的 24 h 连续验证 | ❌ 未做 | 可选；做了才能把「推算」变成「实测」 |
 
 **结论口径**：现在能写「窗口段实测、深睡只能给上界」，24 h 平均电流是 `5.99–10.94 mA` 的区间；补齐深睡那一项后区间才能收窄到 ±10 % 量级。

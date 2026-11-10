@@ -11,7 +11,7 @@
 import argparse
 
 DAY_S = 86400
-DEFAULT_V = 5.0
+DEFAULT_V = 4.9         # V，2026-11-10 USB 表实测 4.90 V（含表自身压降）
 DEFAULT_I_WIN = 95.0      # mA，2026-11-10 实测「窗口空闲」0.09–0.10 A；开着网页刷页面会到 0.12–0.19 A
 DEFAULT_T_WIN = 900.0     # s，冷启动后 WiFi/网页窗口 15 分钟
 DEFAULT_I_WAKE = 145.0    # mA，2026-11-10 /capture 连拍实测 0.13–0.16 A（含 WiFi 空闲，偏保守）
