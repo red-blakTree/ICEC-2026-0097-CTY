@@ -384,7 +384,7 @@ void setup() {
   pinMode(CAM_PIN_FLASH, OUTPUT);
   digitalWrite(CAM_PIN_FLASH, LOW);
 
-  Serial.println("\n=== ESP32-CAM 采集查看器（WiFi 常开，非功耗基线）===");
+  Serial.println("\n=== ESP32-CAM 采集查看器（主基线：WiFi 常开）===");
 
   if (!initCamera()) {
     Serial.println("[FATAL] 摄像头初始化失败");
