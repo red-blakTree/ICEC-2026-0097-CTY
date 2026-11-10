@@ -165,6 +165,7 @@ esp32 核心 3.3.12。WiFi 凭据放在各固件目录的 `secrets.h`（已 giti
 │   ├── ESP32-CAM-Ultra-Low-Power-Solution.md   # 省电方案与功耗测算
 │   ├── FreeRTOS-V11.3.1-Source-Analysis.md      # 内核源码分析
 │   ├── esp32cam-viewer/      # 主基线固件（WiFi + 网页）
+│   ├── esp32cam-capture-probe/  # 拍照电流标定探针（连续拍照）
 │   ├── esp32cam-powersave/   # 省电版固件
 │   └── baseline-24h-2026-11-09/  # 24 h 基线数据归档（不入 git）
 └── 03-AI-Collaboration/  # 协作截图
