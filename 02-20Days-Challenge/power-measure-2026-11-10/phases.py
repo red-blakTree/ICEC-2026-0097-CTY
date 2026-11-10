@@ -135,7 +135,7 @@ def rows_for(sessions):
                 p2_start = s.web_on
                 add("powersave", "P1 冷启动", s.t0, p2_start or s.t_last, "无 [CAP] 行，拍照可能失败")
             p2_end = s.web_off or s.sleep_t or (nxt or s.t_last)
-            if p2_start and p2_end > p2_start:
+            if s.web_on and p2_start and p2_end > p2_start:  # 没开过窗口（如“不开网页”测量档）就不记 P2
                 add("powersave", "P2 窗口空闲", p2_start, p2_end,
                     "" if s.web_off else "窗口未正常关闭（断电/复位）")
 
