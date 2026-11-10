@@ -109,14 +109,26 @@ static const uint32_t kWebWindowMs = 15UL * 60UL * 1000UL;  // WiFi 窗口
 拍照周期可以用编译宏覆盖。功耗测量时烧 30 s 短周期版本（为什么需要它见
 [power-measure README](../power-measure-2026-11-10/README.md)）：
 
+这一版先开 15 分钟窗口，窗口结束后每 30 s 深睡→拍照。只测「深睡 + 唤醒拍照」时再加
+`-DWEB_WINDOW_MS=0`（上电直接进 30 s 循环，不连 WiFi；代价是没 NTP、时间显示「无时间戳」）：
+
 ```bash
 cd 02-20Days-Challenge
 export ARDUINO_DIRECTORIES_DATA=$PWD/.arduino/data ARDUINO_DIRECTORIES_USER=$PWD/.arduino/user
+
+# 档 A：先开 15 分钟窗口，窗口结束后每 30 s 深睡→拍照
 ./arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-30s \
   --build-property compiler.cpp.extra_flags=-DCAPTURE_INTERVAL_MS=30000 \
   esp32cam-powersave/powersave
 ./arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32cam \
   --build-path .arduino/build-30s esp32cam-powersave/powersave
+
+# 档 B：上电直接进 30 s 循环，不连 WiFi（宏值中间有空格，要加引号）
+./arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-30s-noweb \
+  --build-property "compiler.cpp.extra_flags=-DCAPTURE_INTERVAL_MS=30000 -DWEB_WINDOW_MS=0" \
+  esp32cam-powersave/powersave
+./arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32cam \
+  --build-path .arduino/build-30s-noweb esp32cam-powersave/powersave
 ```
 
 ⚠ 不要用 `--build-property build.extra_flags=...` 传宏：那会覆盖核心的 PSRAM / 板级宏，

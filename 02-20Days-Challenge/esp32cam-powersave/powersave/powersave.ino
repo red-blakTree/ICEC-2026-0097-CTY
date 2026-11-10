@@ -38,8 +38,11 @@
 #define CAPTURE_INTERVAL_MS (60UL * 60UL * 1000UL)
 #endif
 static const uint32_t kCaptureIntervalMs = CAPTURE_INTERVAL_MS;
-// 开机后 WiFi + 网页的存活时长：15 分钟
-static const uint32_t kWebWindowMs = 15UL * 60UL * 1000UL;
+// 开机后 WiFi + 网页的存活时长：15 分钟；0 = 不开窗口（上电直接进死循环拍照档）
+#ifndef WEB_WINDOW_MS
+#define WEB_WINDOW_MS (15UL * 60UL * 1000UL)
+#endif
+static const uint32_t kWebWindowMs = WEB_WINDOW_MS;
 // 网页时间与 NTP 都用东八区；deep sleep 后 TZ 会丢，需要每次启动重设
 static const char *kTzString = "CST-8";
 
@@ -514,8 +517,11 @@ void setup() {
   pinMode(CAM_PIN_FLASH, OUTPUT);
   digitalWrite(CAM_PIN_FLASH, LOW);
 
-  Serial.printf("\n=== ESP32-CAM 省电版（%s）===\n",
-                cold_boot ? "冷启动：WiFi + 网页开 15 分钟" : "定时唤醒：不连 WiFi");
+  const char *banner = cold_boot
+                           ? (kWebWindowMs > 0 ? "冷启动：WiFi + 网页开 15 分钟"
+                                              : "冷启动：不开网页，直接深睡拍照循环")
+                           : "定时唤醒：不连 WiFi";
+  Serial.printf("\n=== ESP32-CAM 省电版（%s）===\n", banner);
 
   if (!initCamera()) {
     Serial.println("[FATAL] 摄像头初始化失败");
@@ -539,7 +545,7 @@ void setup() {
   s_next_log_ms = millis() + kPowerLogIntervalMs;
 
   bool online = false;
-  if (cold_boot) {
+  if (cold_boot && kWebWindowMs > 0) {
     online = connectWifi();
     if (online) {
       syncClock();
