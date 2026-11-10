@@ -265,8 +265,6 @@ esp_pm_configure(&pm);
 > **基线口径（本项目统一）**：基线 = 「WiFi 常开 + 每小时一张 + 网页可查」，对应固件
 > [esp32cam-viewer](esp32cam-viewer/README.md)。省电方案同样保留 WiFi，只是改成
 > 「需要时才连、连上就干活、干完就睡」，所以比的是「同样开着 WiFi，谁更省」。
-> [esp32cam-baseline](esp32cam-baseline/README.md)（WiFi 关闭、CPU 空转）降为**下限参考**，
-> 不再作为主基线。
 >
 > **P0 绝不能跳过**。ESP32-CAM 版本差异极大，任何网上数字都可能与你的板子不符；没有基线就无法判断优化是否有效。
 
@@ -303,8 +301,7 @@ esp_pm_configure(&pm);
 
 ## 附：本方案的验证状态说明
 
-- **基线固件**：`esp32cam-baseline`（WiFi 关闭）与 `esp32cam-viewer`（WiFi 常开 + 网页）
-  均已在 AI-Thinker ESP32-CAM + esp32 核心 3.3.12 上实机跑通（拍照、写卡、续号、网页、NTP 时间）。
+- **基线固件**：`esp32cam-viewer`（WiFi 常开 + 网页）已在 AI-Thinker ESP32-CAM + esp32 核心 3.3.12 上实机跑通（拍照、写卡、续号、网页、NTP 时间）。
 - **省电方案代码与配置**：基于 ESP-IDF 官方电源管理文档与 AI-Thinker ESP32-CAM 引脚约束编写，**尚未在目标硬件上编译/运行**（当前环境无 ESP-IDF 与 Xtensa 工具链）。
 - **电流数值**：全部为社区典型值，**必须通过 P0 基线测量校准**后再作为决策依据。
 - **硬件改造项**：需先确认你自己板子的 LDO 型号与封装、以及 OV2640 的 PWDN/供电走线。

@@ -19,7 +19,7 @@ USB-TTL ── 只接 TX / RX / GND（不接 5V、不接 3V3）
 | 分辨率 0.01 A（10 mA） | 深睡电流（模型 5 mA）只读得到 `0.00` / `0.01` A，给不出数值 |
 | 电流到 0 A 时表自动停表 | 深睡一小时，表直接停止计量，整段采不到 |
 
-省电版 24 h 里约 99 % 时间是深睡，所以**「直读深睡」在这块表上不成立**。省电版改为只实测表能分辨的段，深睡用占空比 + 表上界推算；viewer（主基线）与 baseline（下限基线）平均电流在 45–165 mA 量级，表至少能读出数值、也不会停表，仍按原 P1 / P3 / P6 全时段打点。
+省电版 24 h 里约 99 % 时间是深睡，所以**「直读深睡」在这块表上不成立**。省电版改为只实测表能分辨的段，深睡用占空比 + 表上界推算；viewer（主基线，WiFi 常开）平均电流在 95 mA 量级，表能读出数值、也不会停表，仍按原 P1 / P3 / P6 全时段打点。
 
 ## 省电版：三段法
 
@@ -67,7 +67,7 @@ export ARDUINO_DIRECTORIES_DATA=$PWD/.arduino/data ARDUINO_DIRECTORIES_USER=$PWD
 | P3 拍照瞬间 | 拍照开始 → 写卡完成 | `kModelShotMa` / `kModelSaveMa`、峰值 |
 | P4 深睡 | 入睡稳定后 ≥10 min | `kModelSleepMa`：省电版只能给上界 |
 | P5 定时唤醒 | 唤醒 → 拍完继续睡 | 稳态单周期（30 s 固件把这一段的脉冲频率放大） |
-| P6 常开空闲 | 上一次写卡完成 → 下一次拍照开始 | viewer / baseline 的持续空闲电流 |
+| P6 常开空闲 | 上一次写卡完成 → 下一次拍照开始 | viewer 的持续空闲电流 |
 
 P1 在 P3 起点结束，两者首尾相接不重叠，可直接相加。
 
@@ -85,7 +85,7 @@ python3 power-measure-2026-11-10/phases.py .arduino/serial_powersave30s.log \
   --append power-measure-2026-11-10/measure-record.csv --summary
 ```
 
-- `phases.py` 认三种固件的启动标记，输出毫秒级 start/end，可直接和 USB 表的录制时间轴对齐。
+- `phases.py` 认两类固件的启动标记（省电版 / viewer 主基线），输出毫秒级 start/end，可直接和 USB 表的录制时间轴对齐。
 - 缺 `[CAP]` 行、窗口被断电、会话未收尾都会写进 `note`，不会静默跳过。
 - 表没有录制功能时，就在阶段 start/end 那几个时刻读表并记录电流电压。
 - 30 s 固件一轮会切出几十段（每分钟 2 个会话），记录表只填 **1 个代表周期**，其余用 `--summary` 看统计。
@@ -118,7 +118,7 @@ python3 power-measure-2026-11-10/theory.py
 
 ## 基线：正常测量，不改方案
 
-主基线 `esp32cam-viewer`（WiFi 常开）与下限基线 `esp32cam-baseline`（WiFi 全关）电流都在表的量程中段，停不了表，按原来的 P1 / P3 / P6 全时段打点即可，本节的三段法只适用于省电版。
+主基线只有 `esp32cam-viewer`（WiFi 常开），电流在表的量程中段（实测关联空闲约 95 mA），停不了表，按原来的 P1 / P3 / P6 全时段打点即可；本节的三段法只适用于省电版。
 
 ## 已知误差（要写进结论，不许抹掉）
 
@@ -148,8 +148,7 @@ python3 power-measure-2026-11-10/theory.py
 | 深睡电流 | ❌ 只有上界 | 视频/表均读 `0.00 A`，只能报 `≤ 0.01 A`；这是 24 h 能量的 80 %+ |
 | 拍照段电流（无 WiFi） | ❌ 未测 | 脉冲只有 0.1 s，0.01 A 表抓不到；现有一条 `0.13–0.16 A` 是 WiFi 开着连拍 |
 | P1 冷启动能量 | ❌ 只有时长 | `约 6 s`（init + WiFi + NTP），没有对应电流 |
-| 主基线 viewer 的 P6 | ❌ 模型值 | `baseline-24h-2026-11-09` 的 `POWER.CSV` 全部按 `45/180/50 mA` 模型记 |
-| 下限基线 baseline | ❌ 未测 | 只有固件能跑通，没有实机电流 |
+| 主基线 viewer 的 P6 | ❌ 仍是模型值 | `baseline-24h-2026-11-09` 的 `POWER.CSV` 全部按 `45/180/50 mA` 模型记，且不含 WiFi 电流；可用实测的 95 mA 作代理，但要正式数字仍需实测 |
 | 固件模型常量回填 | 🟡 部分 | 窗口段 `kModelWindowMa = 95 mA`、电压 `4.90 V` 已回填并烧录（`POWER.CSV` 的 `WEB_ON` 行已写 95 / 465.5）；`kModelIdleMa` / `kModelShotMa` / `kModelSaveMa` / `kModelSleepMa` 仍待万用表补测 |
 | 实测参数下的 24 h 连续验证 | ❌ 未做 | 可选；做了才能把「推算」变成「实测」 |
 

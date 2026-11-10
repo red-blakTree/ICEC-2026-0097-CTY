@@ -5,7 +5,6 @@
 
 > 这就是本项目的**主基线**：后续省电方案同样保留 WiFi（只是改成需要时才连、连上就干活、
 > 干完就睡），所以对比的是「同样开着 WiFi，谁更省」。
-> WiFi 完全关闭的版本是 [esp32cam-baseline](../esp32cam-baseline/README.md)，只作为下限参考。
 
 - 每 5 分钟向 SD 卡 `/POWER.CSV` 追加一行功耗日志（模型推算，电压需外接分压才可测）
 - **口径注意**：本固件的功耗模型只按 `kModelIdleMa = 45 mA` 记账，**不含 WiFi 电流**；2026-11-10 实测「WiFi 关联空闲」就有 95 mA（见 [powersave-meter-2026-11-10](../powersave-meter-2026-11-10/README.md)）。所以本固件 24 h 的 `POWER.CSV` 是低估值，跨固件比较时不能直接拿两边的 `POWER.CSV` 相加或相减。

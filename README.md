@@ -77,17 +77,16 @@
 
 **目标**：在 AI-Thinker ESP32-CAM（ESP32-D0WDQ6 + OV2640 + microSD）上做定时拍照，把平均电流压到尽可能低。
 
-**三级对照**（同一块板、同一套拍照逻辑）
+**两级对照**（同一块板、同一套拍照逻辑）
 
 | 版本 | 形态 | 用途 |
 |---|---|---|
-| [esp32cam-baseline](02-20Days-Challenge/esp32cam-baseline/README.md) | 只拍照存卡，WiFi 全程关闭，不降频不睡眠 | **下限参考**：标出「WiFi 完全不开」能到多低 |
 | [esp32cam-viewer](02-20Days-Challenge/esp32cam-viewer/README.md) | 每小时一张 + WiFi 常开 + 网页查图 / 下载 `POWER.CSV` | **主基线**：省电方案同样保留 WiFi，对比的是「同样开 WiFi 谁更省」 |
 | [esp32cam-powersave](02-20Days-Challenge/esp32cam-powersave/README.md) | 开机 15 分钟 WiFi / 网页窗口，窗口结束断射频进深睡；定时唤醒只拍照不连 WiFi | 省电方案落地版，已在实机烧录运行 |
 
 **实测与测算要分开看**
 
-- 已实测：三个固件都在 ESP32-CAM + esp32 核心 3.3.12 上跑通；24 h 主基线数据已归档（[baseline-24h-2026-11-09](02-20Days-Challenge/baseline-24h-2026-11-09/README.md)，24 张逐小时照片 + 322 行 `POWER.CSV`，含 1 次拍照失败与 2 次复位的时间线核对）；省电版的 WiFi 窗口段与拍照段用 USB 电压电流表实测，见 [测量方案](02-20Days-Challenge/power-measure-2026-11-10/README.md)。
+- 已实测：两个固件都在 ESP32-CAM + esp32 核心 3.3.12 上跑通；24 h 主基线数据已归档（[baseline-24h-2026-11-09](02-20Days-Challenge/baseline-24h-2026-11-09/README.md)，24 张逐小时照片 + 322 行 `POWER.CSV`，含 1 次拍照失败与 2 次复位的时间线核对）；省电版的 WiFi 窗口段与拍照段用 USB 电压电流表实测，见 [测量方案](02-20Days-Challenge/power-measure-2026-11-10/README.md)。
 - 测算未实测：24 h 模型能耗 5400 mWh（按 45 mA @ 5 V 推算，未接分压电阻）；「17.1 mA → 1.54 mA、续航 3.9 天 → 43 天」是方案测算值。
 - 实测+推算（2026-11-10）：表分辨率只到 0.01 A，深睡电流测不出，所以省电版只实测窗口段（0.09–0.10 A，模型 165 mA 高估约 1.7 倍）与拍照段（0.13–0.16 A），深睡取「5 mA 模型 ～ 10 mA 表上界」区间；24 h 功耗推算 143.8–262.5 mAh（平均 5.99–10.94 mA），续航 11.1–6.1 天（按 1600 mAh 可用）。
 - 硬约束：不改硬件时深睡电流被 AMS1117 的约 5 mA 静态电流卡死，所以方案里换 LDO / 切外设供电 / 去 LED 属于必须做但本次未做的硬件项。
@@ -165,7 +164,6 @@ esp32 核心 3.3.12。WiFi 凭据放在各固件目录的 `secrets.h`（已 giti
 ├── 02-20Days-Challenge/
 │   ├── ESP32-CAM-Ultra-Low-Power-Solution.md   # 省电方案与功耗测算
 │   ├── FreeRTOS-V11.3.1-Source-Analysis.md      # 内核源码分析
-│   ├── esp32cam-baseline/    # 下限基线固件
 │   ├── esp32cam-viewer/      # 主基线固件（WiFi + 网页）
 │   ├── esp32cam-powersave/   # 省电版固件
 │   └── baseline-24h-2026-11-09/  # 24 h 基线数据归档（不入 git）
