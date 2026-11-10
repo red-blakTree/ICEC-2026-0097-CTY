@@ -12,7 +12,7 @@ import argparse
 
 DAY_S = 86400
 DEFAULT_V = 5.0
-DEFAULT_I_WIN = 95.0      # mA，2026-11-10 16:54–17:09 实测窗口段 0.09–0.10 A，取 0.095
+DEFAULT_I_WIN = 95.0      # mA，2026-11-10 实测「窗口空闲」0.09–0.10 A；开着网页刷页面会到 0.12–0.19 A
 DEFAULT_T_WIN = 900.0     # s，冷启动后 WiFi/网页窗口 15 分钟
 DEFAULT_I_WAKE = 145.0    # mA，2026-11-10 /capture 连拍实测 0.13–0.16 A（含 WiFi 空闲，偏保守）
 DEFAULT_T_WAKE = 1.4      # s，单次唤醒（复位→入睡），30 s 固件实测 18:02:34.757→18:02:36.123
