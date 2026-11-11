@@ -1,0 +1,11 @@
+stage,quantity,baseline_value,baseline_unit,baseline_v,powersave_value,powersave_unit,powersave_v,method,evidence
+P6 常开空闲（WiFi 关联、无页面请求）,平均电流,90,mA,5.04,95,mA,4.90,USB 表直读,../evidence/baseline-viewer-meter-2026-11-10/README.md
+P6 开网页（浏览器翻图）,平均电流,110–140,mA,5.04,120–190,mA,4.90,USB 表直读 + 录屏,../evidence/baseline-viewer-meter-2026-11-10/README.md
+P3 拍照 + 写卡（连拍放大占空比）,平均电流,未测,—,—,130–160,mA,4.90,USB 表直读（拍照时 WiFi 处于关联态）,../evidence/powersave-meter-2026-11-10/README.md
+P4 深睡,平均电流,不适用（WiFi 常开、不休眠）,—,—,≤10,mA,4.90,USB 表上界（0.01 A 分辨率）,../evidence/powersave-meter-2026-11-10/README.md
+P5 单次唤醒（复位→再入睡）,时长,不适用,—,—,1.4–2.1,s,4.90,串口 [CAP]/[SLEEP] 时间戳,README.md
+P1 冷启动（WiFi + NTP + 首拍）,时长,未单列,—,—,约 6,s,4.90,串口时间戳,README.md
+24 h 平均电流,平均电流,90 / 136,mA,5.04,5.99–10.94,mA,4.90,基线端点直读 / 省电版按实测段推算,../evidence/baseline-24h-meter-2026-11-10/README.md
+24 h 电量,电量,2160 / 3300,mAh,5.04,143.8–262.5,mAh,4.90,同上,../evidence/baseline-24h-meter-2026-11-10/README.md
+相对基线,倍数,1.0,×,5.04,8.3–15.0,×,4.90,24 h 平均电流之比,README.md
+续航（1600 mAh 可用）,续航,0.74,天,5.04,6.1–11.1,天,4.90,24 h 电量 ÷ 1600 mAh,README.md

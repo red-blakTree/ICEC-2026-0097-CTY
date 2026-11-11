@@ -8,7 +8,7 @@
 |---|---|---|---|
 | 01 现场发现 | 课题 3：2.4 GHz 无线信号测绘 | 8 个点位 / 40 轮测速 / 43 条 RSSI·SIR 读数，盲区只列候选、不定级 | [topic_3/README.md](01-Field-Discovery/topic_3/README.md) |
 | 01 现场发现 | 课题 8：多姿态步态加速度判别 | 跨日盲测 94.5 %（记录级 9/9），并定位到「跨日失效源于非不变判决量」 | [topic_8/README.md](01-Field-Discovery/topic_8/README.md) |
-| 02 20 天挑战 | ESP32-CAM 极致省电 | 方案测算 17.1 mA → 1.54 mA；实机 24 h 平均 90 mA（基线表直读）→ 5.99–10.94 mA（实测段推算），8.3–15 倍；两级固件实机跑通，对照表 / 24 h 日志 / 预算模型 / 状态机源码齐 | [ESP32-CAM-Ultra-Low-Power-Solution.md](02-20Days-Challenge/docs/ESP32-CAM-Ultra-Low-Power-Solution.md) |
+| 02 20 天挑战 | ESP32-CAM 极致省电 | 方案测算 17.1 mA → 1.54 mA；实机 24 h 平均 90 mA（基线表直读）→ 5.99–10.94 mA（实测段推算），8.3–15 倍；两级固件实机跑通，对照表 / 24 h 日志 / 预算模型 / 状态机源码齐 | [02-20Days-Challenge/README.md](02-20Days-Challenge/README.md) |
 | 02 20 天挑战 | FreeRTOS V11.3.1 源码分析 | 以「一条链表 + 一种同步对象」为主线，附功耗专题 | [FreeRTOS-V11.3.1-Source-Analysis.md](02-20Days-Challenge/docs/FreeRTOS-V11.3.1-Source-Analysis.md) |
 | 03 AI 排障记录 | 4 张关键提问排障对话截图 | 课题 3 归因、课题 8 选型 / 对照 / 数据条件四类排障 | [03-AI-Collaboration/](03-AI-Collaboration/) |
 
@@ -76,6 +76,9 @@
 ### 2.1 项目一：ESP32-CAM 极致省电
 
 **目标**：在 AI-Thinker ESP32-CAM（ESP32-D0WDQ6 + OV2640 + microSD）上做定时拍照，把平均电流压到尽可能低。
+
+> 交付物与评分项映射（15 / 25 / 20 分）、对照表、24 h 时序日志与复现命令统一收在
+> [02-20Days-Challenge/README.md](02-20Days-Challenge/README.md)。
 
 **两级对照**（同一块板、同一套拍照逻辑）
 
