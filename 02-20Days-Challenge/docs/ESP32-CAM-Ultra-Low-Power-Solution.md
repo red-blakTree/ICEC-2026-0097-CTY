@@ -255,7 +255,7 @@ esp_pm_configure(&pm);
 
 | 阶段 | 内容 | 周期 | 验证方法 |
 |---|---|---|---|
-| **P0 基线测量** | 基线固件 `esp32cam-viewer/viewer`：**WiFi 常开**、每小时拍一张存 SD、网页可查；测出平均电流与各阶段耗时 | 1 天 | USB 电流表 / INA219 + `/POWER.CSV` |
+| **P0 基线测量** | 基线固件 `firmware/esp32cam-viewer/viewer`：**WiFi 常开**、每小时拍一张存 SD、网页可查；测出平均电流与各阶段耗时 | 1 天 | USB 电流表 / INA219 + `/POWER.CSV` |
 | **P1 零成本软件优化** | PWDN 拉高、`rtc_gpio_isolate`、`gpio_hold_en`、移除 LED、上传改批量 | 2-3 天 | 复测 `I_sleep` 与续航 |
 | **P2 内核/系统配置** | 第四章全部 sdkconfig | 1 天 | 复测 `I_active`、连接耗时 |
 | **P3 WiFi 快速连接** | BSSID + channel + 静态 IP | 1-2 天 | 测连接耗时（目标 <1 s） |
@@ -263,7 +263,7 @@ esp_pm_configure(&pm);
 | **P5 长稳测试** | 连续运行 72 h，记录电量曲线 | 3 天 | 电压记录仪 |
 
 > **基线口径（本项目统一）**：基线 = 「WiFi 常开 + 每小时一张 + 网页可查」，对应固件
-> [esp32cam-viewer](esp32cam-viewer/README.md)。省电方案同样保留 WiFi，只是改成
+> [esp32cam-viewer](../firmware/esp32cam-viewer/README.md)。省电方案同样保留 WiFi，只是改成
 > 「需要时才连、连上就干活、干完就睡」，所以比的是「同样开着 WiFi，谁更省」。
 >
 > **P0 绝不能跳过**。ESP32-CAM 版本差异极大，任何网上数字都可能与你的板子不符；没有基线就无法判断优化是否有效。

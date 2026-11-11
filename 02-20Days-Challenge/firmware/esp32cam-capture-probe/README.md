@@ -14,10 +14,10 @@
 ```bash
 cd 02-20Days-Challenge
 export ARDUINO_DIRECTORIES_DATA=$PWD/.arduino/data ARDUINO_DIRECTORIES_USER=$PWD/.arduino/user
-./arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-probe esp32cam-capture-probe/capture_probe
-./arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32cam --build-path .arduino/build-probe esp32cam-capture-probe/capture_probe
+./arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-probe firmware/esp32cam-capture-probe/capture_probe
+./arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32cam --build-path .arduino/build-probe firmware/esp32cam-capture-probe/capture_probe
 ```
 
 注意：这个固件会以一秒两张左右的速度连拍写卡，SD 卡很快被填满，**标定完就刷回**
 `esp32cam-powersave` 或 `esp32cam-viewer`。拍照段的测量口径见
-[power-measure-2026-11-10](../power-measure-2026-11-10/README.md)。
+[measurement/README.md](../../measurement/README.md)。

@@ -1,6 +1,6 @@
 # ESP32-CAM 省电版部分数据（2026-11-09 21:23 – 2026-11-10 12:35，15.20 h）
 
-- 设备：AI-Thinker ESP32-CAM，固件 [`esp32cam-powersave`](../esp32cam-powersave/README.md)（固定 IP `192.168.16.10`，冷启动开 15 分钟 WiFi 窗口）
+- 设备：AI-Thinker ESP32-CAM，固件 [`esp32cam-powersave`](../../firmware/esp32cam-powersave/README.md)（固定 IP `192.168.16.10`，冷启动开 15 分钟 WiFi 窗口）
 - 抓取时间：2026-11-10 12:35:47（设备本地时间，`window_left=880`）
 - 抓取方式：`/api.json` 快照 + `/POWER.CSV` + `IMG_00001`–`IMG_00021` 逐个 HTTP 下载
 - 本目录随仓库提交（21 张照片共 384 KB）；`manifest.sha256` 可校验完整性

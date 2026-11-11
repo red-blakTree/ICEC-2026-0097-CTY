@@ -1,7 +1,7 @@
 # ESP32-CAM 省电版（开机 WiFi 窗口 15 分钟 + 深睡占空比）
 
 采集与网页沿用 [esp32cam-viewer](../esp32cam-viewer/README.md)，在此基础上按
-[ESP32-CAM 极致省电实现方案](../ESP32-CAM-Ultra-Low-Power-Solution.md) 加了软件侧省电项。
+[ESP32-CAM 极致省电实现方案](../../docs/ESP32-CAM-Ultra-Low-Power-Solution.md) 加了软件侧省电项。
 
 > 状态：**已在 ESP32-CAM 上烧录运行**（esp32 核心 3.3.12）。
 
@@ -73,7 +73,7 @@ WiFi 使用固定 IP `192.168.16.10`（网关 `192.168.16.1`，DNS `192.168.16.1
 ## 目录
 
 ```
-esp32cam-powersave/powersave/
+firmware/esp32cam-powersave/powersave/
 ├─ powersave.ino        # 采集 + 15 分钟 WiFi/网页窗口 + 深睡
 ├─ web/
 │   ├─ index.html       # 网页源码（改这个）
@@ -85,7 +85,7 @@ esp32cam-powersave/powersave/
 网页改完跑一次：
 
 ```bash
-cd 02-20Days-Challenge/esp32cam-powersave/powersave
+cd 02-20Days-Challenge/firmware/esp32cam-powersave/powersave
 python3 web/build_header.py
 ```
 
@@ -93,9 +93,9 @@ python3 web/build_header.py
 
 ```bash
 cd 02-20Days-Challenge
-arduino-cli compile --fqbn esp32:esp32:esp32cam esp32cam-powersave/powersave
+arduino-cli compile --fqbn esp32:esp32:esp32cam firmware/esp32cam-powersave/powersave
 # 确认后再烧（本次未执行）：
-# arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32cam esp32cam-powersave/powersave
+# arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32cam firmware/esp32cam-powersave/powersave
 ```
 可调参数都在 `powersave.ino` 顶部：
 
@@ -107,7 +107,7 @@ static const uint32_t kWebWindowMs = 15UL * 60UL * 1000UL;  // WiFi 窗口
 ```
 
 拍照周期可以用编译宏覆盖。功耗测量时烧 30 s 短周期版本（为什么需要它见
-[power-measure README](../power-measure-2026-11-10/README.md)）：
+[measurement/README.md](../../measurement/README.md)）：
 
 这一版先开 15 分钟窗口，窗口结束后每 30 s 深睡→拍照。只测「深睡 + 唤醒拍照」时再加
 `-DWEB_WINDOW_MS=0`（上电直接进 30 s 循环，不连 WiFi；代价是没 NTP、时间显示「无时间戳」）：
@@ -119,16 +119,16 @@ export ARDUINO_DIRECTORIES_DATA=$PWD/.arduino/data ARDUINO_DIRECTORIES_USER=$PWD
 # 档 A：先开 15 分钟窗口，窗口结束后每 30 s 深睡→拍照
 ./arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-30s \
   --build-property compiler.cpp.extra_flags=-DCAPTURE_INTERVAL_MS=30000 \
-  esp32cam-powersave/powersave
+  firmware/esp32cam-powersave/powersave
 ./arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32cam \
-  --build-path .arduino/build-30s esp32cam-powersave/powersave
+  --build-path .arduino/build-30s firmware/esp32cam-powersave/powersave
 
 # 档 B：上电直接进 30 s 循环，不连 WiFi（宏值中间有空格，要加引号）
 ./arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-30s-noweb \
   --build-property "compiler.cpp.extra_flags=-DCAPTURE_INTERVAL_MS=30000 -DWEB_WINDOW_MS=0" \
-  esp32cam-powersave/powersave
+  firmware/esp32cam-powersave/powersave
 ./arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32cam \
-  --build-path .arduino/build-30s-noweb esp32cam-powersave/powersave
+  --build-path .arduino/build-30s-noweb firmware/esp32cam-powersave/powersave
 ```
 
 ⚠ 不要用 `--build-property build.extra_flags=...` 传宏：那会覆盖核心的 PSRAM / 板级宏，

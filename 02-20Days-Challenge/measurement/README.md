@@ -48,9 +48,9 @@ cd 02-20Days-Challenge
 export ARDUINO_DIRECTORIES_DATA=$PWD/.arduino/data ARDUINO_DIRECTORIES_USER=$PWD/.arduino/user
 ./arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-30s-noweb \
   --build-property "compiler.cpp.extra_flags=-DCAPTURE_INTERVAL_MS=30000 -DWEB_WINDOW_MS=0" \
-  esp32cam-powersave/powersave
+  firmware/esp32cam-powersave/powersave
 ./arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32cam \
-  --build-path .arduino/build-30s-noweb esp32cam-powersave/powersave
+  --build-path .arduino/build-30s-noweb firmware/esp32cam-powersave/powersave
 ```
 
 两个坑：
@@ -77,12 +77,12 @@ P1 在 P3 起点结束，两者首尾相接不重叠，可直接相加。
 cd 02-20Days-Challenge
 
 # 1. 抓串口（宿主机执行），每行带宿主机时间戳；--reset 让芯片从 flash 启动
-distrobox-host-exec python3 $PWD/power-measure-2026-11-10/serial_capture.py \
+distrobox-host-exec python3 $PWD/measurement/serial_capture.py \
   --seconds 1020 --reset --out $PWD/.arduino/serial_powersave30s.log
 
 # 2. 切分阶段 → 写进记录表（v/i 按表上读数填）
-python3 power-measure-2026-11-10/phases.py .arduino/serial_powersave30s.log \
-  --append power-measure-2026-11-10/measure-record.csv --summary
+python3 measurement/phases.py .arduino/serial_powersave30s.log \
+  --append measurement/measure-record.csv --summary
 ```
 
 - `phases.py` 认两类固件的启动标记（省电版 / viewer 主基线），输出毫秒级 start/end，可直接和 USB 表的录制时间轴对齐。
@@ -104,7 +104,7 @@ python3 power-measure-2026-11-10/phases.py .arduino/serial_powersave30s.log \
 `theory.py` 就是这条式子：
 
 ```bash
-python3 power-measure-2026-11-10/theory.py
+python3 measurement/theory.py
 ```
 
 2026-11-10 这轮的输入与结果（`i_win=95 mA` 实测、`i_wake=145 mA` 实测且偏保守、`t_wake=1.4 s` 由 30 s 固件实测的复位→入睡时长 18:02:34.757→18:02:36.123 推得）：
@@ -120,11 +120,11 @@ python3 power-measure-2026-11-10/theory.py
 
 主基线只有 `esp32cam-viewer`（WiFi 常开），电流在表的量程中段（实测关联空闲 95 mA 量级），停不了表，按原来的 P1 / P3 / P6 全时段打点即可；本节的三段法只适用于省电版。
 
-2026-11-10 21:02 对主基线做过一次常开空闲直读：`0.09 A / 5.04 V / 0.45 W`（[baseline-viewer-meter-2026-11-10](../baseline-viewer-meter-2026-11-10/README.md)），与省电版窗口空闲段 `0.09–0.10 A` 一致，是 `kModelIdleMa = 45 mA` 的 2 倍。这一轮随后跑到 24 h（实际 `24:00`，表 `23:53`）：两端仍是 `0.09 A`，但中间有约 12.5 h WiFi 断连（`0.18 A`），表累计 `≥16.38 Wh`；健康空闲口径仍是 `10.8 Wh/天`（[baseline-24h-meter-2026-11-10](../baseline-24h-meter-2026-11-10/README.md)）。
+2026-11-10 21:02 对主基线做过一次常开空闲直读：`0.09 A / 5.04 V / 0.45 W`（[baseline-viewer-meter-2026-11-10](../evidence/baseline-viewer-meter-2026-11-10/README.md)），与省电版窗口空闲段 `0.09–0.10 A` 一致，是 `kModelIdleMa = 45 mA` 的 2 倍。这一轮随后跑到 24 h（实际 `24:00`，表 `23:53`）：两端仍是 `0.09 A`，但中间有约 12.5 h WiFi 断连（`0.18 A`），表累计 `≥16.38 Wh`；健康空闲口径仍是 `10.8 Wh/天`（[baseline-24h-meter-2026-11-10](../evidence/baseline-24h-meter-2026-11-10/README.md)）。
 
 ## 省电版比基线省多少倍（估算）
 
-口径：24 h 平均电流之比，分子分母同一条测量路径（USB 表后整条路径），两边都是 24 张/天。基线取 `0.09 A` 直读（[baseline-viewer-meter-2026-11-10](../baseline-viewer-meter-2026-11-10/README.md)，2026-11-11 的 24 h 端点直读确认这个值），省电版取 `theory.py` 的推算值。异常日（WiFi 断连 0.18 A）单列，不替换分子。
+口径：24 h 平均电流之比，分子分母同一条测量路径（USB 表后整条路径），两边都是 24 张/天。基线取 `0.09 A` 直读（[baseline-viewer-meter-2026-11-10](../evidence/baseline-viewer-meter-2026-11-10/README.md)，2026-11-11 的 24 h 端点直读确认这个值），省电版取 `theory.py` 的推算值。异常日（WiFi 断连 0.18 A）单列，不替换分子。
 
 ```
 基线 24 h = 90 mA × 24 h + 24 × 1.4 s × (145 − 90) mA ≈ 2160.5 mAh（平均 90.0 mA）
@@ -165,7 +165,7 @@ python3 power-measure-2026-11-10/theory.py
 
 ### 基线 24 h 直读（2026-11-11，已完成）
 
-2026-11-10 20:53 → 11-11 20:53 用 USB 表跑满 24 h（[证据](../baseline-24h-meter-2026-11-10/README.md)）。按原判据（`90 ± 10 %` 照用 / 明显偏高按实测重算）分两条：
+2026-11-10 20:53 → 11-11 20:53 用 USB 表跑满 24 h（[证据](../evidence/baseline-24h-meter-2026-11-10/README.md)）。按原判据（`90 ± 10 %` 照用 / 明显偏高按实测重算）分两条：
 
 | 口径 | 24 h 平均 | 依据 | 处理 |
 |---|---|---|---|
@@ -181,10 +181,10 @@ python3 power-measure-2026-11-10/theory.py
 
 - 0.01 A 量化对 0.09–0.10 A 的窗口段是 ±5 %，对 0.13–0.16 A 的拍照段是 ±4 %。
 - 表计时慢 7 min/24 h（24 h 端点实测）：用表时间当分母会高估约 0.49 %。
-- 表累计 `mWh` 显示会停顿/跳变；`W` 是时段平均（终点 `0.65 W ≈ 0.13 A`，不是冻结），[baseline-24h-meter-2026-11-10](../baseline-24h-meter-2026-11-10/README.md)：24 h 按 `16384 mWh` 记，不写成下界。
+- 表累计 `mWh` 显示会停顿/跳变；`W` 是时段平均（终点 `0.65 W ≈ 0.13 A`，不是冻结），[baseline-24h-meter-2026-11-10](../evidence/baseline-24h-meter-2026-11-10/README.md)：24 h 按 `16384 mWh` 记，不写成下界。
 - 深睡项只能给上界：`0.01 A` 这条上界让 24 h 平均电流在 5.99–10.94 mA 之间浮动，**结论必须写成区间**，不能报成单值。
-- 深睡↔拍照的电流变化在 0.01 A 表上**不可分辨**（拍照本身只有 60–90 ms，0.1 s 的脉冲摊进秒级采样窗只剩约 0.015 A，跳 1 个字），现场读数与视频见 [powersave-meter-2026-11-10](../powersave-meter-2026-11-10/README.md)。
-- 本方案的局限（深睡只有上界、峰值抽不到、能量不进位、测的是整条路径、抽样口径有限）逐条写在 [powersave-meter-2026-11-10](../powersave-meter-2026-11-10/README.md#局限这个方案证明不了什么) 的「局限」一节；深睡电流的定量值计划下一步用**万用表 mA 档串测**（拍照峰值用 MAX 保持）补齐。
+- 深睡↔拍照的电流变化在 0.01 A 表上**不可分辨**（拍照本身只有 60–90 ms，0.1 s 的脉冲摊进秒级采样窗只剩约 0.015 A，跳 1 个字），现场读数与视频见 [powersave-meter-2026-11-10](../evidence/powersave-meter-2026-11-10/README.md)。
+- 本方案的局限（深睡只有上界、峰值抽不到、能量不进位、测的是整条路径、抽样口径有限）逐条写在 [powersave-meter-2026-11-10](../evidence/powersave-meter-2026-11-10/README.md#局限这个方案证明不了什么) 的「局限」一节；深睡电流的定量值计划下一步用**万用表 mA 档串测**（拍照峰值用 MAX 保持）补齐。
 - 30 s 固件把唤醒次数从 24 次/天放大到 2880 次/天，测的是「同一次唤醒的电流和时长」，不是 24 h 的真实占空比；`t_wake` 必须用 `[CAP]` / `[SLEEP]` 的时间戳取，不能拿周期长度代替。
 - 唤醒时长会随 SD 上的照片数变长（每次开机都扫目录取下一个编号）：约 40 张时复位→入睡 1.4 s，约 110 张时 2.1 s。按 24 次/天算这一项只占 1–2 mAh，但报 `t_wake` 时要说明是在多少张照片下测的。
 - USB 表测的是表后整条路径（含板载 AMS1117 与 SD），不等于芯片电流；表本身有压降，深睡电压偏低会让功率偏高估。
@@ -207,8 +207,8 @@ python3 power-measure-2026-11-10/theory.py
 | 深睡电流 | ❌ 只有上界 | 视频/表均读 `0.00 A`，只能报 `≤ 0.01 A`；这是 24 h 能量的 80 %+ |
 | 拍照段电流（无 WiFi） | ❌ 未测 | 脉冲只有 0.1 s，0.01 A 表抓不到；现有一条 `0.13–0.16 A` 是 WiFi 开着连拍 |
 | P1 冷启动能量 | ❌ 只有时长 | `约 6 s`（init + WiFi + NTP），没有对应电流 |
-| 主基线 viewer 的 P6 | ✅ 24 h 端点直读 | 2026-11-10 20:53 → 11-11 20:53：健康段两端 `0.09 A / 5.04 V`，08:20–20:50 WiFi 断连时 `0.18 A`；健康口径 `2.16 Ah / 10.8 Wh`，本日 `≥16.38 Wh`（[证据](../baseline-24h-meter-2026-11-10/README.md)）。`baseline-24h-2026-11-09` 的 `POWER.CSV` 仍按 `45 mA` 记 |
+| 主基线 viewer 的 P6 | ✅ 24 h 端点直读 | 2026-11-10 20:53 → 11-11 20:53：健康段两端 `0.09 A / 5.04 V`，08:20–20:50 WiFi 断连时 `0.18 A`；健康口径 `2.16 Ah / 10.8 Wh`，本日 `≥16.38 Wh`（[证据](../evidence/baseline-24h-meter-2026-11-10/README.md)）。`baseline-24h-2026-11-09` 的 `POWER.CSV` 仍按 `45 mA` 记 |
 | 固件模型常量回填 | 🟡 部分 | 窗口段 `kModelWindowMa = 95 mA`、电压 `4.90 V` 已回填并烧录（`POWER.CSV` 的 `WEB_ON` 行已写 95 / 465.5）；`kModelIdleMa` / `kModelShotMa` / `kModelSaveMa` / `kModelSleepMa` 仍待万用表补测 |
-| 实测参数下的 24 h 连续验证 | 🟡 基线已做 | 基线 viewer 已跑 24 h（[证据](../baseline-24h-meter-2026-11-10/README.md)）；省电版仍未做 24 h 表记录 |
+| 实测参数下的 24 h 连续验证 | 🟡 基线已做 | 基线 viewer 已跑 24 h（[证据](../evidence/baseline-24h-meter-2026-11-10/README.md)）；省电版仍未做 24 h 表记录 |
 
 **结论口径**：现在能写「窗口段实测、深睡只能给上界」，24 h 平均电流是 `5.99–10.94 mA` 的区间；补齐深睡那一项后区间才能收窄到 ±10 % 量级。

@@ -3,7 +3,7 @@
 - 设备：AI-Thinker ESP32-CAM，固件 `esp32cam-viewer`（WiFi 常开、每小时一张、网页可查）
 - 导出时间：2026-11-09 12:16
 - 导出方式：串口复位设备 → 重新连上 B-LINK_601（新 IP `192.168.16.101`）→ 通过 `/api.json` + HTTP 下载
-- 本目录未纳入 git，`manifest.sha256` 可校验完整性
+- 本目录已随仓库提交，`manifest.sha256` 可校验完整性
 - 本目录是**固件内置 45 mA 模型日志**；真实电流的 24 h 端点实测见 [baseline-24h-meter-2026-11-10](../baseline-24h-meter-2026-11-10/README.md)（健康段 0.09 A，WiFi 断连段 0.18 A）
 
 ## 文件

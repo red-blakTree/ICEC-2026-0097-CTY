@@ -77,7 +77,7 @@ static const int kSdCmd = 15;
 static const int kSdD0  = 2;
 
 // ── 功耗日志（5 V 输入端的电流）──
-// 实测（2026-11-10，USB 表直读 + 视频复核，见 power-measure-2026-11-10/README.md）
+// 实测（2026-11-10，USB 表直读 + 视频复核，见 measurement/README.md）
 static const float kModelWindowMa = 95.0f;   // 窗口段：实测 0.09–0.10 A（刷页面 0.12–0.19 A、峰值 0.22 A）
 // 以下仍是模型值（未实测，有待万用表补测）
 static const float kModelIdleMa   = 45.0f;   // 醒着但 WiFi 关：240 MHz 空转 + AMS1117 静态电流
