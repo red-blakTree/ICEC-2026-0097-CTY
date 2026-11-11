@@ -13,7 +13,7 @@
 | 评分项 | 题目要求 | 本仓库对应文件 | 状态 |
 |---|---|---|---|
 | **①** 15 分 | 优化前后各阶段实测电流对照表与视频 | [current-comparison.csv](measurement/current-comparison.csv) + 5 段表读数录屏（§1） | ✅ 窗口 / 拍照 / 唤醒 / 深睡（上界）都有表读数；基线 P1/P3 未单测 |
-| **②** 25 分 | 连续 24 小时以上电池电压 / 功耗实测时序 CSV 日志 | 3 份 `POWER.CSV`：基线 24.00 h ×2、省电版 15.20 h（§2） | 🟡 日志有 24 h，但字段是固件模型值；表实测只有端点；省电版未跑满 24 h |
+| **②** 25 分 | 连续 24 小时以上电池电压 / 功耗实测时序 CSV 日志 | 3 份 `POWER.CSV` + 1 份表盘读数转写：基线 24.00 h ×2、省电版 15.20 h（§2） | 🟡 24 h 日志有，但字段是固件模型值；表实测是 10 点稀疏转写；省电版未跑满 24 h |
 | **③** 20 分 | 功耗预算推导模型与状态机源码 | [theory.py](measurement/theory.py)、[phases.py](measurement/phases.py)、[powersave.ino](firmware/esp32cam-powersave/powersave/powersave.ino)（§3） | ✅ 模型与状态机均可复跑 |
 
 > 口径提醒：[方案文档](docs/ESP32-CAM-Ultra-Low-Power-Solution.md) 里的 `17.1 mA → 1.54 mA / 11 倍` 是**设计测算**（T=60 s、每次都上传）；
@@ -43,7 +43,7 @@
 | [meter_window_idle.mp4](evidence/powersave-meter-2026-11-10/meter_window_idle.mp4) | 省电版窗口空闲 `0.09–0.10 A` | 38.9 s |
 | [meter_window_web_load.mp4](evidence/powersave-meter-2026-11-10/meter_window_web_load.mp4) | 省电版窗口内开网页：`0.09 → 0.18 A`，峰值 `0.22 A` | 35.0 s |
 | [video_20261110_212524772.mp4](evidence/baseline-viewer-meter-2026-11-10/video_20261110_212524772.mp4) | 基线常开空闲 `0.09 A`，开网页 `0.11–0.14 A` | 49.4 s |
-| [video_20261111_120804103.mp4](evidence/baseline-24h-meter-2026-11-10/video_20261111_120804103.mp4) | 24 h 轮次中 12:08 WiFi 重连：`0.18 → 0.09 A` | 见目录 |
+| [video_20261111_120804103.mp4](evidence/baseline-24h-meter-2026-11-10/video_20261111_120804103.mp4) | 24 h 轮次中 12:08 WiFi 重连：`0.18 → 0.09 A` | 10.5 s |
 
 **这张表能证明什么、不能证明什么**
 
@@ -58,14 +58,17 @@
 | [baseline-24h-2026-11-09](evidence/baseline-24h-2026-11-09/README.md) | viewer（基线） | 24.00 h | 322 | `v5_mv=-1`（未接分压，按 5.0 V 记） | 固定 `45 mA` 模型 | 设备侧模型日志 |
 | [baseline-24h-meter-2026-11-10](evidence/baseline-24h-meter-2026-11-10/README.md) | viewer（基线） | 24.00 h | 317 | 同上 | 固定 `45 mA` 模型 | 设备侧模型日志 + 表端点实测 |
 | [powersave-15h-2026-11-10](evidence/powersave-15h-2026-11-10/README.md) | powersave（省电版） | 15.20 h | 50 | 同上 | `95 mA`（窗口）/ `5 mA`（深睡模型） | 设备侧模型日志，**不足 24 h** |
+| [meter-readings.csv](evidence/baseline-24h-meter-2026-11-10/meter-readings.csv) | viewer（基线） | 24.01 h（10 点稀疏） | 10 | 表读 `5.04 / 4.93 V` | 表读 `90 / 180 / 190 mA` | **表实测，稀疏转写** |
 
 **表实测到的 24 h 端点**（[baseline-24h-meter README](evidence/baseline-24h-meter-2026-11-10/README.md)）：
 2026-11-10 20:53 → 11-11 20:53，健康段两端都是 `0.09 A`；08:20 起 WiFi 断连抬到 `0.18 A`，表累计 `≈16.38 Wh ≈ 136 mA` 平均。
-表计时 24 h 慢 7 min，按墙钟当分母。
+表计时 24 h 慢 7 min，按墙钟当分母。10 个读数点（含断连段与两次鼠标续测）逐点转写在
+[meter-readings.csv](evidence/baseline-24h-meter-2026-11-10/meter-readings.csv)。
 
-**必须说清的口径**：这三份 CSV 是设备写的**时序日志**，其中的电流/电压字段来自固件常量与 `-1` 占位，**不是表实测的连续曲线**；
-表的连续记录能力受 0.01 A 分辨率与「小电流停表」限制，真正实测的是阶段直读与 24 h 端点。所以本项的交付是
-「24 h 连续日志 + 表端点实测」，不把它写成「24 h 实测曲线」。
+**必须说清的口径**：三份 `POWER.CSV` 是设备写的**时序日志**，其中的电流/电压字段来自固件常量与 `-1` 占位，
+**不是表实测的连续曲线**；`meter-readings.csv` 是 10 个表盘读数的转写，点与点之间没有采样。
+表的连续记录能力受 0.01 A 分辨率与「小电流停表」限制，真正实测的是阶段直读、10 个读数点与 24 h 端点。
+所以本项的交付是「24 h 连续日志 + 表读数点」，不把它写成「24 h 实测曲线」。
 另外，所有电流都在 5 V 输入侧测得，**不是电池端**；续航按 1600 mAh 可用折算，不是电池放电实测。
 
 **补齐 ② 的最短路径**：烧 `powersave` 正式 1 h 档 + USB 表跑满 24 h，每小时拍一张表盘照（或换 INA219 / 带记录的表做连续采样），
