@@ -39,7 +39,7 @@
 | 可配对 ΔRSSI | 走廊 −2、−22 dB；电梯 −24 dB（概览）；宿舍 −19 dB（扫描口径，概览页反向，未定稿） |
 | 走廊衰减指数 n | 近段 0.22 / 远段 2.86 / 全程 1.35 / 同会话 0.58 |
 
-**结论强度**：这是描述性汇总。RSSI / SIR 是点位级快照（同一位置换页差 0–17 dB），4 个点位缺本地零点，距离多为目测或按教室间距推算，所以盲区只给候选（T5-03、T5-06 至少边缘；T5-07、L1-01 边缘；T5-05、D-02 不稳定），不做定级；跨会话的 n 值不可直接比较。这些限制和补测建议写在报告 §6、§8。
+**结论强度**：这是描述性汇总。RSSI / SIR 是点位级快照（同一位置换页差 0–17 dB），4 个点位缺本地零点，距离多为目测或按教室间距推算，所以盲区只给候选（T5-03、T5-06 至少边缘；T5-07、L1-01 边缘；T5-05、D-02 不稳定），不做定级；跨会话的 n 值不可直接比较。这些限制和补测建议写在报告第 6 节、第 8 节。
 
 **交付**：报告 [README.md](01-Field-Discovery/topic_3/README.md)（v5.2）· 原始记录 [data/results.json](01-Field-Discovery/topic_3/data/results.json) · 汇总 [measurements.csv](01-Field-Discovery/topic_3/data/measurements.csv) / [signal.csv](01-Field-Discovery/topic_3/data/signal.csv) · 分析图 [picture/analysis/](01-Field-Discovery/topic_3/picture/analysis/) · 采集脚本 [src/](01-Field-Discovery/topic_3/src/)。
 
@@ -65,7 +65,7 @@
 
 **最有价值的一步**：v2–v5 在同批数据上 97–99 %，换一天只剩 42.8–79.7 %。定位到根因是判下楼的 `ptn = (峰−谷)/(峰+谷)` 会随窗内残余零偏平移；只把这一个判决量换成 `rob_skew`，跨日就从 79.7 % 拉到 94.6 %。这说明瓶颈是**不变性**，不是特征数量或模型复杂度。
 
-**边界（报告 §6 有 13 条）**：一人一机（两组跨日仍是同一人同一手机）；「不摆臂」是协议外变量，引用跨日数字时只用标准段；2026-10-25 曾用于 v5.1 / v6 选型，对 v7 只能算外部抽样复核。
+**边界（报告第 6 节有 13 条）**：一人一机（两组跨日仍是同一人同一手机）；「不摆臂」是协议外变量，引用跨日数字时只用标准段；2026-10-25 曾用于 v5.1 / v6 选型，对 v7 只能算外部抽样复核。
 
 **交付**：报告 [README.md](01-Field-Discovery/topic_8/README.md)（v7.0）· 全部代码 [src/](01-Field-Discovery/topic_8/src/) · 逐窗结果与图 [output/](01-Field-Discovery/topic_8/output/) · 原始 CSV [output/v1/csv/](01-Field-Discovery/topic_8/output/v1/csv/)。
 
