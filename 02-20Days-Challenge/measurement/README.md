@@ -208,7 +208,7 @@ python3 measurement/theory.py
 | 唤醒段时长 | ✅ 实测 | 复位 → 入睡 `1.4–2.1 s`（30 s 固件，随 SD 文件数增长） |
 | 深睡电流 | ❌ 只有上界 | 视频/表均读 `0.00 A`，只能报 `≤ 0.01 A`；这是 24 h 能量的 80 %+ |
 | 拍照段电流（无 WiFi） | ❌ 未测 | 脉冲只有 0.1 s，0.01 A 表抓不到；现有一条 `0.13–0.16 A` 是 WiFi 开着连拍 |
-| P1 冷启动能量 | ❌ 只有时长 | `约 6 s`（init + WiFi + NTP），没有对应电流 |
+| P1 冷启动 | 🟡 只有区间 | `0.09–0.16 A` 波动（上电瞬间）、时长 `约 6 s`；没有稳定均值 |
 | 主基线 viewer 的 P6 | ✅ 24 h 端点直读 | 2026-11-10 20:53 → 11-11 20:53：健康段两端 `0.09 A / 5.04 V`，08:20–20:50 WiFi 断连时 `0.18 A`；健康口径 `2.16 Ah / 10.8 Wh`，本日 `≥16.38 Wh`（[证据](../evidence/baseline-24h-meter-2026-11-10/README.md)）。`baseline-24h-2026-11-09` 的 `POWER.CSV` 仍按 `45 mA` 记 |
 | 固件模型常量回填 | 🟡 部分 | 窗口段 `kModelWindowMa = 95 mA`、电压 `4.90 V` 已回填并烧录（`POWER.CSV` 的 `WEB_ON` 行已写 95 / 465.5）；`kModelIdleMa` / `kModelShotMa` / `kModelSaveMa` / `kModelSleepMa` 仍待万用表补测 |
 | 实测参数下的 24 h 连续验证 | 🟡 基线已做 | 基线 viewer 已跑 24 h（[证据](../evidence/baseline-24h-meter-2026-11-10/README.md)）；省电版 24 h 表记录不可行：深睡 < 0.01 A 时表停表，需换 INA219 |
