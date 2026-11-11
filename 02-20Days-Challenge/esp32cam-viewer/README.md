@@ -7,7 +7,7 @@
 > 干完就睡），所以对比的是「同样开着 WiFi，谁更省」。
 
 - 每 5 分钟向 SD 卡 `/POWER.CSV` 追加一行功耗日志（模型推算，电压需外接分压才可测）
-- **口径注意**：本固件的功耗模型只按 `kModelIdleMa = 45 mA` 记账，**不含 WiFi 电流**；2026-11-10 对本固件常开空闲的直接读数是 `0.09 A`（`5.04 V`，见 [baseline-viewer-meter-2026-11-10](../baseline-viewer-meter-2026-11-10/README.md)），省电版窗口段的间接测量也是 95 mA（[powersave-meter-2026-11-10](../powersave-meter-2026-11-10/README.md)）。所以本固件 24 h 的 `POWER.CSV` 是低估值，跨固件比较时不能直接拿两边的 `POWER.CSV` 相加或相减。
+- **口径注意**：本固件的功耗模型只按 `kModelIdleMa = 45 mA` 记账，**不含 WiFi 电流**；2026-11-10 对本固件常开空闲的直接读数是 `0.09 A`（`5.04 V`，见 [baseline-viewer-meter-2026-11-10](../baseline-viewer-meter-2026-11-10/README.md)），省电版窗口段的间接测量也是 95 mA（[powersave-meter-2026-11-10](../powersave-meter-2026-11-10/README.md)）。同一轮随后跑到 24 h：健康段两端仍是 `0.09 A`，WiFi 断连（08:20–20:50）时为 `0.18 A`，表累计 `≥16.38 Wh`（[baseline-24h-meter-2026-11-10](../baseline-24h-meter-2026-11-10/README.md)）。所以本固件 24 h 的 `POWER.CSV` 是低估值，跨固件比较时不能直接拿两边的 `POWER.CSV` 相加或相减。
 - 跑正式数据集前，把 `kClearDataOnBoot` 临时改 `true` 烧一次清卡，再改回
 
 ## 凭据
