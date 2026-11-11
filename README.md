@@ -89,7 +89,7 @@
 
 **实测与测算要分开看**
 
-- 已实测：viewer / 省电版两个固件在 ESP32-CAM + esp32 核心 3.3.12 上跑通；viewer 的 24 h 主基线数据已归档（[baseline-24h-2026-11-09](02-20Days-Challenge/evidence/baseline-24h-2026-11-09/README.md)，24 张逐小时照片 + 322 行 `POWER.CSV`，含 1 次拍照失败与 2 次复位的时间线核对）；2026-11-10/11 又把主基线实跑 24 h 并用 USB 表记两端（[baseline-24h-meter-2026-11-10](02-20Days-Challenge/evidence/baseline-24h-meter-2026-11-10/README.md)，7 张表盘照片 + 板载 `POWER.CSV`/`api.json`，实际 24:00、表计时慢 7 min）。
+- 已实测：viewer / 省电版两个固件在 ESP32-CAM + esp32 核心 3.3.12 上跑通；viewer 的 24 h 主基线数据已归档（[baseline-24h-2026-11-09](02-20Days-Challenge/evidence/baseline-24h-2026-11-09/README.md)，24 张逐小时照片 + 322 行 `POWER.CSV`，含 1 次拍照失败与 2 次复位的时间线核对）；2026-11-10/11 又把主基线实跑 24 h 并用 USB 表记两端（[baseline-24h-meter-2026-11-10](02-20Days-Challenge/evidence/baseline-24h-meter-2026-11-10/README.md)，9 张表盘照片（含 2 张鼠标续测）+ 板载 `POWER.CSV`/`api.json`，实际 24:00、表计时慢 7 min）。
 - 省电版 USB 表实测（2026-11-10，见 [测量方案](02-20Days-Challenge/measurement/README.md) 与 [证据目录](02-20Days-Challenge/evidence/powersave-meter-2026-11-10/README.md)）：窗口空闲 `0.09–0.10 A`、开网页刷图 `0.12–0.19 A`（峰值 `0.22 A`）、电压 `4.90 V`；拍照 `capture=0 ms / save=60–90 ms`、单次唤醒复位→入睡 `1.4–2.1 s`。三段录屏（深睡 / 窗口空闲 / 窗口刷页面）与抽帧图都在证据目录里。
 - 主基线 viewer 常开空闲直读（2026-11-10 21:02，[证据](02-20Days-Challenge/evidence/baseline-viewer-meter-2026-11-10/README.md)）：`0.09 A / 5.04 V / 0.45 W`，与省电版窗口空闲段一致，是 `POWER.CSV` 里 45 mA 模型的 2 倍，所以 `baseline-24h` 那 24 h 是低估值；同一轮 21:25 的录屏里，打开网页后电流抬到 `0.11–0.14 A`。这一轮随后跑到 24 h：两端仍是 `0.09 A`，但 08:20 起 WiFi 断连、12:08 重连后又多次掉回 `0.18 A` 档，表累计 `≈16.38 Wh`（健康段仍算 `10.8 Wh/天`；`16384 mWh` 不是计数上限）。
 - 只有上界：深睡电流在 0.01 A 表上读 `0.00 A`，只能报 `≤ 0.01 A`，定量值待万用表 mA 档串测。
