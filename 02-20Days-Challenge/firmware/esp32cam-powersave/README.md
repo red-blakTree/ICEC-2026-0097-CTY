@@ -83,7 +83,7 @@ static const uint32_t kWebWindowMs = 15UL * 60UL * 1000UL;  // WiFi 窗口
 两点必须知道：
 
 - **深睡期间不写日志**（SD 已卸载），所以 `SAMPLE` 只在窗口内出现；`e_mwh` 把深睡能耗按 `kModelSleepMa`（5 mA，仍是模型值；官方手册整板 6 mA，可按 6 mA 回填）在入睡时一次性补上。
-- 常量口径：窗口段 `kModelWindowMa = 95 mA` 是 2026-11-10 实测；`kModelIdleMa` / `kModelShotMa` / `kModelSaveMa` / `kModelSleepMa` 仍是模型值，等万用表补测后回填。
+- 常量口径：窗口段 `kModelWindowMa = 95 mA` 是 2026-11-10 实测；`kModelIdleMa` / `kModelShotMa` / `kModelSaveMa` / `kModelSleepMa` 仍是模型值，等低阻分流补测后回填（万用表无法从源头串入）。
 - **冷启动那一小时的 `CAPTURE` 行偏低**：它按“1 小时 − 15 分钟窗口”的模型算，没算窗口本身的电流。看窗口能耗请看 `WEB_CLOSE` 行。
 
 ## 6. 编译与烧录
