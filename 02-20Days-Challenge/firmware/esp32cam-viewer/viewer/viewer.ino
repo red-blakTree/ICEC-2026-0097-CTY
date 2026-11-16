@@ -400,10 +400,10 @@ void setup() {
   }
   Serial.println("[OK] SD 卡初始化完成");
 
+  clearDataIfRequested();
   s_next_index = nextIndexFromSd();
   Serial.printf("[OK] 下一张编号 IMG_%05lu.jpg\n", (unsigned long)s_next_index);
 
-  clearDataIfRequested();
   powerLogHeaderIfNeeded();
   s_last_sample_ms = millis();
   s_next_log_ms = millis() + kPowerLogIntervalMs;
