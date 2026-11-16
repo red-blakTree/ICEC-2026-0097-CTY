@@ -51,6 +51,8 @@ $$I_{avg} = \frac{I_{active} \times t_{active} + I_{sleep} \times (T - t_{active
 | 仅软件优化（PWDN 拉高 + GPIO isolate） | ~3-4 mA | 摄像头省掉一部分，但 LDO 静态电流不变 |
 | **换 LDO + MOSFET 切断摄像头/SD + 去 LED** | **~0.05-0.15 mA** | 目标值，需 `【实测】` 确认 |
 
+> 官方 ESP32-CAM 数据手册（AI-Thinker v1.0）写 `Deep-Sleep: 6mA @ 5V`，与上表 `~5 mA` 同量级；上表 5 mA 是 AMS1117 静态，整板 6 mA 含其余漏电。
+
 ### 2.3 平均电流与续航对比（2000 mAh 锂电，按可用 80% = 1600 mAh·h 计算）
 
 > 下表是「T=60 s 每次都上传」的旧测算口径，用于说明各杠杆的相对大小；
