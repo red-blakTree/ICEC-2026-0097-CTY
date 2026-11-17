@@ -8,7 +8,7 @@
 |---|---|---|---|
 | 01 现场发现 | 课题 3：2.4 GHz 无线信号测绘 | 8 点位 × 3 轮 = **24 组主数据**（共 40 轮）/ 43 条 PureHub 读数（29 扫描 + 14 概览）；宿舍隔墙净损耗 13–19 dB、电梯轿厢 18–24 dB；走廊衰减指数四个口径 0.22 / 2.86 / 1.35 / 0.58；盲区只列候选 | [topic_3/README.md](01-Field-Discovery/topic_3/README.md) |
 | 01 现场发现 | 课题 8：多姿态步态加速度判别 | 4 类交付 97.5 %（记录级 4/4）；5 类跨日 86.8–94.6 %（记录级全对）；2026-11-17 完全未参与选型，v7 94.5 %（v6 87.8 %），不摆臂段 v7 94.5 %（v6 37.1 %） | [topic_8/README.md](01-Field-Discovery/topic_8/README.md) |
-| 02 20 天挑战 | ESP32-CAM 极致省电 | 24 h 平均 `90 mA → 6.98 mA`（**12.9 倍**，手册 6 mA 口径）/ `10.94 mA`（8.2 倍，表上界 10 mA）；「10 倍」临界是深睡 `≤ 8.04 mA`；三项均有交付（② 受限项见 2.1） | [02-20Days-Challenge/README.md](02-20Days-Challenge/README.md) |
+| 02 20 天挑战 | ESP32-CAM 极致省电 | 24 h 平均 `90 mA → 6.98 mA`（**12.9 倍**，手册 6 mA 口径）/ `10.94 mA`（8.2 倍，表上界 10 mA）；「10 倍」临界是深睡 `≤ 8.04 mA`；三项均有交付，① 与 ② 各有受限项（见 2.1） | [02-20Days-Challenge/README.md](02-20Days-Challenge/README.md) |
 | 02 20 天挑战 | FreeRTOS V11.3.1 源码分析 | 以「一条链表 + 一种同步对象」为主线，附功耗专题 | [docs/FreeRTOS-V11.3.1-Source-Analysis.md](02-20Days-Challenge/docs/FreeRTOS-V11.3.1-Source-Analysis.md) |
 | 03 AI 排障记录 | 7 张关键提问排障对话截图 | 课题 3 归因、课题 8 选型 / 对照 / 采集协议三类排障 | [03-AI-Collaboration/](03-AI-Collaboration/) |
 
@@ -95,7 +95,7 @@
 
 | 交付项 | 内容 | 状态 |
 |---|---|---|
-| ① 优化前后各阶段实测电流对照表与视频 | P1–P6 对照表 + [current-comparison.csv](02-20Days-Challenge/measurement/current-comparison.csv) + 6 段录屏（合计约 3.8 min） | ✅ 对照表与视频齐；基线 P3 只有 1 s 视频表读（🟡）、无 WiFi 拍照段未测（❌），逐项见 [02 README 交付状态](02-20Days-Challenge/README.md) |
+| ① 优化前后各阶段实测电流对照表与视频 | P1–P6 对照表 + [current-comparison.csv](02-20Days-Challenge/measurement/current-comparison.csv) + 6 段录屏（合计约 3.8 min） | 🟡 对照表与视频齐；基线 P3 只有 1 s 视频表读、无 WiFi 拍照段未测，逐项见 [02 README 交付状态](02-20Days-Challenge/README.md) |
 | ② 连续 24 h 以上电压 / 功耗时序 CSV | 3 份 `POWER.CSV` + [24 h 表实测能量区间](02-20Days-Challenge/measurement/24h-meter-series.csv) + 10 个表盘点 + 5 点能量曲线 | 🟡 24 h 数据齐套（设备日志 + 表实测区间）；省电版连续电压 / 电流曲线受 0.01 A 表限制不可得（见 02 README 2.5） |
 | ③ 功耗预算推导模型与状态机源码 | [theory.py](02-20Days-Challenge/measurement/theory.py) + [power-budget-model.md](02-20Days-Challenge/docs/power-budget-model.md) + [state-machine.md](02-20Days-Challenge/docs/state-machine.md) + [powersave.ino](02-20Days-Challenge/firmware/esp32cam-powersave/powersave/powersave.ino) | ✅ 模型可复跑（`verify.py` 34 项自检 + 7 个回归测试），状态机源码 / 行号映射完整 |
 
