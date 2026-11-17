@@ -100,9 +100,9 @@ def build(anchors):
 
 def _note(a, b):
     if a["ts"].strftime("%H:%M") == "21:02" and b["ts"].strftime("%H:%M") == "12:04":
-        return "含 08:20–12:04 WiFi 断连段，区间平均被 0.18 A 抬高"
+        return "含 08:20 起的断连段（12:08 才重连成功），区间平均被 0.18 A 抬高"
     if a["ts"].strftime("%H:%M") == "12:04":
-        return "WiFi 重连成功后的 4 min"
+        return "重连过程中的 4 min（12:08 成功）"
     if a["ts"].strftime("%H:%M") == "12:08":
         return "12:08 后累计量反推仍主要处于 0.18 A 档"
     return "上电稳定段（8 min）"
@@ -138,7 +138,7 @@ def main():
     t = totals(rows)
     print(text, end="")
     print(f"合计: {t['hours']:.2f} h / {t['mwh']} mWh / "
-          f"{t['avg_mw']:.1f} mW / {t['avg_ma']:.1f} mA @5 V")
+          f"{t['avg_mw']:.1f} mW / {t['avg_ma']:.1f} mA @5.04 V")
     if not 23.9 <= t["hours"] <= 24.2:
         raise SystemExit("跨度不是 24 h 左右，检查锚点")
     if t["mwh"] != 16384:
