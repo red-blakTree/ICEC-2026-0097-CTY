@@ -1,0 +1,35 @@
+v7 盲测：data/blind/2026-11-17（RBF-SVM，v6 特征，8 s 窗 / 1 s 步长）
+模型：output/svm/model_rbf.joblib（训练 2026-10-30、2026-10-31、2026-11-01，36 段 2785 窗；训练设备 PKG110（OnePlus））
+输入：/home/binarytree/.fedora/ICEC-2026-0097-CTY/01-Field-Discovery/topic_8/data/blind/2026-11-17
+段数 13，窗数 1078；输入设备：PKG110（OnePlus）×13
+真值由段目录名推断；记录级 = 每段多数票；macro-F1 按实际出现的 5 类计算。
+
+窗口级 94.5%（1019/1078），Wilson 95% [93.0, 95.7]；记录级 13/13；macroF1 0.912
+
+逐段：
+记录             真值       窗数      窗口级 多数票       对错      平均P 设备
+go_downstairs-1 下楼       95     81.1% 下楼         对    0.753 PKG110（OnePlus）
+go_downstairs-2 下楼       86     97.7% 下楼         对    0.950 PKG110（OnePlus）
+go_downstairs-noswing-1 下楼       82     74.4% 下楼         对    0.600 PKG110（OnePlus）
+go_downstairs-noswing-2 下楼       82    100.0% 下楼         对    0.928 PKG110（OnePlus）
+go_upstairs-1  上楼       96    100.0% 上楼         对    0.992 PKG110（OnePlus）
+go_upstairs-2  上楼       94     94.7% 上楼         对    0.932 PKG110（OnePlus）
+go_upstairs-noswing-1 上楼       97     96.9% 上楼         对    0.963 PKG110（OnePlus）
+go_upstairs-noswing-2 上楼      101    100.0% 上楼         对    0.994 PKG110（OnePlus）
+jogging        快跑      152    100.0% 快跑         对    0.990 PKG110（OnePlus）
+sprint         快跑       14    100.0% 快跑         对    0.880 PKG110（OnePlus）
+stand          静止       18     61.1% 静止         对    0.562 PKG110（OnePlus）
+walk-1         慢走       68     97.1% 慢走         对    0.934 PKG110（OnePlus）
+walk-noswing   慢走       93     98.9% 慢走         对    0.985 PKG110（OnePlus）
+
+窗口级混淆矩阵（行=真值，列=判决）
+           静止     慢走     快跑     上楼     下楼
+静止         11      0      7      0      0
+慢走          0    158      0      2      1
+快跑          0      0    166      0      0
+上楼          0      6      0    380      2
+下楼          0     12      0     29    304
+逐类召回：静止 61.1%，慢走 98.1%，快跑 100.0%，上楼 97.9%，下楼 88.1%
+逐类精确率：静止 100.0%，慢走 89.8%，快跑 96.0%，上楼 92.5%，下楼 99.0%
+
+注：窗重叠 7/8，记录级比窗口级可信；概率为 Platt 校准，仅作排序参考。
