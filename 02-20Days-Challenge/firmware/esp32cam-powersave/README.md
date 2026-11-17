@@ -9,6 +9,8 @@
 
 ## 2. 行为与状态机
 
+> 完整状态图、状态×动作×源码行号表、RTC 变量与失败模式见 [`docs/state-machine.md`](../../docs/state-machine.md)。
+
 ```text
 上电/复位 ─► 冷启动：连 WiFi+NTP ─► 拍照 ─► Web 窗口 15 min ─► 停网页/断射频 ─► 关摄像头、卸载 SD ─► deep sleep 1 h
                                                         └─ 窗口内可查图、下载 POWER.CSV
@@ -48,13 +50,13 @@ WiFi 使用固定 IP `192.168.16.10`（网关 `192.168.16.1`，DNS `192.168.16.1
 | 睡眠能耗记账 | `kModelSleepMa` + RTC 内存累计，`POWER.CSV` 的 `e_mwh` 不会被低估 | 2.3 |
 | 关闭闪光灯 | GPIO4 输出低，开机即关 | — |
 | WiFi modem sleep | Arduino ESP32 核心默认 `WIFI_PS_MIN_MODEM`，无需再调 | — |
-| 数字 IO 自动隔离 | deep sleep 入口调用 `esp_sleep_isolate_digital_gpio()`，未 hold 的 IO 全部隔离 | — |
+| 数字 IO | 仅对 PWDN 做 `gpio_hold_en` + `gpio_deep_sleep_hold_en`；**未调用** `esp_sleep_isolate_digital_gpio()` | — |
 
 ## 4. 没有做（及原因）
 
 | 措施 | 原因 |
 |---|---|
-| CPU 降频（240 → 80 MHz） | 活跃阶段只有约 1 s/小时，省下的电 < 0.1%；反而给 SDMMC / 摄像头时序引入风险 |
+| CPU 降频（240 → 80 MHz） | 已定量评估、未启用：活跃段仅 33.6–50.4 s/天，上限收益 `≤0.42 mAh/天`（<0.25 %），却给 OV2640 XCLK / SDMMC 时序引入风险；取舍表见 [`state-machine.md` 第 6 节](../../docs/state-machine.md#6-时钟降频专项点名要求但未落地) |
 | BSSID + channel 直连 | 只在冷启动连一次，能省 1–2 s × 120 mA ≈ 0.06 mAh，占 15 分钟窗口的 0.1% |
 | 降低 TX 功率 | 窗口内基本是空闲收包，TX 占比极低；降功率有掉线风险 |
 | `sdkconfig` 内核/系统配置 | Arduino 核心用预编译库，改不了；要改只能换 ESP-IDF |
@@ -150,4 +152,4 @@ WiFi 连接失败时不开网页，拍完直接睡到下个周期。
 - 拍照峰值（60–90 ms）测不到；现有一条 `0.13–0.16 A` 是连拍放大后的平均值。
 - `POWER.CSV` 的电流/电压是模型值（`v5_mv=-1`），不是表实测曲线。
 - 15 分钟窗口内是否有人刷页面，会让窗口段电流在 `0.09–0.22 A` 之间差 2.4 倍；24 h 平均跟着差 15–20 %。
-- CPU 降频、BSSID 直连、降 TX 功率、sdkconfig、换 LDO、切外设供电均未做，原因见第 4 节。
+- CPU 降频已定量评估、未启用（理由与收益表见 [`state-machine.md` 第 6 节](../../docs/state-machine.md#6-时钟降频专项点名要求但未落地)）；BSSID 直连、降 TX 功率、sdkconfig、换 LDO、切外设供电均未做，原因见第 4 节。
