@@ -319,6 +319,62 @@ def fig4():
     plt.close(fig)
 
 
+def fig5(signal):
+    """可配对组的相对衰减：采用页与另一页各给一个 ΔRSSI。"""
+    def rssi(rel):
+        return float(signal[rel]["rssi_dbm"])
+
+    groups = [
+        ("corridor 8.5 m (air)", "T5-01", "T5-02", "overview"),
+        ("corridor 42.5 m (air)", "T5-01", "T5-03", "overview"),
+        ("elevator cabin (metal)", "T5-04", "T5-05", "overview"),
+        ("dorm partition (concrete+tile)", "D-01", "D-02", "scan"),
+    ]
+    ov = [rssi(OVERVIEW_FILE[x]) - rssi(OVERVIEW_FILE[z]) for _, z, x, _ in groups]
+    sc = [rssi(SCAN_FILE[x]) - rssi(SCAN_FILE[z]) for _, z, x, _ in groups]
+    adopted = [sc[i] if groups[i][3] == "scan" else ov[i] for i in range(len(groups))]
+    other = [ov[i] if groups[i][3] == "scan" else sc[i] for i in range(len(groups))]
+    # T5-05 的扫描页有两张（−65 / −76），用区间表示，不取其中一张
+    other[2] = None
+    lo2 = rssi("in_elevator/in_elevator.4.jpg") - rssi("datum_mark/elevator-after.1.jpg")
+    hi2 = rssi("in_elevator/in_elevator.3.jpg") - rssi("datum_mark/elevator-after.1.jpg")
+
+    y = list(range(len(groups)))[::-1]
+    fig, ax = plt.subplots(figsize=(8.6, 4.4), constrained_layout=True)
+    ax.axvline(0, color="#888888", lw=0.9)
+    for yy, adv, oth in zip(y, adopted, other):
+        end = adv if oth is None else oth
+        ax.plot([min(adv, end), max(adv, end)], [yy, yy], color="#cccccc", lw=1.2, zorder=1)
+    ax.scatter(adopted, y, s=70, color=C_OV, zorder=3)
+    for yy, v in zip(y, adopted):
+        ax.annotate(f"{v:+.0f}", (v, yy), textcoords="offset points", xytext=(0, 10),
+                    ha="center", fontsize=8, color=C_OV)
+    for yy, v in zip(y, other):
+        if v is None:
+            ax.plot([lo2, hi2], [yy, yy], color=C_SC, lw=1.4, marker="|", ms=7)
+            ax.annotate(f"{lo2:+.0f} ~ {hi2:+.0f}", ((lo2 + hi2) / 2, yy),
+                        textcoords="offset points", xytext=(0, -14), ha="center",
+                        fontsize=8, color=C_SC)
+        else:
+            ax.scatter([v], [yy], s=70, facecolor="white", edgecolor=C_SC, lw=1.4, zorder=3)
+            ax.annotate(f"{v:+.0f}", (v, yy), textcoords="offset points", xytext=(0, -14),
+                        ha="center", fontsize=8, color=C_SC)
+    ax.set_yticks(y)
+    ax.set_yticklabels([g[0] for g in groups])
+    ax.set_xlim(-32, 8)
+    ax.set_ylim(-0.75, 3.5)
+    ax.set_xlabel("ΔRSSI vs. 1 m zero (dB; negative = attenuation)")
+    ax.set_title("Paired relative attenuation, two page conventions per group")
+    ax.grid(axis="y", visible=False)
+    ax.legend(handles=[
+        Line2D([], [], marker="o", ls="", color=C_OV, label="adopted page"),
+        Line2D([], [], marker="o", ls="", mfc="white", mec=C_SC, color=C_SC,
+               label="other page"),
+    ], loc="lower left", fontsize=8)
+    fig.savefig(OUT / "fig5_paired_delta.png", bbox_inches="tight")
+    plt.close(fig)
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     stats, signal = load_data()
@@ -326,8 +382,10 @@ def main():
     fig2(stats)
     fig3(stats, signal)
     fig4()
+    fig5(signal)
     for name in ("fig1_rssi_sir.png", "fig2_latency_throughput.png",
-                 "fig3_distance_profile.png", "fig4_corridor.png"):
+                 "fig3_distance_profile.png", "fig4_corridor.png",
+                 "fig5_paired_delta.png"):
         print(OUT / name)
 
 
