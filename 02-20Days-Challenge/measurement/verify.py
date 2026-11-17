@@ -81,7 +81,7 @@ def check_budget():
 def check_comparison():
     path = HERE / "current-comparison.csv"
     rows = rows_of(path)
-    check("current-comparison.csv 行数", len(rows) == 11, f"{len(rows)} 行")
+    check("current-comparison.csv 行数", len(rows) == 12, f"{len(rows)} 行")
     need = {"stage", "quantity", "baseline_value", "baseline_unit",
             "baseline_v", "powersave_value", "powersave_unit",
             "powersave_v", "method", "evidence"}
