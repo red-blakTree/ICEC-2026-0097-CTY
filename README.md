@@ -6,7 +6,7 @@
 
 | 模块 | 内容 | 一句话结果 | 入口 |
 |---|---|---|---|
-| 01 现场发现 | 课题 3：2.4 GHz 无线信号测绘 | 8 个点位 / 40 轮测速 / 43 条 RSSI·SIR 读数，盲区只列候选、不定级 | [topic_3/README.md](01-Field-Discovery/topic_3/README.md) |
+| 01 现场发现 | 课题 3：2.4 GHz 无线信号测绘 | 8 点位 × 3 轮 = **24 组主数据**（共 40 轮）/ 43 条 RSSI·SIR 读数；墙体净穿墙损耗 13–19 dB、走廊 n = 0.58–1.35；盲区只列候选 | [topic_3/README.md](01-Field-Discovery/topic_3/README.md) |
 | 01 现场发现 | 课题 8：多姿态步态加速度判别 | 跨日盲测 94.5 %（记录级 9/9），并定位到「跨日失效源于非不变判决量」 | [topic_8/README.md](01-Field-Discovery/topic_8/README.md) |
 | 02 20 天挑战 | ESP32-CAM 极致省电 | 实机 24 h 平均 `90 mA → 6.98–10.94 mA`（**8.2–12.9 倍**；手册 6 mA 口径 12.9 倍），三项均有交付（②含 24 h 连续日志 + 表实测能量；连续电压/电流曲线受 0.01 A 表限制） | [02-20Days-Challenge/README.md](02-20Days-Challenge/README.md) |
 | 02 20 天挑战 | FreeRTOS V11.3.1 源码分析 | 以「一条链表 + 一种同步对象」为主线，附功耗专题 | [docs/FreeRTOS-V11.3.1-Source-Analysis.md](02-20Days-Challenge/docs/FreeRTOS-V11.3.1-Source-Analysis.md) |
@@ -31,17 +31,19 @@
 
 | 指标 | 结果 |
 |---|---|
-| 规模 | 8 点位 + 3 零点；40 轮测速；43 条无线读数 |
+| 规模 | 8 点位 × 3 轮 = 24 组主数据 + 16 轮补测 / 零点（共 40 轮）；43 条无线读数（测试点位 28 条） |
 | 丢包 | 0 / 40 轮 |
 | PING 中位 | 15.9–29.5 ms；P95 22.9–473.8 ms（仅电梯首轮超 100 ms） |
 | 吞吐 | 下载 3.14–158.32 Mbps；有效上传 34.11–242.08 Mbps |
 | 采用页 RSSI / SIR | −83 ~ −63 dBm / −35.3 ~ +4.2 dB |
 | 可配对 ΔRSSI | 走廊 −2、−22 dB；电梯 −24 dB（概览）；宿舍 −19 dB（扫描口径，概览页反向，未定稿） |
 | 走廊衰减指数 n | 近段 0.22 / 远段 2.86 / 全程 1.35 / 同会话 0.58 |
+| 墙体材质（可配对） | 10 cm 混凝土 + 瓷砖净损耗 13–19 dB；金属轿厢 18–24 dB；均与文献量级一致 |
+| 多径规律 | 6 条（波导增强、近场饱和、快衰落 0–17 dB、深衰落长尾、吞吐非单调、频率选择性） |
 
-**结论强度**：这是描述性汇总。RSSI / SIR 是点位级快照（同一位置换页差 0–17 dB），4 个点位缺本地零点，距离多为目测或按教室间距推算，所以盲区只给候选（T5-03、T5-06 至少边缘；T5-07、L1-01 边缘；T5-05、D-02 不稳定），不做定级；跨会话的 n 值不可直接比较。这些限制和补测建议写在报告第 6 节、第 8 节。
+**结论强度**：这是描述性汇总。RSSI / SIR 是点位级快照（同一位置换页差 0–17 dB），4 个点位缺本地零点，距离多为目测或按教室间距推算，所以盲区只给候选（T5-03、T5-06 至少边缘；T5-07、L1-01 边缘；T5-05、D-02 不稳定），不做定级；跨会话的 n 值不可直接比较。这些限制和补测建议写在报告第 12 节、第 13 节。
 
-**交付**：报告 [README.md](01-Field-Discovery/topic_3/README.md)（v5.2）· 原始记录 [data/results.json](01-Field-Discovery/topic_3/data/results.json) · 汇总 [measurements.csv](01-Field-Discovery/topic_3/data/measurements.csv) / [signal.csv](01-Field-Discovery/topic_3/data/signal.csv) · 分析图 [picture/analysis/](01-Field-Discovery/topic_3/picture/analysis/) · 采集脚本 [src/](01-Field-Discovery/topic_3/src/)。
+**交付**：报告 [README.md](01-Field-Discovery/topic_3/README.md)（v6.0）· 原始记录 [data/results.json](01-Field-Discovery/topic_3/data/results.json) · **24 组明细 [delivery_24.csv](01-Field-Discovery/topic_3/data/delivery_24.csv)** · 汇总 [measurements.csv](01-Field-Discovery/topic_3/data/measurements.csv) / [signal.csv](01-Field-Discovery/topic_3/data/signal.csv) · 分析图 [picture/analysis/](01-Field-Discovery/topic_3/picture/analysis/)（图 1–5）· 采集脚本 [src/](01-Field-Discovery/topic_3/src/)。
 
 ### 1.2 课题 8：多姿态步态加速度判别（v1 → v7）
 
