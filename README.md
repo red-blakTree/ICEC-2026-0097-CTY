@@ -8,7 +8,7 @@
 |---|---|---|---|
 | 01 现场发现 | 课题 3：2.4 GHz 无线信号测绘 | 8 个点位 / 40 轮测速 / 43 条 RSSI·SIR 读数，盲区只列候选、不定级 | [topic_3/README.md](01-Field-Discovery/topic_3/README.md) |
 | 01 现场发现 | 课题 8：多姿态步态加速度判别 | 跨日盲测 94.5 %（记录级 9/9），并定位到「跨日失效源于非不变判决量」 | [topic_8/README.md](01-Field-Discovery/topic_8/README.md) |
-| 02 20 天挑战 | ESP32-CAM 极致省电 | 实机 24 h 平均 `90 mA → 6.98–10.94 mA`（**8.2–12.9 倍**；手册 6 mA 口径 12.9 倍），三项均有交付（②受表停表限制） | [02-20Days-Challenge/README.md](02-20Days-Challenge/README.md) |
+| 02 20 天挑战 | ESP32-CAM 极致省电 | 实机 24 h 平均 `90 mA → 6.98–10.94 mA`（**8.2–12.9 倍**；手册 6 mA 口径 12.9 倍），三项均有交付（②含 24 h 连续日志 + 表实测能量；连续电压/电流曲线受 0.01 A 表限制） | [02-20Days-Challenge/README.md](02-20Days-Challenge/README.md) |
 | 02 20 天挑战 | FreeRTOS V11.3.1 源码分析 | 以「一条链表 + 一种同步对象」为主线，附功耗专题 | [docs/FreeRTOS-V11.3.1-Source-Analysis.md](02-20Days-Challenge/docs/FreeRTOS-V11.3.1-Source-Analysis.md) |
 | 03 AI 排障记录 | 4 张关键提问排障对话截图 | 课题 3 归因、课题 8 选型 / 对照 / 数据条件四类排障 | [03-AI-Collaboration/](03-AI-Collaboration/) |
 
@@ -81,17 +81,17 @@
 
 | 题面要求 | 本仓库交付 | 状态 |
 |---|---|---|
-| ① 优化前后各阶段实测电流对照表与视频 | P1–P6 对照表 + [current-comparison.csv](02-20Days-Challenge/measurement/current-comparison.csv) + 6 段录屏 | ✅ 五阶段都有读数；基线 P3 为同条件推断 + 1 s 视频表读 |
-| ② 连续 24 h 以上电压 / 功耗时序 CSV | 3 份 `POWER.CSV` + 10 点表读转写 + 24 h 表端点 | 🟡 24 h 设备侧时序与表端点齐；连续表曲线受 0.01 A 表停表限制 |
-| ③ 功耗预算推导模型与状态机源码 | [theory.py](02-20Days-Challenge/measurement/theory.py) + [powersave.ino](02-20Days-Challenge/firmware/esp32cam-powersave/powersave/powersave.ino) | ✅ 模型可复跑，状态机源码完整 |
+| ① 优化前后各阶段实测电流对照表与视频 | P1–P6 对照表 + [current-comparison.csv](02-20Days-Challenge/measurement/current-comparison.csv) + 6 段录屏 | ✅ 五阶段都有读数；基线 P3 只有 1 s 视频表读，60–90 ms 未测 |
+| ② 连续 24 h 以上电压 / 功耗时序 CSV | 3 份 `POWER.CSV` + [24 h 表实测能量区间](02-20Days-Challenge/measurement/24h-meter-series.csv) + 10 点表读 + 24 h 表端点 | 🟡 24 h 连续日志与表实测能量齐；连续电压/电流曲线受 0.01 A 表限制（见 02 README 2.5） |
+| ③ 功耗预算推导模型与状态机源码 | [theory.py](02-20Days-Challenge/measurement/theory.py) + [power-budget-model.md](02-20Days-Challenge/docs/power-budget-model.md) + [state-machine.md](02-20Days-Challenge/docs/state-machine.md) + [powersave.ino](02-20Days-Challenge/firmware/esp32cam-powersave/powersave/powersave.ino) | ✅ 模型可复跑（verify.py 34 项自检），状态机源码/行号映射完整 |
 
-**结论**：24 h 平均电流 **`90 mA → 6.98–10.94 mA`，8.2–12.9 倍**。10 倍要求是 `I_avg ≤ 9.0 mA`，代入三段式模型约等于深睡 `≤ 8.0 mA`；按官方手册的整板深睡 `6 mA @ 5 V` 得 `6.98 mA / 12.9×`（达标），按表的分辨率上界 `10 mA` 得 `10.94 mA / 8.2×`（不到 10 倍）。10 mA 是仪器上界，不是实测值；本板整板电流无法用万用表测量（无法从源头串入，见 [测量方案](02-20Days-Challenge/measurement/README.md) 第 6 节），深睡只能取「表上界 + 手册点值」这个区间。
+**结论**：24 h 平均电流 **`90 mA → 6.98–10.94 mA`，8.2–12.9 倍**。10 倍要求是 `I_avg ≤ 9.0 mA`，代入三段式模型约等于深睡 `≤ 8.04 mA`；按官方手册的整板深睡 `6 mA @ 5 V` 得 `6.98 mA / 12.9×`（达标），按表的分辨率上界 `10 mA` 得 `10.94 mA / 8.2×`（不到 10 倍）。10 mA 是仪器上界，不是实测值；本板整板电流无法用万用表测量（无法从源头串入，见 [测量方案](02-20Days-Challenge/measurement/README.md) 第 6 节），深睡只能取「表上界 + 手册点值」这个区间。
 
 **各阶段实测（USB 表串在 5 V 输入端，0.01 A 分辨率）**
 
 | 阶段 | 基线 viewer | 省电版 powersave |
 |---|---|---|
-| P1 冷启动（上电 → 首拍） | `0.09–0.16 A`（约 6 s） | `0.09–0.16 A` |
+| P1 冷启动（上电 → 首拍） | `0.09–0.15 A`（约 6 s） | `0.09–0.15 A` |
 | P3 拍照 + 写卡 | 1 s 表读 `0.10–0.13 A`（旁证）；60–90 ms 平均未测 | `0.13–0.16 A`（24 s / 10 次连拍放大占空比） |
 | P4 深睡 | 不休眠 | 表 `≤ 0.01 A`；手册 `6 mA @ 5 V` |
 | P5 单次唤醒（复位 → 再入睡） | 不适用 | `1.4–2.1 s` |
@@ -100,8 +100,8 @@
 **24 h 数据怎么读（两个口径必须分开）**
 
 - 基线健康段：`0.09 A` 直读 → `2.16 Ah / 10.8 Wh`，平均 `90 mA`。
-- 2026-11-11 异常日：08:20 起约 12.6 h WiFi 断连，电流抬到 `0.18 A`，表累计 `≈16.38 Wh ≈ 136 mA` 平均；单列为异常日，不进倍数表。
-- 省电版没有 24 h 表曲线：深睡（手册 6 mA）低于 0.01 A 分辨率，且表在电流低于阈值时停表不累计；24 h 里约 99 % 时间是深睡，所以「直读深睡」在这块表上不成立。现有的是 [15.20 h 设备侧模型日志](02-20Days-Challenge/evidence/powersave-15h-2026-11-10/README.md)（含 9 次冷启动，均值被窗口抬高，不代表常态），以及窗口 / 唤醒段的实测值。
+- 2026-11-11 异常日：08:20 起约 12.6 h WiFi 断连，电流抬到 `0.18 A`，表累计 `≈16.38 Wh`、平均 `135.4 mA`；按 4 个实测区间差分见 [24h-meter-series.csv](02-20Days-Challenge/measurement/24h-meter-series.csv)，异常日单列、不进倍数表。
+- 省电版没有 24 h 表曲线：深睡（手册 6 mA）低于 0.01 A 分辨率，且表在电流低于阈值时停表不累计；24 h 里约 99 % 时间是深睡，所以「直读深睡」在这块表上不成立。现有的是 [24 h 连续设备日志](02-20Days-Challenge/evidence/baseline-24h-meter-2026-11-10/POWER.CSV) + [表实测能量区间](02-20Days-Challenge/measurement/24h-meter-series.csv) + [15.20 h 省电版运行片段](02-20Days-Challenge/evidence/powersave-15h-2026-11-10/README.md)，以及窗口 / 唤醒段的实测值。
 - 模型修正：窗口段模型按 `165 mA` 记，实测 `95 mA`，高估约 1.7 倍；基线 `POWER.CSV` 的 `45 mA` 固件模型不含 WiFi，实测 `90 mA` 是它的 2 倍。
 
 **三个固件**
@@ -112,11 +112,11 @@
 | [esp32cam-powersave](02-20Days-Challenge/firmware/esp32cam-powersave/README.md) | 开机 15 min WiFi / 网页窗口，窗口结束断射频进深睡；定时唤醒只拍照不连 WiFi | 省电方案落地版，实机运行 |
 | [esp32cam-capture-probe](02-20Days-Challenge/firmware/esp32cam-capture-probe/README.md) | 连拍放大占空比的拍照电流探针 | 让 60–90 ms 的拍照脉冲在秒级表上可读 |
 
-**省电手段**：深睡占空比、WiFi 用完即关、定时唤醒不连 WiFi、摄像头 `esp_camera_deinit()` 后 PWDN 拉高并 `gpio_hold` 保持、睡眠前卸载 SD、把睡眠能耗记进账。题面三项策略里，外设断电控制与 Deep-Sleep 已落地，**时钟降频未做**——活跃段合计约 34–50 s / 天，相机与 SD 电流不随 CPU 主频下降，估算收益 < 0.1 %，却会给 OV2640 XCLK / SDMMC 时序引入风险；理由写在省电版 README。硬件改造（换 LDO、MOSFET 切供电、去 LED）只写进方案，未实做。
+**省电手段**：深睡占空比、WiFi 用完即关、定时唤醒不连 WiFi、摄像头 `esp_camera_deinit()` 后 PWDN 拉高并 `gpio_hold` 保持、睡眠前卸载 SD、把睡眠能耗记进账。题面三项策略里，外设断电控制与 Deep-Sleep 已落地；**时钟降频已定量评估、未启用**——活跃段合计 33.6–50.4 s/天，上限收益 `≤0.42 mAh/天`（<0.25 %），却会给 OV2640 XCLK / SDMMC 时序引入风险，取舍表见 [state-machine.md](02-20Days-Challenge/docs/state-machine.md) 第 6 节。硬件改造（换 LDO、MOSFET 切供电、去 LED）只写进方案，未实做。
 
-**证据**：[evidence/](02-20Days-Challenge/evidence/) 下 6 组目录——两份 24 h 日志（[11-09](02-20Days-Challenge/evidence/baseline-24h-2026-11-09/README.md) / [11-10 表端点](02-20Days-Challenge/evidence/baseline-24h-meter-2026-11-10/README.md)）、[基线常开直读](02-20Days-Challenge/evidence/baseline-viewer-meter-2026-11-10/README.md)、[基线 P3 连拍](02-20Days-Challenge/evidence/baseline-viewer-meter-2026-11-16/README.md)、[省电版窗口录屏](02-20Days-Challenge/evidence/powersave-meter-2026-11-10/README.md)、[省电版 15.2 h 运行](02-20Days-Challenge/evidence/powersave-15h-2026-11-10/README.md)，含 6 段视频、表盘照片与 `manifest.sha256`。
+**证据**：[evidence/](02-20Days-Challenge/evidence/) 下 6 组目录——两份 24 h 日志（[11-09](02-20Days-Challenge/evidence/baseline-24h-2026-11-09/README.md) / [11-10 表端点](02-20Days-Challenge/evidence/baseline-24h-meter-2026-11-10/README.md)）、[基线常开直读](02-20Days-Challenge/evidence/baseline-viewer-meter-2026-11-10/README.md)、[基线 P3 连拍](02-20Days-Challenge/evidence/baseline-viewer-meter-2026-11-16/README.md)、[省电版窗口录屏](02-20Days-Challenge/evidence/powersave-meter-2026-11-10/README.md)、[省电版 15.2 h 运行](02-20Days-Challenge/evidence/powersave-15h-2026-11-10/README.md)，含 6 段视频、表盘照片与 `manifest.sha256`。新增的 [24 h 区间 CSV](02-20Days-Challenge/measurement/24h-meter-series.csv) 由 [build_meter_series.py](02-20Days-Challenge/measurement/build_meter_series.py) 生成，[verify.py](02-20Days-Challenge/measurement/verify.py) 可一键复核 34 项。
 
-> [docs/ESP32-CAM-Ultra-Low-Power-Solution.md](02-20Days-Challenge/docs/ESP32-CAM-Ultra-Low-Power-Solution.md) 是设计推演（架构、`sdkconfig`、陷阱清单、早期 `17.1 mA → 1.54 mA` 测算）。量化结论以实机口径为准，早期测算不再作为交付数字。
+> [docs/ESP32-CAM-Ultra-Low-Power-Solution.md](02-20Days-Challenge/docs/ESP32-CAM-Ultra-Low-Power-Solution.md) 是设计推演（架构、`sdkconfig`、陷阱清单、早期 `17.1 mA → 1.54 mA` 测算）。量化结论以实机口径为准，早期测算不再作为交付数字；三段式推导见 [power-budget-model.md](02-20Days-Challenge/docs/power-budget-model.md)，状态机见 [state-machine.md](02-20Days-Challenge/docs/state-machine.md)。
 
 ### 2.2 FreeRTOS Kernel V11.3.1 源码分析
 
