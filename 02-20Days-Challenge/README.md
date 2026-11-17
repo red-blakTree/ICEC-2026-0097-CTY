@@ -10,9 +10,9 @@
 
 | 题面要求 | 本仓库交付 | 直接证据 | 状态 |
 |---|---|---|---|
-| **①** 优化前后各阶段实测电流对比照与视频（15 分） | P1–P6 分阶段对照表、同一块表的对比照、6 段录屏 | 第 1 节；[`current-comparison.csv`](measurement/current-comparison.csv)；[`evidence/`](evidence/) | ✅ 五个阶段都有表读；基线 P3 只有 1 s 视频表读，60–90 ms 未测（见 1.4） |
-| **②** 连续 24 h 以上电池电压/功耗实测时序 CSV（25 分） | 24.00 h 设备侧 5 min 日志（317 行；另一轮 322 行）+ **24 h 表累计能量区间序列**（4 段）+ 10 个表盘点 + 24 张整点照片（11-09 轮归档；11-10 轮 api 清单 28 张未入库） | 第 2 节；[`24h-meter-series.csv`](measurement/24h-meter-series.csv)；[`POWER.CSV`](evidence/baseline-24h-meter-2026-11-10/POWER.CSV)；[`meter-readings.csv`](evidence/baseline-24h-meter-2026-11-10/meter-readings.csv) | 🟡 24 h 连续设备日志 ✅、表实测能量区间 ✅；连续**电压/电流**曲线 ❌（0.01 A 表限制，见 2.5） |
-| **③** 功耗预算推导模型与状态机源码（20 分） | 三段式预算模型 + 敏感性分析 + 可跑代码/测试；状态机源码、状态图与源码行号映射 | 第 3 节；[`theory.py`](measurement/theory.py)；[`powersave.ino`](firmware/esp32cam-powersave/powersave/powersave.ino)；[`state-machine.md`](docs/state-machine.md) | ✅ 模型可复跑（`verify.py` 自检 34 项）；外设断电与 Deep-Sleep 已落地，时钟降频已定量评估未启用（见 3.3） |
+| **①** 优化前后各阶段实测电流对比照与视频 | P1–P6 分阶段对照表、同一块表的对比照、6 段录屏 | 第 1 节；[`current-comparison.csv`](measurement/current-comparison.csv)；[`evidence/`](evidence/) | ✅ 五个阶段都有表读；基线 P3 只有 1 s 视频表读，60–90 ms 未测（见 1.4） |
+| **②** 连续 24 h 以上电池电压/功耗实测时序 CSV | 24.00 h 设备侧 5 min 日志（317 行；另一轮 322 行）+ **24 h 表累计能量区间序列**（4 段）+ 10 个表盘点 + 24 张整点照片（11-09 轮归档；11-10 轮 api 清单 28 张未入库） | 第 2 节；[`24h-meter-series.csv`](measurement/24h-meter-series.csv)；[`POWER.CSV`](evidence/baseline-24h-meter-2026-11-10/POWER.CSV)；[`meter-readings.csv`](evidence/baseline-24h-meter-2026-11-10/meter-readings.csv) | 🟡 24 h 连续设备日志 ✅、表实测能量区间 ✅；连续**电压/电流**曲线 ❌（0.01 A 表限制，见 2.5） |
+| **③** 功耗预算推导模型与状态机源码 | 三段式预算模型 + 敏感性分析 + 可跑代码/测试；状态机源码、状态图与源码行号映射 | 第 3 节；[`theory.py`](measurement/theory.py)；[`powersave.ino`](firmware/esp32cam-powersave/powersave/powersave.ino)；[`state-machine.md`](docs/state-machine.md) | ✅ 模型可复跑（`verify.py` 自检 34 项）；外设断电与 Deep-Sleep 已落地，时钟降频已定量评估未启用（见 3.3） |
 
 ## 0. 三张图看懂
 
@@ -28,7 +28,7 @@
 
 *图 3：基线 100 % 时间 WiFi 常开；省电版 98.9 % 时间深睡、1.04 % 窗口、0.039 % 唤醒拍照。活跃段电流没有变神奇，变的是**时间占比**。*
 
-## 1. ① 各阶段实测电流对照（15 分）
+## 1. ① 各阶段实测电流对照
 
 ### 1.1 测法
 
@@ -88,7 +88,7 @@ USB-TTL  ── 只接 TX / RX / GND（不接 5V、不接 3V3，避免绕开电�
 窗口段、P3 有现场读数/录屏，P5 有串口时长。
 **不能证明**：P4 的定量值（`0.00 A` 只说明 `< 10 mA`）、60–90 ms 的拍照峰值、基线 P3 的 60–90 ms 平均值（没有同口径数据）。
 
-## 2. ② 24 h 连续日志与表实测（25 分）
+## 2. ② 24 h 连续日志与表实测
 
 ### 2.1 交付清单
 
@@ -153,7 +153,7 @@ uptime_s,event,window_s,v5_mv,i_ma,p_mw,e_mwh
 5. **本项交付 = 24 h 连续设备日志 + 24 h 表实测能量区间 + 表盘点 + 24 张整点照片（11-09 轮）**，
    不写成“24 h 实测电流曲线”。这条边界在第 1、2 节的表格里都保留，避免把上界当实测值。
 
-## 3. ③ 功耗预算模型与状态机源码（20 分）
+## 3. ③ 功耗预算模型与状态机源码
 
 ### 3.1 模型：窗口 + 唤醒 + 深睡
 
