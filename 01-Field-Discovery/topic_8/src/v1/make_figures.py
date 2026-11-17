@@ -206,7 +206,7 @@ def fig5_spectrum():
     ax.set_xlim(0.5, 6)
     ax.set_ylim(1e-4, 2)
     ax.legend(fontsize=8.5, loc="upper right")
-    ax.set_title("图 5  |a| 功率谱（8 s 分段平均）：静止比行走低约 3 个数量级", fontsize=12)
+    ax.set_title("图 5  |a| 功率谱（8 s 分段平均）：静止比行走低约 1.5 个数量级", fontsize=12)
     fig.tight_layout()
     fig.savefig(os.path.join(FIG, "fig5_spectrum.png"))
     plt.close(fig)

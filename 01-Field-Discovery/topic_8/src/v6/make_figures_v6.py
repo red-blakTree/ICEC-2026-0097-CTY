@@ -116,7 +116,7 @@ def fig_versions(rows):
                     ha="center", va="bottom", fontsize=9)
     ax.set_ylim(0, 112)
     ax.set_ylabel("窗口级准确率（%）")
-    ax.set_title("跨日盲测 2026-10-25（704 窗 / 9 段，不参与任何选择）")
+    ax.set_title("跨日盲测 2026-10-25（704 窗 / 9 段）")
     fig.tight_layout()
     fig.savefig(os.path.join(FIG, "fig23_versions.png"))
     plt.close(fig)
