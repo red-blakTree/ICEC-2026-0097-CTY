@@ -18,7 +18,7 @@
 
 用法：
     .venv/bin/python src/v3/gait_analysis_v3.py
-    .venv/bin/python src/v3/gait_analysis_v3.py --eval data/calib/data_2 data_routine
+    .venv/bin/python src/v3/gait_analysis_v3.py --eval data/calib/data_2 data/calib/2026-10-24
 """
 import argparse
 import csv

@@ -4,7 +4,7 @@
 背景：v5 的 `ptn=(mean(pv)-mean(tv))/(mean(pv)+mean(tv))` 看起来像"比例"，其实
 对加性零偏不是不变的——峰抬 c、谷的绝对值降 c，ptn 随之改变。2026-10-25 的跨日
 盲测里，这个残余零偏让 ptn 的类条件分布整体上移，窗口级准确率从 96 % 掉到 79.7 %
-（README §8.6）。这个 bug 不需要更多数据就能发现，只需要一条"特征在 s→s+c 下必须
+（见报告第 3 节特征不变性）。这个 bug 不需要更多数据就能发现，只需要一条"特征在 s→s+c 下必须
 不变"的测试。v6 把它补上，并让它可执行：
 
     MPLCONFIGDIR=/tmp/mplcfg .venv/bin/python src/v6/invariants.py

@@ -6,7 +6,7 @@
   output/v1/features/eval.txt               v1 全量 1049/1058
   output/reports/blind_2026-11-17/          11-17 六版逐窗结果
   output/svm/blind_2026-11-17/              v7 11-17 逐窗结果
-  各版本 report.txt / README 第 4.1 节     手工转录的窗口级准确率
+  各版本 report.txt / README 第 4、5 节     手工转录的窗口级准确率
 
 输出：output/compare/figures/fig_compare_*.png
 用法：MPLCONFIGDIR=/tmp/mplcfg .venv/bin/python src/make_comparison_figures.py

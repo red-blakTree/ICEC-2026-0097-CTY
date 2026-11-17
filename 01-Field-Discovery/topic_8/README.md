@@ -86,7 +86,9 @@ md5 与源文件逐字节一致：`01` `c539aebd…`、`02` `175fdc76…`、`03`
 | `data/blind/2026-10-30/`、`10-31/`、`11-01/` | 10-30～11-01 | 36 | 2785 | 跨日 2；v7 训练集 |
 | `data/blind/2026-11-17/` | 11-17 08:47–09:20 | 13 | 1078 | 跨日 3（完全未参与选型） |
 
-每段保留 `meta/device.csv`、`meta/time.csv` 与 `_zips/` 原始导出；`data_1`、`data_2` 另有现场照片与 Phyphox 截图。
+每段保留原始 CSV 与 `meta/device.csv`、`meta/time.csv`；每个数据集目录下另有 `_zips/`（每段一个 zip 原始导出）。`data_1`、`data_2` 另有现场照片与 Phyphox 截图。
+
+> 历史版本脚本与产物中的 `data_routine` 标签即上表 `data/calib/2026-10-24/`（640 窗 / 9 段）；取数路径已写死为该目录。
 
 ![v1 图 1](output/v1/figures/fig1_raw_overview.png)
 
@@ -231,13 +233,16 @@ topic_8/
 │   ├── v1/ … v6/                   ← 各版本规则与作图
 │   ├── v5_1/                       ← v5.1 规则（rob_skew + 算术中点）
 │   ├── svm/                        ← v7 训练 / 盲测 / 作图
+│   ├── blind_test.py               ← v2 / v3 / v4 盲测对比 + 独立性检查
+│   ├── eval_stats.py               ← 置信区间 / macro-F1 / 去重叠估计
 │   ├── make_comparison_figures.py  ← 图 A–F
 │   └── blind_eval.py               ← 六版同表盲测
 └── output/
-    ├── v1/csv/                     ← 4 份提交 CSV
-    ├── v1/figures/                 ← 图 1–8（v1）
+    ├── v1/{csv,features,figures}/  ← 4 份提交 CSV、逐窗结果、图 1–8
+    ├── v2/ … v6/、v5_1/             ← 各版本 windows.csv / report.txt / figures
     ├── compare/figures/            ← 图 A–F
-    └── reports/、svm/               ← 逐窗结果与报告
+    ├── reports/                    ← 六版逐日盲测、blind_test、stats_2026-10-25
+    └── svm/                        ← v7 模型、折外 / 外部逐窗结果、图 24–26、predict/
 ```
 
 **环境**：Python 3.14.8 / 3.13.16、numpy 2.5.4 / 2.5.5、matplotlib 3.11.2、scikit-learn 1.9.1（11-17 复跑时容器内 3.14 不可用，用 3.13 重建 venv）；依赖见 [`requirements.txt`](requirements.txt)。

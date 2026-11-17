@@ -18,7 +18,7 @@ v5 的改动（只改这三处）：
     权重固定为 1，不在测试集上调参。
   - 判决仍是"静止/快跑门限 → 下楼 → 上楼/慢走"，后接 ±2 窗多数票平滑。
 
-未采纳（见 README 第 8.1 节的逐条核查）：
+未采纳（见 output/v5/features/report.txt 的逐条核查）：
   - scipy.signal.find_peaks / prominence 替换：无 scipy 依赖；
     自实现 prominence 版本在留一记录上从 95.6 % 掉到 87.5–90.0 %，故不替换。
   - i_cv / cadence 进打分：有涨有跌、无稳定增益，故只作为诊断量输出。
@@ -122,7 +122,7 @@ def waveform_features(t, ax, ay, az, gx, gy, gz):
 
     # 稳健偏度：分子分母都是同类差值，对加性偏移与增益都不变。
     # ptn 的分子分母含 pv+tv，给窗内所有样本加常数会改变它们，
-    # 跨日残余零偏/重力方向泄漏因此直接跨过阈值（README §8.6、§8.7）。
+    # 跨日残余零偏/重力方向泄漏因此直接跨过阈值（见报告第 3 节特征不变性）。
     q05, q95 = np.percentile(s0, [5, 95])
     rob_skew = float((q95 + q05 - 2 * np.median(s0)) / (q95 - q05 + 1e-9))
 
@@ -177,7 +177,7 @@ def calibrate(rows, asym="ptn"):
         t_down = _geometric(a_down, b_down)
     else:
         # 有符号量用算术中点：几何中点会被 0 附近的 q98 拉向多数类，
-        # 单侧标定时阈值贴着 walk/up 的上尾（routine→data_2 从 94 % 掉到 83 %，见 README §8.7）
+        # 单侧标定时阈值贴着 walk/up 的上尾（routine→data_2 从 94 % 掉到 83 %，见 output/v5/features/report.txt）
         t_down = 0.5 * (a_down + b_down)
     th = dict(stand=t_stand, run=t_run, down=t_down, asym=asym,
               acp=_zstats(rows, "acp"), zcr=_zstats(rows, "zcr"), up=0.0)
