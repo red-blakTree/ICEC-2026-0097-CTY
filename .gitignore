@@ -9,3 +9,7 @@
 
 # 本地 WiFi 凭据
 **/secrets.h
+
+# Python 缓存
+__pycache__/
+*.pyc
