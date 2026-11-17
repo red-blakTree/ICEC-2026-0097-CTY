@@ -73,13 +73,13 @@
 
 ## 2. 20 天挑战（02-20Days-Challenge）
 
-项目一按题面三项要求交付，交付索引、全量对照表与证据清单统一收在 [02-20Days-Challenge/README.md](02-20Days-Challenge/README.md)。
+项目一按三项要求交付，交付索引、全量对照表与证据清单统一收在 [02-20Days-Challenge/README.md](02-20Days-Challenge/README.md)。
 
 ### 2.1 项目一：ESP32-CAM 极致省电
 
-**题面三项与交付状态**
+**三项交付状态**
 
-| 题面要求 | 本仓库交付 | 状态 |
+| 交付项 | 内容 | 状态 |
 |---|---|---|
 | ① 优化前后各阶段实测电流对照表与视频 | P1–P6 对照表 + [current-comparison.csv](02-20Days-Challenge/measurement/current-comparison.csv) + 6 段录屏 | ✅ 五阶段都有读数；基线 P3 只有 1 s 视频表读，60–90 ms 未测 |
 | ② 连续 24 h 以上电压 / 功耗时序 CSV | 3 份 `POWER.CSV` + [24 h 表实测能量区间](02-20Days-Challenge/measurement/24h-meter-series.csv) + 10 点表读 + 24 h 表端点 | 🟡 24 h 连续日志与表实测能量齐；连续电压/电流曲线受 0.01 A 表限制（见 02 README 2.5） |
@@ -113,7 +113,7 @@
 | [esp32cam-powersave](02-20Days-Challenge/firmware/esp32cam-powersave/README.md) | 开机 15 min WiFi / 网页窗口，窗口结束断射频进深睡；定时唤醒只拍照不连 WiFi | 省电方案落地版，实机运行 |
 | [esp32cam-capture-probe](02-20Days-Challenge/firmware/esp32cam-capture-probe/README.md) | 连拍放大占空比的拍照电流探针 | 让 60–90 ms 的拍照脉冲在秒级表上可读 |
 
-**省电手段**：深睡占空比、WiFi 用完即关、定时唤醒不连 WiFi、摄像头 `esp_camera_deinit()` 后 PWDN 拉高并 `gpio_hold` 保持、睡眠前卸载 SD、把睡眠能耗记进账。题面三项策略里，外设断电控制与 Deep-Sleep 已落地；**时钟降频已定量评估、未启用**——活跃段合计 33.6–50.4 s/天，上限收益 `≤0.42 mAh/天`（<0.25 %），却会给 OV2640 XCLK / SDMMC 时序引入风险，取舍表见 [state-machine.md](02-20Days-Challenge/docs/state-machine.md) 第 6 节。硬件改造（换 LDO、MOSFET 切供电、去 LED）只写进方案，未实做。
+**省电手段**：深睡占空比、WiFi 用完即关、定时唤醒不连 WiFi、摄像头 `esp_camera_deinit()` 后 PWDN 拉高并 `gpio_hold` 保持、睡眠前卸载 SD、把睡眠能耗记进账。三项策略里，外设断电控制与 Deep-Sleep 已落地；**时钟降频已定量评估、未启用**——活跃段合计 33.6–50.4 s/天，上限收益 `≤0.42 mAh/天`（<0.25 %），却会给 OV2640 XCLK / SDMMC 时序引入风险，取舍表见 [state-machine.md](02-20Days-Challenge/docs/state-machine.md) 第 6 节。硬件改造（换 LDO、MOSFET 切供电、去 LED）只写进方案，未实做。
 
 **证据**：[evidence/](02-20Days-Challenge/evidence/) 下 6 组目录——两份 24 h 日志（[11-09](02-20Days-Challenge/evidence/baseline-24h-2026-11-09/README.md) / [11-10 表端点](02-20Days-Challenge/evidence/baseline-24h-meter-2026-11-10/README.md)）、[基线常开直读](02-20Days-Challenge/evidence/baseline-viewer-meter-2026-11-10/README.md)、[基线 P3 连拍](02-20Days-Challenge/evidence/baseline-viewer-meter-2026-11-16/README.md)、[省电版窗口录屏](02-20Days-Challenge/evidence/powersave-meter-2026-11-10/README.md)、[省电版 15.2 h 运行](02-20Days-Challenge/evidence/powersave-15h-2026-11-10/README.md)，含 6 段视频、表盘照片与 `manifest.sha256`。新增的 [24 h 区间 CSV](02-20Days-Challenge/measurement/24h-meter-series.csv) 由 [build_meter_series.py](02-20Days-Challenge/measurement/build_meter_series.py) 生成，[verify.py](02-20Days-Challenge/measurement/verify.py) 可一键复核 34 项。
 
@@ -208,4 +208,4 @@ esp32 核心 3.3.12。烧录与看串口在本机走宿主机（`distrobox-host-
 - 课题 8：一人一机；「不摆臂」是协议外变量；2026-10-25 参与过 v5.1 / v6 选型，对 v7 不是完全未看过。
 - ESP32-CAM 测量：P3 的 60–90 ms 平均电流测不到（秒级表），现有 `0.13–0.16 A` 是连拍放大值；深睡只有表上界 `≤ 10 mA` + 手册 `6 mA`；`POWER.CSV` 的电压字段是 `-1`（未接分压，按 5.0 V 记账，`Wh` 约有 ±2 % 误差）。
 - ESP32-CAM 24 h：设备侧日志是固件模型值，不是表实测曲线；异常日（约 12.6 h 断连）单列、不进倍数表；省电版没有 24 h 表记录是仪器限制（低于 0.01 A 停表），要连续曲线需 INA219 一类低阻分流记录模块（万用表无法从源头串入）。
-- ESP32-CAM 未做：换 LDO、MOSFET 切外设供电、去 LED（硬件项）；时钟降频（题面三策略唯一未落地，理由见第 2.1 节）；供电用充电宝/充电器代替电池（基线用充电宝、省电版用充电器，因为充电宝会把 5 mA 深睡判为“无负载”断电），续航为 1600 mAh 折算的预算值（非实测电池）。
+- ESP32-CAM 未做：换 LDO、MOSFET 切外设供电、去 LED（硬件项）；时钟降频（三策略唯一未落地，理由见第 2.1 节）；供电用充电宝/充电器代替电池（基线用充电宝、省电版用充电器，因为充电宝会把 5 mA 深睡判为“无负载”断电），续航为 1600 mAh 折算的预算值（非实测电池）。

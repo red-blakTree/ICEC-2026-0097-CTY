@@ -2,17 +2,9 @@
 
 > 硬件：AI-Thinker ESP32-CAM（ESP32-D0WDQ6 + OV2640 + microSD）+ USB 电压电流表（5 V 输入侧）
 > 固件：[`esp32cam-viewer`](firmware/esp32cam-viewer/README.md)（主基线，WiFi 常开）与 [`esp32cam-powersave`](firmware/esp32cam-powersave/README.md)（15 min 窗口 + 深睡占空比）
-> 结论：24 h 平均电流 **`90 mA → 6.98 mA`（12.9×，手册 6 mA 口径）**；按表分辨率上界 10 mA 为 `10.94 mA`（8.2×）。题面“10 倍”的临界是深睡 `≤ 8.04 mA`。
+> 结论：24 h 平均电流 **`90 mA → 6.98 mA`（12.9×，手册 6 mA 口径）**；按表分辨率上界 10 mA 为 `10.94 mA`（8.2×）。目标“10 倍”的临界是深睡 `≤ 8.04 mA`。
 
-**评审 3 分钟路径**：本页「评分项对照」→ 第 1 节对照表 + 表盘对比照 → 第 2 节 24 h 实测曲线与区间表 → 第 3 节预算公式 + 状态机 → [`docs/power-budget-model.md`](docs/power-budget-model.md)。
-
-## 评分项对照
-
-| 题面要求 | 本仓库交付 | 直接证据 | 状态 |
-|---|---|---|---|
-| **①** 优化前后各阶段实测电流对比照与视频 | P1–P6 分阶段对照表、同一块表的对比照、6 段录屏 | 第 1 节；[`current-comparison.csv`](measurement/current-comparison.csv)；[`evidence/`](evidence/) | ✅ 五个阶段都有表读；基线 P3 只有 1 s 视频表读，60–90 ms 未测（见 1.4） |
-| **②** 连续 24 h 以上电池电压/功耗实测时序 CSV | 24.00 h 设备侧 5 min 日志（317 行；另一轮 322 行）+ **24 h 表累计能量区间序列**（4 段）+ 10 个表盘点 + 24 张整点照片（11-09 轮归档；11-10 轮 api 清单 28 张未入库） | 第 2 节；[`24h-meter-series.csv`](measurement/24h-meter-series.csv)；[`POWER.CSV`](evidence/baseline-24h-meter-2026-11-10/POWER.CSV)；[`meter-readings.csv`](evidence/baseline-24h-meter-2026-11-10/meter-readings.csv) | 🟡 24 h 连续设备日志 ✅、表实测能量区间 ✅；连续**电压/电流**曲线 ❌（0.01 A 表限制，见 2.5） |
-| **③** 功耗预算推导模型与状态机源码 | 三段式预算模型 + 敏感性分析 + 可跑代码/测试；状态机源码、状态图与源码行号映射 | 第 3 节；[`theory.py`](measurement/theory.py)；[`powersave.ino`](firmware/esp32cam-powersave/powersave/powersave.ino)；[`state-machine.md`](docs/state-machine.md) | ✅ 模型可复跑（`verify.py` 自检 34 项）；外设断电与 Deep-Sleep 已落地，时钟降频已定量评估未启用（见 3.3） |
+**阅读路径**：第 1 节对照表 + 表盘对比照 → 第 2 节 24 h 实测曲线与区间表 → 第 3 节预算公式 + 状态机 → [`docs/power-budget-model.md`](docs/power-budget-model.md)。
 
 ## 0. 三张图看懂
 
@@ -208,7 +200,7 @@ stateDiagram-v2
 
 完整状态表、RTC 变量、失败模式与“时钟降频”定量评估见 [`docs/state-machine.md`](docs/state-machine.md)。
 
-### 3.3 题面三项策略的落地
+### 3.3 三项策略的落地
 
 | 策略 | 落地 | 证据 | 状态 |
 |---|---|---|---|
@@ -300,7 +292,7 @@ arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-powe
 
 ```text
 02-20Days-Challenge/
-├── README.md                        # 本页：评分项 → 交付 → 证据
+├── README.md                        # 本页：项目说明与证据索引
 ├── docs/
 │   ├── ESP32-CAM-Ultra-Low-Power-Solution.md  # 方案：功耗测算、架构、sdkconfig、陷阱
 │   ├── power-budget-model.md                  # 三段式预算推导、敏感性、不确定度
