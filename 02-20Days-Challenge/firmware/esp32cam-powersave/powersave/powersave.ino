@@ -83,7 +83,7 @@ static const float kModelWindowMa = 95.0f;   // 窗口段：实测 0.09–0.10 A
 static const float kModelIdleMa   = 45.0f;   // 醒着但 WiFi 关：240 MHz 空转 + AMS1117 静态电流
 static const float kModelShotMa   = 180.0f;  // 摄像头 init + JPEG 捕获
 static const float kModelSaveMa   = 50.0f;   // SD 卡写入
-static const float kModelSleepMa  = 5.0f;    // 深睡：表测不出，只能给上界 0.01 A
+static const float kModelSleepMa  = 6.0f;    // 深睡：官方手册整板 6 mA @5V；表 0.01 A 只能给上界，测不出点值
 // 电压：没接分压电阻时按实测值算（2026-11-10 USB 表读 4.90 V，含表自身压降）
 static const float kFallbackV = 4.90f;
 
