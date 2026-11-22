@@ -57,9 +57,9 @@ AI 排障记录不是第四个课题：它收的是上面三个模块真正卡�
 | 丢包 | 0 / 40 轮（1160 次请求 0 失败，真实失败率低于约 0.3 %；单轮 0 % 只能表述为低于约 10 %） |
 | PING 中位 / P95 | 15.9–29.5 ms / 22.9–473.8 ms（仅电梯首轮超 100 ms）；抖动 3.07–115.14 ms |
 | 吞吐 | 下载 3.14–158.32 Mbps；有效上传 34.11–242.08 Mbps（2 个失败轮不计） |
-| RSSI / SIR | 28 条测试点位读数：−83 ~ −63 dBm / −35.3 ~ +4.2 dB（43 条里 27 条带 SIR） |
+| RSSI / SIR | 8 个测试点位采用页：−83 ~ −63 dBm / −35.3 ~ +4.2 dB（28 条测试读数中 17 条带 SIR；43 条合计 27 条） |
 | 低于 −70 dBm | 6 / 8 个点位：T5-03 −83、T5-05 −81、T5-06 −80、D-02 −74、T5-07 −73、L1-01 −72 dBm |
-| 可配对 ΔRSSI | 走廊 8.5 m −2 dB、42.5 m −22 dB（扫描页）；电梯 −24 dB；宿舍隔墙 −19 dB（扫描）/ +2 dB（概览，符号相反，未定稿） |
+| 可配对 ΔRSSI | 走廊 8.5 m −2 dB、42.5 m −22 dB（概览页）；电梯 −24 dB；宿舍隔墙 −19 dB（扫描）/ +2 dB（概览，符号相反，未定稿） |
 | 走廊衰减指数 n | 近段 0.22 / 远段 2.86 / 全程 1.35 / 同会话 0.58（三点最小二乘另得 1.29） |
 | 墙体材质（可配对） | 10 cm 混凝土 + 瓷砖净损耗 13–19 dB（扫描口径）；金属轿厢 18–24 dB（概览口径）；均与文献量级一致 |
 | 多径规律 | 6 条（波导增强、近场饱和、快衰落 0–17 dB、深衰落长尾、吞吐非单调、频率选择性），逐条标强度 |
@@ -99,11 +99,11 @@ AI 排障记录不是第四个课题：它收的是上面三个模块真正卡�
 | 2026-11-17 不摆臂段（455 窗 / 5 段） | v6 37.1 %、**v7 94.5 %**，记录级 2/5 → 5/5 |
 | 学习模型 v7 | 5 折折外 94.2 %（不摆臂 94.0 %）；留一天 94.0 %（标准 95.4 %、不摆臂 91.9 %）；外部 10-25 92.8 %、11-17 94.5 % |
 
-**最有价值的一步**：v2–v5 在同批数据上 97–99 %，换一天只剩 42.8–79.7 %。定位到根因是判下楼的 `ptn = (峰−谷)/(峰+谷)` 会随窗内残余零偏平移；只把这一个判决量换成 `rob_skew`（并改用算术中点），跨日就从 79.7 % 拉到 94.6 %。这说明瓶颈是**不变性**，不是特征数量或模型复杂度。
+**最有价值的一步**：v2–v5 在同批数据上 91–98 %，换一天只剩 42.8–79.7 %。定位到根因是判下楼的 `ptn = (峰−谷)/(峰+谷)` 会随窗内残余零偏平移；只把这一个判决量换成 `rob_skew`（并改用算术中点），跨日就从 79.7 % 拉到 94.6 %。这说明瓶颈是**不变性**，不是特征数量或模型复杂度。
 
 **边界（报告第 7 节 9 条）**：一人一机（v7 换人换机必须重训重验）；4 类 97.5 % 是同集标定结果，只能当拟合度；2026-10-25 曾用于 v5.1 / v6 方向选择，2026-11-17 完全未参与；「不摆臂」是协议外变量，引用跨日数字时只用标准段；窗重叠 7/8（704 窗去重叠只剩 90），引用以记录级为主；照片只覆盖 `data_1` / `data_2`。
 
-**交付**：报告 [README.md](01-Field-Discovery/topic_8/README.md)（v1 → v7）· 4 份原始 CSV [output/v1/csv/](01-Field-Discovery/topic_8/output/v1/csv/) · 8 张图 [output/v1/figures/](01-Field-Discovery/topic_8/output/v1/figures/) · 版本对比图 A–F [output/compare/figures/](01-Field-Discovery/topic_8/output/compare/figures/) · 逐窗结果 [output/reports/](01-Field-Discovery/topic_8/output/reports/) 与 [output/svm/](01-Field-Discovery/topic_8/output/svm/) · 全部代码 [src/](01-Field-Discovery/topic_8/src/)（v1–v7 + 对比作图）· 采集照片与截图 [picture/](01-Field-Discovery/topic_8/picture/)。
+**交付**：报告 [README.md](01-Field-Discovery/topic_8/README.md)（v1 → v7）· 4 份原始 CSV [output/v1/csv/](01-Field-Discovery/topic_8/output/v1/csv/) · 8 张图 [output/v1/figures/](01-Field-Discovery/topic_8/output/v1/figures/) · 版本对比图 A–F [output/compare/figures/](01-Field-Discovery/topic_8/output/compare/figures/) · 逐窗结果 [output/reports/](01-Field-Discovery/topic_8/output/reports/) 与 [output/svm/](01-Field-Discovery/topic_8/output/svm/) · 全部代码 [src/](01-Field-Discovery/topic_8/src/)（v1–v6 / v5_1 / svm（v7）+ 对比作图）· 采集照片与截图 [picture/](01-Field-Discovery/topic_8/picture/)。
 
 ---
 
@@ -141,10 +141,10 @@ AI 排障记录不是第四个课题：它收的是上面三个模块真正卡�
 **24 h 数据怎么读（两个口径必须分开）**
 
 - 基线健康段：`0.09 A / 5.04 V` 直读 → `2.16 Ah / 10.8 Wh`，平均 `90 mA`。
-- 2026-11-11 异常日：08:20 起约 12.6 h WiFi 断连，电流抬到 `0.18 A`，表累计 `≈16.38 Wh`、等效平均 `135.4 mA @5.04 V`（`power-budget-model.md` 记作 ≈136 mA，同一事实两种取整）；按 4 个实测区间差分见 [24h-meter-series.csv](02-20Days-Challenge/measurement/24h-meter-series.csv)，异常日单列、不进倍数表。
+- 2026-11-11 异常日：08:20–12:08 WiFi 断连，12:08 重连后至 20:54 仍处 `0.18 A` 异常档（合计约 12.6 h），表累计 `≈16.38 Wh`、等效平均 `135.4 mA @5.04 V`（`power-budget-model.md` 记作 ≈136 mA，同一事实两种取整）；按 4 个实测区间差分见 [24h-meter-series.csv](02-20Days-Challenge/measurement/24h-meter-series.csv)，异常日单列、不进倍数表。
 - 省电版没有 24 h 表曲线：深睡（手册 6 mA）低于 0.01 A 分辨率，且表在电流低于阈值时停表不累计；24 h 里约 99 % 时间是深睡，所以「直读深睡」在这块表上不成立。现有的是 [24 h 连续设备日志](02-20Days-Challenge/process_logs/baseline-24h-meter-2026-11-10/POWER.CSV) + [表实测能量区间](02-20Days-Challenge/measurement/24h-meter-series.csv) + [15.20 h 省电版运行片段](02-20Days-Challenge/process_logs/powersave-15h-2026-11-10/README.md)，以及窗口 / 唤醒段的实测值。
 - 表盘点与建曲线不是一回事：`meter-readings.csv` 有 10 个锚点，图 2 与区间 CSV 只用其中 5 个（`0 → 64 → 8508 → 8567 → 16384 mWh`）。
-- 模型修正：窗口段模型按 `165 mA` 记，实测 `95 mA`，高估约 1.7 倍；基线 `POWER.CSV` 的 `45 mA` 固件模型不含 WiFi，实测 `90 mA` 是它的 2 倍。
+- 模型修正：旧模型窗口段按 `165 mA` 记，实测 `95 mA`，高估约 1.7 倍；基线 `POWER.CSV` 的 `45 mA` 固件模型不含 WiFi，实测 `90 mA` 是它的 2 倍。
 
 **三个固件**
 
@@ -219,7 +219,7 @@ export MPLCONFIGDIR=/tmp/mplcfg
 .venv/bin/python src/make_comparison_figures.py  # 图 A–F
 ```
 
-实测环境：Python 3.14.8（11-17 复跑用 3.13.16）、numpy 2.5.4、matplotlib 3.11.2、scikit-learn 1.9.1。
+实测环境：Python 3.14.8 / numpy 2.5.4（11-17 复跑用 Python 3.13.16 / numpy 2.5.5）、matplotlib 3.11.2、scikit-learn 1.9.1。
 
 **ESP32-CAM**
 
@@ -247,12 +247,12 @@ esp32 核心 3.3.12。烧录与看串口在本机走宿主机（`distrobox-host-
 
 ```
 .
-├── README.md            # 个人简介与选题说明
+├── README.md            # 个人简介、比赛与项目、选题说明
 ├── Makefile             # 统一入口：make check / verify / data / topic8 / speedtest / firmware
 ├── tools/               # 仓库级检查脚本（check_repo.py：Markdown 断链 + 暂存区大文件）
 ├── 01-Field-Discovery/  # 阶段一：报告、照片与 raw_data/
 │   ├── topic_3/         # 课题 3：无线信号测绘（报告 / raw_data / picture / src / Rust 测速服务）
-│   └── topic_8/         # 课题 8：步态判别（报告 / raw_data / output 逐版本结果 / src v1–v7 / picture）
+│   └── topic_8/         # 课题 8：步态判别（报告 / raw_data / output 逐版本结果 / src v1–v6、v5_1、svm（v7）/ picture）
 ├── 02-20Days-Challenge/ # 阶段二：源码、process_logs/ 与 iterations/
 │   ├── README.md        # 项目交付索引：三项要求 / 对照表 / 24 h 数据 / 模型
 │   ├── docs/            # 省电方案（测算 / 架构 / sdkconfig / 图 1–5）与 FreeRTOS 源码分析
