@@ -94,6 +94,9 @@ static const uint32_t kWebWindowMs = 15UL * 60UL * 1000UL;  // WiFi 窗口
 ```bash
 cd 02-20Days-Challenge
 export ARDUINO_DIRECTORIES_DATA=$PWD/.arduino/data ARDUINO_DIRECTORIES_USER=$PWD/.arduino/user
+# 新克隆先创建本机凭据（secrets.h 已被 .gitignore 忽略）
+cp firmware/esp32cam-powersave/powersave/secrets.example.h firmware/esp32cam-powersave/powersave/secrets.h
+# 再编辑 secrets.h，填入 SSID / 密码
 
 # 正式固件（1 h 周期）
 ./arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-powersave firmware/esp32cam-powersave/powersave

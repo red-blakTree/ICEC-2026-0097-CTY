@@ -38,6 +38,9 @@
 ```bash
 cd 02-20Days-Challenge
 export ARDUINO_DIRECTORIES_DATA=$PWD/.arduino/data ARDUINO_DIRECTORIES_USER=$PWD/.arduino/user
+# 新克隆先创建本机凭据（secrets.h 已被 .gitignore 忽略）
+cp firmware/esp32cam-viewer/viewer/secrets.example.h firmware/esp32cam-viewer/viewer/secrets.h
+# 再编辑 secrets.h，填入 SSID / 密码
 
 ./arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-viewer firmware/esp32cam-viewer/viewer
 ./arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32cam --build-path .arduino/build-viewer firmware/esp32cam-viewer/viewer
@@ -65,7 +68,7 @@ export ARDUINO_DIRECTORIES_DATA=$PWD/.arduino/data ARDUINO_DIRECTORIES_USER=$PWD
 
 - 开机联网后同步 NTP（东八区），之后写卡的照片 FAT 时间戳就是真实时间。
 - NTP 同步之前拍的照片（例如基线固件留下的旧图）没有时间基准，网页上显示“无时间戳”。
-- WiFi 账号密码放 `viewer/secrets.h`（已 gitignore，不会进仓库）：
+- WiFi 账号密码放 `viewer/secrets.h`（已 gitignore，不会进仓库；模板是 `viewer/secrets.example.h`）：
 
 ```cpp
 static const char *kWifiSsid = "...";
@@ -81,6 +84,7 @@ firmware/esp32cam-viewer/viewer/
 │   ├─ index.html      # 网页源码（改这个）
 │   └─ build_header.py # 把 index.html 打包成 web_page.h
 ├─ web_page.h          # 由脚本生成，别手改
+├─ secrets.example.h   # 模板（入库）
 └─ secrets.h           # WiFi 凭据（已 gitignore）
 ```
 

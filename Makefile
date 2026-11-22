@@ -1,10 +1,11 @@
 # 统一入口：所有目标都在仓库根目录执行；分模块的详细命令仍以各 README 为准。
 # 依赖：python3 常备；topic8 需要 01-Field-Discovery/topic_8/.venv；
-#       speedtest 需要 cargo；firmware 需要 02-20Days-Challenge/arduino-cli 与 .arduino/。
+#       speedtest 需要 cargo；firmware 需要 arduino-cli（默认 02-20Days-Challenge/arduino-cli）与 .arduino/。
 
 PYTHON    ?= python3
 MPLCONFIG ?= /tmp/mplcfg
 ARDUINO_ENV = ARDUINO_DIRECTORIES_DATA=$$PWD/.arduino/data ARDUINO_DIRECTORIES_USER=$$PWD/.arduino/user
+ARDUINO_CLI ?= ./arduino-cli
 
 .DEFAULT_GOAL := help
 
@@ -34,6 +35,6 @@ speedtest:
 	cd 01-Field-Discovery/topic_3/SpeedMeasurement && cargo test
 
 firmware:
-	cd 02-20Days-Challenge && $(ARDUINO_ENV) ./arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-viewer firmware/esp32cam-viewer/viewer
-	cd 02-20Days-Challenge && $(ARDUINO_ENV) ./arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-powersave firmware/esp32cam-powersave/powersave
-	cd 02-20Days-Challenge && $(ARDUINO_ENV) ./arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-demo firmware/esp32cam-sleep-demo/sleep_demo
+	cd 02-20Days-Challenge && $(ARDUINO_ENV) $(ARDUINO_CLI) compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-viewer firmware/esp32cam-viewer/viewer
+	cd 02-20Days-Challenge && $(ARDUINO_ENV) $(ARDUINO_CLI) compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-powersave firmware/esp32cam-powersave/powersave
+	cd 02-20Days-Challenge && $(ARDUINO_ENV) $(ARDUINO_CLI) compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-demo firmware/esp32cam-sleep-demo/sleep_demo
