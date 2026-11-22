@@ -54,7 +54,7 @@ cargo run --release
 `down_mbps`、`up_mbps` 与时间戳；删除该文件即可重置。旧版本没有 P95 / 丢包字段的记录仍可正常读取（缺省为 0），
 文件解析失败时启动日志会告警，但仍按空数据处理；下一次保存会覆盖原文件，需先备份。路径相对**进程工作目录**：在 `SpeedMeasurement/` 下
 `cargo run --release` 写入 `SpeedMeasurement/data/results.json`；直接执行 `target/release/SpeedMeasurement`
-则写入 `target/release/data/results.json`。课题 3 的 10-25 补测数据就是这样产生的，已复制回 `../data/results.json`。
+则写入 `target/release/data/results.json`。`data/` 是服务的本地运行目录，已列入 `.gitignore`、不入库；课题 3 的 10-25 补测数据就是这样产生的，归档副本是 `../raw_data/results.json`（仓库只保留这份归档副本）。
 
 ## 接口
 
