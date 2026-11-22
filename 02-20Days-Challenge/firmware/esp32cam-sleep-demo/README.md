@@ -79,9 +79,11 @@
 - 照片越多，`/api.json` 遍历 SD 目录越慢（59 张时 TTFB 约 `0.95 s`，清空后约 `0.2 s`）。
 - `temp_c` / `rssi` 是 2026-11-22 加的，网页顶部显示为 `IP · dBm · °C`。
 
-固定 IP `192.168.16.50`（网关 `192.168.16.1`，DNS `192.168.16.1` / `223.5.5.5`），
-网页地址固定为 `http://192.168.16.50/`。WiFi 凭据放 `sleep_demo/secrets.h`
-（已被 `.gitignore` 忽略，不入库）。
+SSID、密码、静态 IP、网关、DNS 全部在 `sleep_demo/secrets.h`（已被 `.gitignore` 忽略，不入库）：
+换 Wi-Fi 或换网段只改这一个文件，不用动 sketch。
+
+仓库里的默认例子是家庭网 `192.168.16.50`（网关 `192.168.16.1`）；2026-11-22 晚上实测切到
+手机热点后改成了 `10.77.67.50`（网关 `10.77.67.199`），固件本身没改。
 
 ## 4. POWER.CSV 事件
 
@@ -235,10 +237,13 @@ DTR/RTS 复位板子，验证主体仍以网页/API 为准。
 | 手动结束会话（22:28） | `POST /mode?m=modem` 后 `POST /stop` | 启动 6 s 后 `shots=1`；`/stop` 返回 `{"ok":true,"state":"stopping"}`，3 s 后 `session=idle`、`mode=normal`，会话不再继续拍 |
 | 重置后编号 | 22:24:56–22:26:56 的一轮会话（不是本次脚本触发，来源未确认） | `IMG_00001..00005` 重新从 1 开始，5 张正常写入 |
 | 页面精简 + gzip（22:32） | 连续 3 次 `GET /` | 压缩后 `3920 B`，3/3 完整收到（0.18–1.9 s）；解压 `10772 B`，4 个模式按钮 + 清空 + 结束会话都在 |
+| modem 5/5（22:58–23:00） | 网页轮询、不接串口 | `MODE_MODEM` + 5×`CAPTURE` + `SESSION_END`；`IMG_00001..00005` 间隔 30 s，模型电流 `94.9–95.1 mA` |
+| 浅睡 5/5（23:04–23:06） | 同上 | `MODE_LIGHT` + 5×`CAPTURE` + 4×`LIGHT_SLEEP`/`LIGHT_WAKE` + `SESSION_END`；网页离线约 80 s 后恢复；`IMG_00006..00010` |
+| 深睡 5/5（23:07–23:09） | 同上（手机热点，RSSI -42） | `MODE_DEEP` + 5×`CAPTURE` + 4×`DEEP_SLEEP`/`DEEP_WAKE`（每次唤醒 `uptime` 归零）+ `SESSION_END`；网页离线约 90 s 后恢复；`IMG_00011..00015` |
 
 **未完成 / 异常**
 
-- `modem`、`light`、`deep` 尚未在“不接串口”的干净条件下跑完。
+- `modem` / `light` / `deep` 已在 23:00–23:09 逐个跑满（见上表），不再列为未完成。
 - 串口打开 + 频繁 HTTP 轮询的几轮出现过：HTTP 超时、照片只到 3–4 张后设备离线；
   但同一块板在不轮询时 normal 5/5 完成，说明不是单纯拍照逻辑的问题。
 - **串口抓取本身会复位板子**：`serial_capture.py` 打开/关闭 `/dev/ttyUSB0` 会通过
@@ -250,10 +255,10 @@ DTR/RTS 复位板子，验证主体仍以网页/API 为准。
   抖动大（min 4 ms / max 200~670 ms）；带 DF 的 ping ≥ 1 kB 基本不通；`/`（当时未压缩，10.6 KB）
   只能收到 `0~1436 B` 就停住，而 `/api.json`（214 B）稳定返回。卡顿发生在大帧上，不是 WebServer 或拍照逻辑。
 
-**待复测判定标准**：4 个模式各一轮；`/api.json` 的 `session` 从 `idle → running → idle`、
-`shots_done` 到 5；每个模式新增 5 张 `IMG_*.jpg`，时间戳间隔约 30 s；`POWER.CSV` 出现
-对应 `MODE_*` / `CAPTURE` / `*_SLEEP` / `*_WAKE` / `SESSION_END`；浅睡/深睡期间网页失败、
-约 2 分钟后同一 IP 恢复；modem 模式网页全程可访问。
+**复测判定标准（2026-11-22 四个模式已全部满足）**：4 个模式各一轮；`/api.json` 的 `session` 从
+`idle → running → idle`、`shots_done` 到 5；每个模式新增 5 张 `IMG_*.jpg`，时间戳间隔约 30 s；
+`POWER.CSV` 出现对应 `MODE_*` / `CAPTURE` / `*_SLEEP` / `*_WAKE` / `SESSION_END`；浅睡/深睡期间
+网页失败、约 1.5~2 分钟后同一 IP 恢复；modem 模式网页全程可访问。
 
 ## 9. 限制与未做
 
