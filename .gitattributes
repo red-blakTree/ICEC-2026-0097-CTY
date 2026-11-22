@@ -1,0 +1,8 @@
+# 二进制素材：不做文本 diff / merge，避免 patch、行数统计与合并把图片/视频当文本处理。
+# 体积约束见 README 第 6 节；单文件 >25 MB 的暂存文件由 tools/check_repo.py 拦截。
+*.jpg    binary
+*.jpeg   binary
+*.png    binary
+*.mp4    binary
+*.zip    binary
+*.joblib binary
