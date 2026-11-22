@@ -10,7 +10,7 @@
 
 | 交付要求 | 状态 | 依据 |
 |---|---|---|
-| ① 各阶段实测电流对照表与视频 | 🟡 对照表 + 6 段视频齐；基线 P3 只有 1 s 表读、无 WiFi 拍照段未测 | 第 1 节；[`measurement/README.md`](measurement/README.md) §7 |
+| ① 各阶段实测电流对照表与视频 | 🟡 对照表 + 6 段视频齐；基线 P3 只有 1 s 表读、无 WiFi 拍照段未测 | 第 1 节；[`measurement/README.md`](measurement/README.md) §7；睡眠模式演示是扩展演示（normal/deep 实测，modem/light 未实测），不计入这 6 段 |
 | ② 连续 24 h 电压 / 功耗时序 CSV | 🟡 设备日志 + 表实测区间齐；连续电压 / 电流曲线受表分辨率限制不可得 | 2.1、2.5；§7 |
 | ③ 功耗预算模型与状态机源码 | ✅ 模型可复跑（34 项自检 + 7 个回归测试） | 3.1、3.4 |
 
@@ -297,7 +297,8 @@ arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-demo
 ```
 
 睡眠模式演示（网页切换正常 / WiFi modem sleep / 浅睡 / 深睡）的说明见
-[`firmware/esp32cam-sleep-demo/README.md`](firmware/esp32cam-sleep-demo/README.md)。
+[`firmware/esp32cam-sleep-demo/README.md`](firmware/esp32cam-sleep-demo/README.md)；
+现场流程与预检见 [`DEMO.md`](firmware/esp32cam-sleep-demo/DEMO.md)，该演示是扩展，不参与 24 h 测量；normal/deep 已实测，modem/light 未实测。
 
 30 s 短周期测量档的编译宏、烧录与串口抓取见 [`measurement/README.md`](measurement/README.md)；
 烧录/看串口在本机走宿主机（`distrobox-host-exec`），板子 DTR/RTS 已接 GPIO0/EN。

@@ -29,3 +29,7 @@
 - **验证**：WiFi 关联下连拍 `0.13–0.16 A`。
 - **不能测**：60–90 ms 的瞬时峰值；也不能替代基线 P3——探针是无 WiFi 条件，基线 P3 是 WiFi 关联 + 拍照写卡。
 - **注意**：连拍会很快填满 SD 卡，标定完刷回 F1 或 F2。
+
+## 附：演示固件 esp32cam-sleep-demo
+
+不是 F1–F3 的迭代：它不参与 24 h 省电测量，只把「正常 / modem sleep / 浅睡 / 深睡」四种状态放到网页上切换，用于现场对比行为（normal/deep 已实测，modem/light 未实测）。说明见 [README](../firmware/esp32cam-sleep-demo/README.md)，现场流程见 [DEMO](../firmware/esp32cam-sleep-demo/DEMO.md)。

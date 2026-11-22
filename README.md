@@ -117,7 +117,7 @@ AI 排障记录不是第四个课题：它收的是上面三个模块真正卡�
 
 | 交付项 | 内容 | 状态 |
 |---|---|---|
-| ① 优化前后各阶段实测电流对照表与视频 | P1–P6 对照表 + [current-comparison.csv](02-20Days-Challenge/measurement/current-comparison.csv) + 6 段录屏（合计约 3.8 min） | 🟡 对照表与视频齐；基线 P3 只有 1 s 视频表读、无 WiFi 拍照段未测，逐项见 [02 README 交付状态](02-20Days-Challenge/README.md) |
+| ① 优化前后各阶段实测电流对照表与视频 | P1–P6 对照表 + [current-comparison.csv](02-20Days-Challenge/measurement/current-comparison.csv) + 6 段录屏（合计约 3.8 min）；另有 sleep-demo 扩展演示，normal/deep 实测、modem/light 未实测，不计入这 6 段 | 🟡 对照表与视频齐；基线 P3 只有 1 s 视频表读、无 WiFi 拍照段未测，逐项见 [02 README 交付状态](02-20Days-Challenge/README.md) |
 | ② 连续 24 h 以上电压 / 功耗时序 CSV | 3 份 `POWER.CSV` + [24 h 表实测能量区间](02-20Days-Challenge/measurement/24h-meter-series.csv) + 10 个表盘点 + 5 点能量曲线 | 🟡 24 h 数据齐套（设备日志 + 表实测区间）；省电版连续电压 / 电流曲线受 0.01 A 表限制不可得（见 02 README 2.5） |
 | ③ 功耗预算推导模型与状态机源码 | [theory.py](02-20Days-Challenge/measurement/theory.py) + [power-budget-model.md](02-20Days-Challenge/docs/power-budget-model.md) + [state-machine.md](02-20Days-Challenge/docs/state-machine.md) + [powersave.ino](02-20Days-Challenge/firmware/esp32cam-powersave/powersave/powersave.ino) | ✅ 模型可复跑（`verify.py` 34 项自检 + 7 个回归测试），状态机源码 / 行号映射完整 |
 
@@ -146,13 +146,14 @@ AI 排障记录不是第四个课题：它收的是上面三个模块真正卡�
 - 表盘点与建曲线不是一回事：`meter-readings.csv` 有 10 个锚点，图 2 与区间 CSV 只用其中 5 个（`0 → 64 → 8508 → 8567 → 16384 mWh`）。
 - 模型修正：旧模型窗口段按 `165 mA` 记，实测 `95 mA`，高估约 1.7 倍；基线 `POWER.CSV` 的 `45 mA` 固件模型不含 WiFi，实测 `90 mA` 是它的 2 倍。
 
-**三个固件**
+**三个测量固件 + 一个演示固件**
 
 | 固件 | 形态 | 用途 |
 |---|---|---|
 | [esp32cam-viewer](02-20Days-Challenge/firmware/esp32cam-viewer/README.md) | 每小时一张 + WiFi 常开 + 网页查图 / 下载 `POWER.CSV` | 主基线：省电方案同样保留 WiFi，比的是「同样开 WiFi 谁更省」 |
 | [esp32cam-powersave](02-20Days-Challenge/firmware/esp32cam-powersave/README.md) | 开机 15 min WiFi / 网页窗口，窗口结束断射频进深睡；定时唤醒只拍照不连 WiFi | 省电方案落地版，实机运行 |
 | [esp32cam-capture-probe](02-20Days-Challenge/firmware/esp32cam-capture-probe/README.md) | 连拍放大占空比的拍照电流探针 | 让 60–90 ms 的拍照脉冲在秒级表上可读 |
+| [esp32cam-sleep-demo](02-20Days-Challenge/firmware/esp32cam-sleep-demo/README.md) | 网页切 normal / modem / 浅睡 / 深睡，2 min 会话 | 扩展演示：normal/deep 已实测，modem/light 未实测；不参与 24 h 测量，证据待补，现场流程见 [DEMO.md](02-20Days-Challenge/firmware/esp32cam-sleep-demo/DEMO.md) |
 
 **省电手段**：深睡占空比、WiFi 用完即关、定时唤醒不连 WiFi、摄像头 `esp_camera_deinit()` 后 PWDN 拉高并 `gpio_hold` 保持、睡眠前卸载 SD、把睡眠能耗记进账。三项策略里，外设断电控制与 Deep-Sleep 已落地；**时钟降频已定量评估、未启用**——活跃段合计 33.6–50.4 s/天，上限收益 `≤0.42 mAh/天`（<0.25 %），却会给 OV2640 XCLK / SDMMC 时序引入风险，取舍表见 [state-machine.md](02-20Days-Challenge/docs/state-machine.md) 第 6 节。硬件改造（换 LDO、MOSFET 切供电、去 LED）只写进方案，未实做。
 
@@ -186,7 +187,7 @@ AI 排障记录不是第四个课题：它收的是上面三个模块真正卡�
 
 ## 4. 环境与复现
 
-根目录 [Makefile](Makefile) 提供统一入口（`make help` 看全部目标）：`make check` 跑全仓库断链与大文件检查、`make verify` 跑 02 自检与回归测试、`make data` 重跑课题 3 建表、`make topic8` 跑不变性自检、`make firmware` 编译两个固件。下面是分模块命令。
+根目录 [Makefile](Makefile) 提供统一入口（`make help` 看全部目标）：`make check` 跑全仓库断链与大文件检查、`make verify` 跑 02 自检与回归测试、`make data` 重跑课题 3 建表、`make topic8` 跑不变性自检、`make firmware` 编译三个固件（viewer / powersave / sleep-demo）。下面是分模块命令。
 
 **课题 3**
 
@@ -256,7 +257,7 @@ esp32 核心 3.3.12。烧录与看串口在本机走宿主机（`distrobox-host-
 ├── 02-20Days-Challenge/ # 阶段二：源码、process_logs/ 与 iterations/
 │   ├── README.md        # 项目交付索引：三项要求 / 对照表 / 24 h 数据 / 模型
 │   ├── docs/            # 省电方案（测算 / 架构 / sdkconfig / 图 1–5）与 FreeRTOS 源码分析
-│   ├── firmware/        # 阶段二源码：viewer 主基线 / powersave 省电版 / capture-probe 拍照探针
+│   ├── firmware/        # 阶段二源码：viewer 主基线 / powersave 省电版 / capture-probe 拍照探针 / sleep-demo 演示
 │   ├── measurement/     # 电流对照表、24 h 预算模型、区间 CSV、阶段切分、自检与回归测试
 │   ├── process_logs/    # 过程记录：时序 CSV、表盘照片、6 段录屏与抽帧
 │   └── iterations/      # 迭代记录：固件 F1–F3 与测量口径 M1–M4
