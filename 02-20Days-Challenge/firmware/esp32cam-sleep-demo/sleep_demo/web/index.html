@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ESP32-CAM 睡眠模式演示</title>
+<style>
+:root{--bg:#0e1014;--card:#161a21;--line:#252a34;--text:#e7eaf0;--muted:#8b93a5;--accent:#4f8cff;--ok:#3ecf8e;--warn:#f0b34a;--danger:#e55353}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.55 system-ui,-apple-system,"Segoe UI","Noto Sans SC",sans-serif}
+header{position:sticky;top:0;z-index:9;display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line);background:rgba(14,16,20,.9)}
+h1{margin:0;font-size:15px;font-weight:650;display:flex;align-items:center;gap:8px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.dot.off{background:var(--muted)}
+.stat{color:var(--muted);font-size:13px;white-space:nowrap}
+.stat b{color:var(--text);font-weight:600;margin-left:4px}
+.spacer{flex:1}
+.btn{color:var(--text);text-decoration:none;border:1px solid var(--line);padding:6px 12px;border-radius:8px;font-size:13px;background:transparent;cursor:pointer}
+.btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.danger{border-color:rgba(229,83,83,.55);color:#f4a6a6}
+.btn.danger:hover:not(:disabled){border-color:var(--danger);color:var(--danger)}
+main{padding:18px;display:grid;gap:14px;max-width:1100px;margin:0 auto}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.panel h2{margin:0 0 8px;font-size:14px}
+.hint{color:var(--muted);font-size:12.5px;margin:0}
+.modes{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-top:10px}
+.mode{text-align:left;background:#12161c;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text);cursor:pointer;font:inherit}
+.mode:hover:not(:disabled){border-color:var(--accent)}
+.mode:disabled{cursor:not-allowed;opacity:.5}
+.mode.on{border-color:var(--accent);box-shadow:0 0 0 1px rgba(79,140,255,.35) inset}
+.mode .title{font-size:13.5px;font-weight:650}
+.mode .tag{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:1px 7px;margin-left:6px}
+.mode .desc{color:var(--muted);font-size:12px;margin-top:4px}
+.notice{margin-top:12px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:#11151a;color:var(--muted);font-size:13px}
+.notice.ok{border-color:rgba(62,207,142,.5);color:var(--ok)}
+.notice.warn{border-color:rgba(240,179,74,.5);color:var(--warn)}
+.notice.err{border-color:rgba(229,83,83,.5);color:var(--danger)}
+.maint{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+.card{background:#12161c;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#0a0c0f}
+.meta{padding:8px 10px}
+.name{font-size:12.5px;font-weight:600}
+.sub{color:var(--muted);font-size:11.5px;margin-top:2px}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:28px}
+</style>
+</head><body>
+<header>
+<h1><span class="dot" id="dot"></span>ESP32-CAM 睡眠模式演示</h1>
+<div class="stat">IP<b id="ip">-</b></div>
+<div class="stat">模式<b id="mode">-</b></div>
+<div class="stat">会话<b id="session">-</b></div>
+<div class="stat">照片<b id="cnt">-</b></div>
+<div class="spacer"></div>
+<a class="btn" href="/POWER.CSV">POWER.CSV</a>
+</header>
+<main>
+<section class="panel">
+<h2>选择模式</h2>
+<p class="hint">每次会话 5 张：进入即拍 1 张，之后每 30 s 一张；点当前高亮的模式可提前结束。</p>
+<div class="modes">
+<button class="mode" data-mode="normal"><div class="title">正常模式<span class="tag">不休眠</span></div><div class="desc">WiFi 不睡，延迟最低也最热。</div></button>
+<button class="mode" data-mode="modem"><div class="title">modem sleep<span class="tag">网页常开</span></div><div class="desc">射频按 DTIM 睡，网页仍可访问。</div></button>
+<button class="mode" data-mode="light"><div class="title">浅睡<span class="tag">关网页</span></div><div class="desc">拍照间 light sleep，约 2 分钟后恢复。</div></button>
+<button class="mode" data-mode="deep"><div class="title">深睡<span class="tag">关网页</span></div><div class="desc">拍照间 deep sleep，每次唤醒重启。</div></button>
+</div>
+<div class="notice" id="notice">空闲，等待网页命令。</div>
+<div class="maint">
+<button class="btn danger" id="reset">清空全部数据</button>
+<span class="hint">删除 SD 上所有照片与 POWER.CSV，回到空闲。</span>
+</div>
+</section>
+<section class="panel">
+<h2>照片</h2>
+<div class="grid" id="grid"><div class="empty">还没有照片</div></div>
+</section>
+</main>
+<script>
+const MODES={
+  normal:{label:'正常模式',confirm:'执行一次 2 分钟正常模式会话？'},
+  modem:{label:'modem sleep',confirm:'执行一次 modem sleep 会话？网页保持可访问。'},
+  light:{label:'浅睡',confirm:'进入浅睡并执行 2 分钟会话？期间网页与 WiFi 断开，约 2 分钟后恢复。'},
+  deep:{label:'深睡',confirm:'进入深睡并执行 2 分钟会话？期间网页与 WiFi 断开，约 2 分钟后恢复。'}
+};
+const $=id=>document.getElementById(id),grid=$('grid');
+let loaded=false,busy=false,offline=false,pendingMode=null,wakeAt=0,curRunning=false,curMode='';
+
+function notice(t,c){const el=$('notice');el.textContent=t;el.className='notice'+(c?' '+c:'')}
+function setOnline(on){$('dot').className='dot'+(on?'':' off')}
+function setBusy(on){
+  busy=on;
+  const lock=on||offline||pendingMode==='light'||pendingMode==='deep';
+  document.querySelectorAll('.mode').forEach(b=>b.disabled=lock);
+  $('reset').disabled=lock;
+}
+
+function render(d){
+  $('ip').textContent=d.ip+' · '+d.rssi+' dBm · '+d.temp_c+' °C';
+  $('mode').textContent=d.mode_label;
+  $('cnt').textContent=d.count;
+  const running=d.session==='running';
+  $('session').textContent=running?d.shots_done+'/'+d.shots_total+(d.next_in_ms?' · '+Math.ceil(d.next_in_ms/1000)+'s':''):'空闲';
+  curRunning=running;curMode=d.mode;
+  document.querySelectorAll('.mode').forEach(b=>{
+    const active=running&&b.dataset.mode===d.mode;
+    b.classList.toggle('on',active);
+    b.disabled=busy||offline||pendingMode==='light'||pendingMode==='deep'||(running&&!active);
+  });
+  if(!loaded){grid.innerHTML='';loaded=true}
+  if(!d.count){grid.innerHTML='<div class="empty">还没有照片</div>';return}
+  if(grid.querySelector('.empty'))grid.innerHTML='';
+  for(const f of d.files){
+    let c=document.getElementById(f.name);
+    if(!c){
+      c=document.createElement('div');c.className='card';c.id=f.name;
+      c.innerHTML='<a href="/'+f.name+'"><img loading="lazy" src="/'+f.name+'"></a>'+
+        '<div class="meta"><div class="name">'+f.name+'</div><div class="sub"></div></div>';
+      grid.appendChild(c);
+    }
+    c.querySelector('.sub').textContent=f.time+' · '+(f.size/1024).toFixed(1)+' KB';
+  }
+}
+
+async function tick(){
+  try{
+    const r=await fetch('/api.json',{cache:'no-store'});
+    if(!r.ok)throw new Error('http '+r.status);
+    const d=await r.json();
+    if(offline){
+      offline=false;setOnline(true);pendingMode=null;wakeAt=0;
+      notice('设备已恢复：'+d.mode_label+'，会话'+(d.session==='running'?'进行中':'已结束'),'ok');
+    }
+    render(d);
+    if(d.session==='running'){
+      notice('会话进行中：'+d.shots_done+'/'+d.shots_total+'。模式：'+d.mode_label,'ok');
+    }else if(!pendingMode){
+      notice('空闲，等待网页命令。上次模式：'+d.mode_label,'');
+    }
+  }catch(e){
+    if(!offline){offline=true;setOnline(false);document.querySelectorAll('.mode').forEach(b=>b.disabled=true);$('reset').disabled=true}
+    if(pendingMode==='light'||pendingMode==='deep'){
+      const left=Math.max(0,Math.ceil((wakeAt-Date.now())/1000));
+      notice('设备睡眠中（'+MODES[pendingMode].label+'），约 '+(left?left+' s 后恢复':'等待恢复…'),'warn');
+    }else{
+      notice('设备离线，正在重试…','warn');
+    }
+  }
+}
+
+async function start(mode){
+  if(busy)return;
+  if(!confirm(MODES[mode].confirm))return;
+  setBusy(true);pendingMode=mode;
+  notice('已发送命令：'+MODES[mode].label+'，等待设备响应…','ok');
+  try{
+    const r=await fetch('/mode?m='+mode,{method:'POST',cache:'no-store'});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok){
+      pendingMode=null;notice('启动失败：'+(j.error||('HTTP '+r.status)),'err');setBusy(false);return;
+    }
+    if(mode==='light'||mode==='deep'){
+      wakeAt=Date.now()+125000;
+      notice('设备进入'+MODES[mode].label+'，约 2 分钟后恢复；期间照片继续写入 SD。','warn');
+    }else{
+      pendingMode=null;notice('已启动'+MODES[mode].label+'会话，网页保持可访问。','ok');
+    }
+  }catch(e){
+    if(mode==='normal'||mode==='modem')pendingMode=null;
+    notice('请求失败，设备可能已进入睡眠；网页会自动重试。','warn');
+  }
+  setBusy(false);setTimeout(tick,600);
+}
+
+async function stopSession(){
+  if(busy)return;
+  if(!confirm('结束当前会话，回到空闲状态？'))return;
+  setBusy(true);notice('正在结束会话…','warn');
+  try{
+    const r=await fetch('/stop',{method:'POST',cache:'no-store'});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok)notice('结束失败：'+(j.error||('HTTP '+r.status)),'err');
+    else{pendingMode=null;notice('会话已结束，设备回到空闲。','ok')}
+  }catch(e){notice('请求失败，设备可能已离线。','err')}
+  setBusy(false);setTimeout(tick,600);
+}
+
+async function reset(){
+  if(busy)return;
+  if(!confirm('清空 SD 卡上的所有照片与 POWER.CSV？此操作不可恢复。'))return;
+  setBusy(true);notice('正在清空数据…','warn');
+  try{
+    const r=await fetch('/admin/reset',{method:'POST',cache:'no-store'});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok){
+      notice('清空失败：'+(j.error||('HTTP '+r.status)),'err');
+    }else{
+      loaded=true;grid.innerHTML='<div class="empty">还没有照片</div>';
+      notice('已清空 '+(j.removed??0)+' 个文件，设备回到空闲状态。','ok');
+    }
+  }catch(e){notice('请求失败，设备可能离线。','err')}
+  setBusy(false);setTimeout(tick,600);
+}
+
+document.querySelectorAll('.mode').forEach(b=>{
+  b.addEventListener('click',()=>{
+    if(curRunning&&curMode===b.dataset.mode){stopSession();return}
+    start(b.dataset.mode);
+  });
+});
+$('reset').addEventListener('click',reset);
+tick();
+setInterval(tick,2000);
+</script>
+</body></html>
