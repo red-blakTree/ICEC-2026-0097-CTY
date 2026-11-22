@@ -149,7 +149,7 @@ def fig11_confusion(routine):
 
 def main():
     setup()
-    d2, routine = load("data/calib/data_2"), load("data/calib")
+    d2, routine = load("raw_data/calib/data_2"), load("raw_data/calib")
     th2, th3 = add_preds(d2, routine)
     print("thresholds v2:", {k: round(v, 3) for k, v in th2.items()})
     print("thresholds v3:", {k: round(v, 3) for k, v in th3.items()})

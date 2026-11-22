@@ -21,7 +21,7 @@ from gait_analysis_v2 import (  # noqa: E402
 )
 
 FIG = os.path.join(ROOT, "output", "v2", "figures")
-DATA = os.path.join(ROOT, "data", "calib", "data_2")
+DATA = os.path.join(ROOT, "raw_data", "calib", "data_2")
 COLOR = {"stand": "#2ca02c", "walk": "#1f77b4", "run": "#d62728",
          "up": "#ff7f0e", "down": "#9467bd"}
 ORDER = ["stand", "walk", "run", "up", "down"]

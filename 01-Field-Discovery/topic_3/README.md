@@ -3,7 +3,7 @@
 > 版本 v6.0（2026-11-17）
 > 采集：2026-10-24 11:39–12:39（教学楼 5F、图书馆 1F）· 2026-10-25 15:30–15:36（1 m 本地零点）· 2026-10-25 20:14–20:21（宿舍 6F）· 2026-11-01 14:45–15:10（走廊距离阶梯与点位复测）
 > 规模：8 个测试点位 × 3 轮 = **24 组主数据**；另 16 轮补测与零点，合计 40 轮测速；43 条 PureHub 读数（8 个测试点位 28 条）；74 个采集素材 + 5 张分析图
-> 数据：[`data/results.json`](data/results.json)（40 条原始记录，只读）· [`data/delivery_24.csv`](data/delivery_24.csv)（24 组交付明细）· [`data/measurements.csv`](data/measurements.csv)（40 行）· [`data/signal.csv`](data/signal.csv)（43 行）
+> 数据：[`raw_data/results.json`](raw_data/results.json)（40 条原始记录，只读）· [`raw_data/delivery_24.csv`](raw_data/delivery_24.csv)（24 组交付明细）· [`raw_data/measurements.csv`](raw_data/measurements.csv)（40 行）· [`raw_data/signal.csv`](raw_data/signal.csv)（43 行）
 > 测速工具：[`SpeedMeasurement/`](SpeedMeasurement/README.md)
 >
 > **导航**：1 摘要 · 2 题面对照 · 3 目标与 RQ · 4 设计 · 5 口径 · 6 数据 · 7 结果 · **8 墙体材质** · **9 多径规律** · 10 盲区 · 11 核验 · 12 局限 · 13 补测 · 14 交付 · 参考文献 · 附录
@@ -43,7 +43,7 @@
 |---|---|---|---|
 | 8 个具不同遮挡特征的校园点位（走廊、转角、电梯口等） | 8 个测试点位覆盖 7 类特征：走廊空气 ×2（近 / 远）、转角、电梯轿厢（金属，电梯口作 1 m 零点）、楼梯间、金属防火门、玻璃隔断、混凝土 + 瓷砖隔墙（D-01 作零点） | 4.2 节点位表 | ✅ 达成，另设 3 个 1 m 零点 |
 | 每点位连续测试 3 次信号强度与延迟 | 延迟 / 吞吐：8 × 3 = 24 组（6.3 节）；信号强度：每点位 2–6 条读数，其中 6 / 8 个点位有**第二时段（11-01）复测**，2 个点位只有同会话两页（6.4 节） | 6.3、6.4 节 | 🟡 延迟达成；信号强度为点位级快照，非逐轮同步 |
-| 24 组网络测速原始数据 | `results.json` 40 条（24 主 + 16 补测 / 零点）、`delivery_24.csv` 24 组明细、`measurements.csv` 40 行 | `data/` | ✅ 达成，24 组逐组可回查 |
+| 24 组网络测速原始数据 | `results.json` 40 条（24 主 + 16 补测 / 零点）、`delivery_24.csv` 24 组明细、`measurements.csv` 40 行 | `raw_data/` | ✅ 达成，24 组逐组可回查 |
 | 点位照片 | 20 张位置照（其中 2 张是热点位置照；测试点位 7 / 8 有位置照），逐点位映射见表 3 | `picture/` | 🟡 7 / 8：T5-03（507 后门）缺位置照，以平面图 + 瓷砖标定替代 |
 | 墙体材质分析 | 2 组可配对算净穿透损耗（宿舍隔墙、电梯轿厢）；走廊 2 点作距离对照；其余 4 类遮挡（防火门 / 玻璃 / 转角 / 楼梯间）只报绝对值；全部与文献量级对照 | 第 8 节 | 🟡 只有 2 组是定量结论，其余是绝对值 + 机制解释（8.5） |
 | 多径衰减规律 | 6 条规律（波导增强、近场饱和、快衰落、深衰落长尾、吞吐非单调、频率选择性）+ 强度表 + 工程含义 | 第 9 节 | 🟡 规律已给出，但 M4 为单例、M6 仅靠文献，强度见 9.4 |
@@ -191,7 +191,7 @@
 1. 选点：可安全停留 ≥ 3 分钟、位置可复现（有明确参照物）、避开人流高峰与施工区。
 2. 建网：`iw list` / `iw reg get` 查能力与监管域；关 WiFi 省电与自动连接；NetworkManager 共享模式建热点并固定 SSID / 频段 / 信道；放行 8080/TCP；记录热点位置照片。
 3. 单点：站定、按组内姿态放置手机、静置 30 s；**PureHub 读数每点位测前、测后各一次**（概览 + 扫描；不逐轮重复，原因见 2.1）；接着连续 3 轮测速，每轮约 60 s，记录 PING / P95 / 抖动 / 丢包；标签写 `点位-轮次`；静置 30 s 进下一轮。
-4. 收尾：核对 BSSID 与热点状态；上传为 0 或结果异常时补测并写明失败轮；拍点位照片；导出并备份 `data/results.json` 与截图，当天初检。
+4. 收尾：核对 BSSID 与热点状态；上传为 0 或结果异常时补测并写明失败轮；拍点位照片；导出并备份 `raw_data/results.json` 与截图，当天初检。
 
 ## 6 数据
 
@@ -199,10 +199,10 @@
 
 | 路径 | 内容 | 规模 |
 |---|---|---|
-| `data/results.json` | SpeedMeasurement 原始记录（只读，不手改） | 40 条，id 1–40 |
-| `data/delivery_24.csv` | **24 组交付明细**：8 个测试点位 × 3 轮，含记录 id、时间与全部读数字段 | 24 行（`src/build_delivery.py` 生成） |
-| `data/measurements.csv` | 一次测速一行：点位 + 标签 + 延迟 / 速率 | 40 行 |
-| `data/signal.csv` | 一张截图一行：RSSI / SIR / 信道 / 链路速率，附 `source_file` 可逐条回查 | 43 行（29 扫描 + 14 概览） |
+| `raw_data/results.json` | SpeedMeasurement 原始记录（只读，不手改） | 40 条，id 1–40 |
+| `raw_data/delivery_24.csv` | **24 组交付明细**：8 个测试点位 × 3 轮，含记录 id、时间与全部读数字段 | 24 行（`src/build_delivery.py` 生成） |
+| `raw_data/measurements.csv` | 一次测速一行：点位 + 标签 + 延迟 / 速率 | 40 行 |
+| `raw_data/signal.csv` | 一张截图一行：RSSI / SIR / 信道 / 链路速率，附 `source_file` 可逐条回查 | 43 行（29 扫描 + 14 概览） |
 | `picture/` | 43 张 PureHub 截图 + 10 张测速页 + 20 张位置照 + 1 张 5F 平面图 | 74 个采集素材 |
 | `picture/analysis/` | 图 1–5：RSSI/SIR、延迟/吞吐、距离剖面、走廊 1D 标定、可配对 ΔRSSI | 5 张分析图 |
 
@@ -229,7 +229,7 @@
 point_id,building,floor,location,obstruction,distance_m,ssid,bssid,band,channel,seq,time,rssi_dbm,sir_db,ping_ms,p95_ms,jitter_ms,loss_pct,down_mbps,up_mbps,raw_label,note
 ```
 
-`data/delivery_24.csv` 额外给出 `group_id`（1–24）与 `record_id`（对应 `results.json` 的 id），用于「24 组 → 原始记录」的一对一回查。
+`raw_data/delivery_24.csv` 额外给出 `group_id`（1–24）与 `record_id`（对应 `results.json` 的 id），用于「24 组 → 原始记录」的一对一回查。
 
 ### 6.3 24 组交付明细（8 个点位 × 3 轮）
 
@@ -262,7 +262,7 @@ RSSI / SIR 为该点位的采用值（点位级，3 轮共用）；其余字段�
 | 23 | D-02 | R2 | 36 | 20:19:51 | −74 | +4.2 | 17.00 | 38.30 | 7.55 | 108.52 | 217.81 |
 | 24 | D-02 | R3 | 37 | 20:20:33 | −74 | +4.2 | 16.30 | 23.40 | 3.56 | 108.87 | 190.39 |
 
-完整的 24 行（含各列小数位、note 与记录 id）见 [`data/delivery_24.csv`](data/delivery_24.csv)，由 `python3 src/build_delivery.py` 从 `measurements.csv` + `results.json` 生成，脚本会校验「24 行 = 8 点位 × 3 轮」且每条都能回填记录 id。
+完整的 24 行（含各列小数位、note 与记录 id）见 [`raw_data/delivery_24.csv`](raw_data/delivery_24.csv)，由 `python3 src/build_delivery.py` 从 `measurements.csv` + `results.json` 生成，脚本会校验「24 行 = 8 点位 × 3 轮」且每条都能回填记录 id。
 
 ### 6.4 逐点位无线读数（8 个测试点位 28 条 + 3 个零点）
 
@@ -631,9 +631,9 @@ T5-03 的 7 轮里，前 4 轮在 42.5 m、后 3 轮在 34 m，上表延迟与�
 
 | 交付物 | 位置 | 状态 |
 |---|---|---|
-| 原始数据 | `data/results.json` | 已交付（40 条） |
-| **24 组交付明细** | `data/delivery_24.csv` | 已交付（24 行，`src/build_delivery.py` 生成） |
-| 汇总表 | `data/measurements.csv`、`data/signal.csv` | 已交付（40 / 43 行） |
+| 原始数据 | `raw_data/results.json` | 已交付（40 条） |
+| **24 组交付明细** | `raw_data/delivery_24.csv` | 已交付（24 行，`src/build_delivery.py` 生成） |
+| 汇总表 | `raw_data/measurements.csv`、`raw_data/signal.csv` | 已交付（40 / 43 行） |
 | 分析图 | `picture/analysis/`（图 1–5） | 已交付（`src/make_figures.py` 生成） |
 | 点位标注图 | `picture/analysis/fig4_corridor.png` | 部分：1D 走廊标定示意；5F 平面图坐标叠加未产出 |
 | 实验报告 | 本文 | 已交付（含 11 节数据核验） |
@@ -646,7 +646,7 @@ python3 src/build_delivery.py   # 由 measurements.csv + results.json 生成 del
 python3 src/make_figures.py     # 重新生成 picture/analysis/ 的 5 张图（需 matplotlib，本机用 ../topic_8/.venv/bin/python）
 ```
 
-脚本只读 `data/results.json` 与脚本内的人工转录表，不修改原始数据；截图的 RSSI / SIR / 信道 / 链路速率可在 `signal.csv` 的 `source_file` 逐条回查。图 1–3、图 5 的数据点由两份 CSV 直接读取，图 4 按 4.4 节的几何标定绘制。测速服务端见 [`SpeedMeasurement/`](SpeedMeasurement/README.md)（`cargo run --release`，默认监听 `0.0.0.0:8080`，可用 `PORT` 覆盖）。
+脚本只读 `raw_data/results.json` 与脚本内的人工转录表，不修改原始数据；截图的 RSSI / SIR / 信道 / 链路速率可在 `signal.csv` 的 `source_file` 逐条回查。图 1–3、图 5 的数据点由两份 CSV 直接读取，图 4 按 4.4 节的几何标定绘制。测速服务端见 [`SpeedMeasurement/`](SpeedMeasurement/README.md)（`cargo run --release`，默认监听 `0.0.0.0:8080`，可用 `PORT` 覆盖）。
 
 ## 参考文献
 

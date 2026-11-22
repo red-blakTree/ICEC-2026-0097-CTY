@@ -9,8 +9,8 @@ v2 / v3 用窗口统计量（σ、σ_v、p99、f_dom），换一天（2026-10-25
   - 判决：σ 门限 → 静止/快跑，pt → 下楼，acp → 上楼/慢走；
   - ±2 窗（5 窗）多数票平滑，抹平边界单窗抖动。
 
-标定：data/calib/data_2 + data_routine（都是本人数据，PKG110）
-盲测：data/blind/2026-10-25（跨日，本人 PKG110），不参与标定。
+标定：raw_data/calib/data_2 + data_routine（都是本人数据，PKG110）
+盲测：raw_data/blind/2026-10-25（跨日，本人 PKG110），不参与标定。
 
 输出：output/v4/features/{windows.csv,report.txt}、output/v4/figures/
 用法：MPLCONFIGDIR=/tmp/mplcfg .venv/bin/python src/v4/gait_analysis_v4.py
@@ -30,10 +30,10 @@ from gait_analysis_v2 import (  # noqa: E402
 )
 
 OUT = os.path.join(ROOT, "output", "v4", "features")
-TRAIN = os.path.join(ROOT, "data", "calib", "data_2")
+TRAIN = os.path.join(ROOT, "raw_data", "calib", "data_2")
 # 2026-10-25 起，data_routine 下出现新日期；新日期留作跨日盲测，标定只用 10-24。
-ROUTINE = os.path.join(ROOT, "data", "calib", "2026-10-24")
-BLIND = os.path.join(ROOT, "data", "blind", "2026-10-25")
+ROUTINE = os.path.join(ROOT, "raw_data", "calib", "2026-10-24")
+BLIND = os.path.join(ROOT, "raw_data", "blind", "2026-10-25")
 STATES = ("stand", "walk", "run", "up", "down")
 
 
@@ -245,7 +245,7 @@ def main():
     smooth(d2 + routine + blind)
     hit, tot, hold = loro(d2, routine)
 
-    lines = ["v4 波形检测：阈值在 data/calib/data_2 + data_routine（均为本人数据）上标定",
+    lines = ["v4 波形检测：阈值在 raw_data/calib/data_2 + data_routine（均为本人数据）上标定",
              "留一记录（data_2，%s）: %d/%d = %.4f" % (",".join(hold), hit, tot, hit / tot), ""]
     lines += report(d2, th, "本人 data_2") + [""]
     lines += report(routine, th, "本人 data_routine") + [""]

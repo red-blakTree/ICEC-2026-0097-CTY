@@ -1,5 +1,17 @@
 # ICEC 2026 实验班入选测试 · 项目与课题提交
 
+## 0. 选题说明
+
+**课题 3（2.4 GHz 无线信号测绘）**：用一台参数可控的热点当信号源，在遮挡与距离不同的点位上采 RSSI、SIR 和端到端延迟 / 吞吐。「信号差」这个日常判断能被拆成可测的量——同一位置的重复性、同一条走廊的距离衰减指数、隔墙与金属轿厢的净损耗；所以它值得做：结论要么可回查，要么就写进局限。
+
+**课题 8（多姿态步态加速度判别）**：只用一个手机加速度计区分静止 / 慢走 / 快跑 / 上下楼梯。难点不在同日准确率，而在换一天还能不能判对；因此这份提交的主线是找一个对零偏和增益都不变的判决量，而不是堆特征或换模型。
+
+**20 天挑战（ESP32-CAM 极致省电）**：要求给出优化前后各阶段电流对照、24 h 电压 / 功耗时序、预算推导模型与状态机源码。它把「改了什么」和「省了多少」用一块 USB 表直接连起来，每个数字都要有实测或明确口径。
+
+**03 AI 排障记录**：不是独立课题，收的是上面三个模块推进时关键提问的对话截图，以及哪些判断最后回到了报告和代码里。
+
+---
+
 本仓库是实验班入选测试的完整提交物，分三个模块：**现场发现（两个课题）**、**20 天挑战（嵌入式项目）**、**AI 提问排障对话记录**。
 
 每个课题都有独立报告、原始数据、可复跑的脚本和图表；报告中所有结论都标注强弱与适用边界，未达成的部分写在各自「局限」一节，不做补白。
@@ -10,7 +22,7 @@
 | 01 现场发现 | 课题 8：多姿态步态加速度判别 | 4 类交付 97.5 %（记录级 4/4）；5 类跨日 86.8–94.6 %（记录级全对）；2026-11-17 完全未参与选型，v7 94.5 %（v6 87.8 %），不摆臂段 v7 94.5 %（v6 37.1 %） | [topic_8/README.md](01-Field-Discovery/topic_8/README.md) |
 | 02 20 天挑战 | ESP32-CAM 极致省电 | 24 h 平均 `90 mA → 6.98 mA`（**12.9 倍**，手册 6 mA 口径）/ `10.94 mA`（8.2 倍，表上界 10 mA）；「10 倍」临界是深睡 `≤ 8.04 mA`；三项均有交付，① 与 ② 各有受限项（见 2.1） | [02-20Days-Challenge/README.md](02-20Days-Challenge/README.md) |
 | 02 20 天挑战 | FreeRTOS V11.3.1 源码分析 | 以「一条链表 + 一种同步对象」为主线，附功耗专题 | [docs/FreeRTOS-V11.3.1-Source-Analysis.md](02-20Days-Challenge/docs/FreeRTOS-V11.3.1-Source-Analysis.md) |
-| 03 AI 排障记录 | 7 张关键提问排障对话截图 | 课题 3 归因、课题 8 选型 / 对照 / 采集协议三类排障 | [03-AI-Collaboration/](03-AI-Collaboration/) |
+| 03 AI 排障记录 | 7 张关键提问排障对话截图 | 课题 3 归因、课题 8 选型 / 对照 / 采集协议三类排障 | [03-AI-Collaboration/](03-AI-Collaboration/README.md) |
 
 ---
 
@@ -45,7 +57,7 @@
 
 **结论强度**：报告第 12 节把局限分成四类——采样与配对（影响最大）、几何与材质、证据与记录、外推边界。RSSI / SIR 是**点位级快照**（每点位 1–2 个时刻的 2–6 张截图，3–7 轮测速共用同一点位读数），4 个点位缺本地零点，单次快照重复性上限已有 8.5 dB 半极差，阈值 −70 / −80 dBm 是工程经验值，所以**盲区只列候选、不做定级**；走廊 n 只在「本走廊几何 + 本热点高度」内成立，远段 2.86 只在 10-24 那批出现，同会话阶梯只给 0.58，跨会话不可直接比较。
 
-**交付**：报告 [README.md](01-Field-Discovery/topic_3/README.md)（v6.0）· 原始记录 [data/results.json](01-Field-Discovery/topic_3/data/results.json) · **24 组明细 [delivery_24.csv](01-Field-Discovery/topic_3/data/delivery_24.csv)** · 汇总 [measurements.csv](01-Field-Discovery/topic_3/data/measurements.csv) / [signal.csv](01-Field-Discovery/topic_3/data/signal.csv) · 分析图 [picture/analysis/](01-Field-Discovery/topic_3/picture/analysis/)（`fig1_rssi_sir` · `fig2_latency_throughput` · `fig3_distance_profile` · `fig4_corridor` · `fig5_paired_delta`）· 采集脚本 [src/](01-Field-Discovery/topic_3/src/)。
+**交付**：报告 [README.md](01-Field-Discovery/topic_3/README.md)（v6.0）· 原始记录 [raw_data/results.json](01-Field-Discovery/topic_3/raw_data/results.json) · **24 组明细 [delivery_24.csv](01-Field-Discovery/topic_3/raw_data/delivery_24.csv)** · 汇总 [measurements.csv](01-Field-Discovery/topic_3/raw_data/measurements.csv) / [signal.csv](01-Field-Discovery/topic_3/raw_data/signal.csv) · 分析图 [picture/analysis/](01-Field-Discovery/topic_3/picture/analysis/)（`fig1_rssi_sir` · `fig2_latency_throughput` · `fig3_distance_profile` · `fig4_corridor` · `fig5_paired_delta`）· 采集脚本 [src/](01-Field-Discovery/topic_3/src/)。
 
 ### 1.2 课题 8：多姿态步态加速度判别（v1 → v7）
 
@@ -120,7 +132,7 @@
 
 - 基线健康段：`0.09 A / 5.04 V` 直读 → `2.16 Ah / 10.8 Wh`，平均 `90 mA`。
 - 2026-11-11 异常日：08:20 起约 12.6 h WiFi 断连，电流抬到 `0.18 A`，表累计 `≈16.38 Wh`、等效平均 `135.4 mA @5.04 V`（`power-budget-model.md` 记作 ≈136 mA，同一事实两种取整）；按 4 个实测区间差分见 [24h-meter-series.csv](02-20Days-Challenge/measurement/24h-meter-series.csv)，异常日单列、不进倍数表。
-- 省电版没有 24 h 表曲线：深睡（手册 6 mA）低于 0.01 A 分辨率，且表在电流低于阈值时停表不累计；24 h 里约 99 % 时间是深睡，所以「直读深睡」在这块表上不成立。现有的是 [24 h 连续设备日志](02-20Days-Challenge/evidence/baseline-24h-meter-2026-11-10/POWER.CSV) + [表实测能量区间](02-20Days-Challenge/measurement/24h-meter-series.csv) + [15.20 h 省电版运行片段](02-20Days-Challenge/evidence/powersave-15h-2026-11-10/README.md)，以及窗口 / 唤醒段的实测值。
+- 省电版没有 24 h 表曲线：深睡（手册 6 mA）低于 0.01 A 分辨率，且表在电流低于阈值时停表不累计；24 h 里约 99 % 时间是深睡，所以「直读深睡」在这块表上不成立。现有的是 [24 h 连续设备日志](02-20Days-Challenge/process_logs/baseline-24h-meter-2026-11-10/POWER.CSV) + [表实测能量区间](02-20Days-Challenge/measurement/24h-meter-series.csv) + [15.20 h 省电版运行片段](02-20Days-Challenge/process_logs/powersave-15h-2026-11-10/README.md)，以及窗口 / 唤醒段的实测值。
 - 表盘点与建曲线不是一回事：`meter-readings.csv` 有 10 个锚点，图 2 与区间 CSV 只用其中 5 个（`0 → 64 → 8508 → 8567 → 16384 mWh`）。
 - 模型修正：窗口段模型按 `165 mA` 记，实测 `95 mA`，高估约 1.7 倍；基线 `POWER.CSV` 的 `45 mA` 固件模型不含 WiFi，实测 `90 mA` 是它的 2 倍。
 
@@ -134,7 +146,7 @@
 
 **省电手段**：深睡占空比、WiFi 用完即关、定时唤醒不连 WiFi、摄像头 `esp_camera_deinit()` 后 PWDN 拉高并 `gpio_hold` 保持、睡眠前卸载 SD、把睡眠能耗记进账。三项策略里，外设断电控制与 Deep-Sleep 已落地；**时钟降频已定量评估、未启用**——活跃段合计 33.6–50.4 s/天，上限收益 `≤0.42 mAh/天`（<0.25 %），却会给 OV2640 XCLK / SDMMC 时序引入风险，取舍表见 [state-machine.md](02-20Days-Challenge/docs/state-machine.md) 第 6 节。硬件改造（换 LDO、MOSFET 切供电、去 LED）只写进方案，未实做。
 
-**证据**：[evidence/](02-20Days-Challenge/evidence/) 下 6 组目录——两份 24 h 日志（[11-09](02-20Days-Challenge/evidence/baseline-24h-2026-11-09/README.md) / [11-10 表端点](02-20Days-Challenge/evidence/baseline-24h-meter-2026-11-10/README.md)）、[基线常开直读](02-20Days-Challenge/evidence/baseline-viewer-meter-2026-11-10/README.md)、[基线 P3 连拍](02-20Days-Challenge/evidence/baseline-viewer-meter-2026-11-16/README.md)、[省电版窗口录屏](02-20Days-Challenge/evidence/powersave-meter-2026-11-10/README.md)、[省电版 15.2 h 运行](02-20Days-Challenge/evidence/powersave-15h-2026-11-10/README.md)，含 6 段视频（合计约 3.8 min）、表盘照片与 `manifest.sha256`。新增的 [24 h 区间 CSV](02-20Days-Challenge/measurement/24h-meter-series.csv) 由 [build_meter_series.py](02-20Days-Challenge/measurement/build_meter_series.py) 生成，[verify.py](02-20Days-Challenge/measurement/verify.py) 可一键复核 34 项（`--manifest` 为 40 项，多校验 6 份 SHA256）。
+**证据**：[process_logs/](02-20Days-Challenge/process_logs/) 下 6 组目录——两份 24 h 日志（[11-09](02-20Days-Challenge/process_logs/baseline-24h-2026-11-09/README.md) / [11-10 表端点](02-20Days-Challenge/process_logs/baseline-24h-meter-2026-11-10/README.md)）、[基线常开直读](02-20Days-Challenge/process_logs/baseline-viewer-meter-2026-11-10/README.md)、[基线 P3 连拍](02-20Days-Challenge/process_logs/baseline-viewer-meter-2026-11-16/README.md)、[省电版窗口录屏](02-20Days-Challenge/process_logs/powersave-meter-2026-11-10/README.md)、[省电版 15.2 h 运行](02-20Days-Challenge/process_logs/powersave-15h-2026-11-10/README.md)，含 6 段视频（合计约 3.8 min）、表盘照片与 `manifest.sha256`。新增的 [24 h 区间 CSV](02-20Days-Challenge/measurement/24h-meter-series.csv) 由 [build_meter_series.py](02-20Days-Challenge/measurement/build_meter_series.py) 生成，[verify.py](02-20Days-Challenge/measurement/verify.py) 可一键复核 34 项（`--manifest` 为 40 项，多校验 6 份 SHA256）。
 
 > [docs/ESP32-CAM-Ultra-Low-Power-Solution.md](02-20Days-Challenge/docs/ESP32-CAM-Ultra-Low-Power-Solution.md) 是设计推演（架构、`sdkconfig`、陷阱清单、早期 `17.1 mA → 1.54 mA` 测算，数值为社区典型值）。量化结论以实机口径为准，早期测算不再作为交付数字；三段式推导见 [power-budget-model.md](02-20Days-Challenge/docs/power-budget-model.md)，状态机见 [state-machine.md](02-20Days-Challenge/docs/state-machine.md)。
 
@@ -146,7 +158,7 @@
 
 ## 3. AI 提问排障对话记录（03-AI-Collaboration）
 
-[03-AI-Collaboration/](03-AI-Collaboration/) 存了 7 张关键提问排障对话截图：我提出具体问题、把已知条件和数据边界一并给出，AI 定位根因并给修正方案，结论再回到报告和代码里核对。
+[03-AI-Collaboration/](03-AI-Collaboration/README.md) 存了 7 张关键提问排障对话截图：我提出具体问题、把已知条件和数据边界一并给出，AI 定位根因并给修正方案，结论再回到报告和代码里核对。
 
 | 截图 | 排障问题 | AI 回答与落地 |
 |---|---|---|
@@ -190,8 +202,8 @@ export MPLCONFIGDIR=/tmp/mplcfg
 .venv/bin/python src/v6/invariants.py            # 不变性自检，失败非零退出
 .venv/bin/python src/v6/evaluate.py
 .venv/bin/python src/svm/train_svm.py            # v7：5 折折外 + 留一天
-.venv/bin/python src/svm/blind_svm.py --input data/blind/2026-10-25
-.venv/bin/python src/svm/blind_svm.py --input data/blind/2026-11-17
+.venv/bin/python src/svm/blind_svm.py --input raw_data/blind/2026-10-25
+.venv/bin/python src/svm/blind_svm.py --input raw_data/blind/2026-11-17
 .venv/bin/python src/make_comparison_figures.py  # 图 A–F
 ```
 
@@ -223,16 +235,18 @@ esp32 核心 3.3.12。烧录与看串口在本机走宿主机（`distrobox-host-
 
 ```
 .
-├── 01-Field-Discovery/
-│   ├── topic_3/          # 课题 3：无线信号测绘（报告 / 数据 / 图 / 脚本 / Rust 测速服务）
-│   └── topic_8/          # 课题 8：步态判别（报告 / 6 组数据 / output 逐版本结果 / src v1–v7 / 采集照片）
-├── 02-20Days-Challenge/
-│   ├── README.md         # 项目交付索引：三项要求 / 对照表 / 24 h 数据 / 模型
-│   ├── docs/             # 省电方案（测算 / 架构 / sdkconfig / 图 1–5）与 FreeRTOS 源码分析
-│   ├── firmware/         # viewer 主基线 / powersave 省电版 / capture-probe 拍照探针
-│   ├── measurement/      # 电流对照表、24 h 预算模型、区间 CSV、阶段切分、自检与回归测试
-│   └── evidence/         # 6 组证据：时序 CSV、表盘照片、6 段录屏与抽帧
-└── 03-AI-Collaboration/  # 7 张关键 AI 提问排障对话截图
+├── README.md            # 个人简介与选题说明
+├── 01-Field-Discovery/  # 阶段一：报告、照片与 raw_data/
+│   ├── topic_3/         # 课题 3：无线信号测绘（报告 / raw_data / picture / src / Rust 测速服务）
+│   └── topic_8/         # 课题 8：步态判别（报告 / raw_data / output 逐版本结果 / src v1–v7 / picture）
+├── 02-20Days-Challenge/ # 阶段二：源码、process_logs/ 与 iterations/
+│   ├── README.md        # 项目交付索引：三项要求 / 对照表 / 24 h 数据 / 模型
+│   ├── docs/            # 省电方案（测算 / 架构 / sdkconfig / 图 1–5）与 FreeRTOS 源码分析
+│   ├── firmware/        # 阶段二源码：viewer 主基线 / powersave 省电版 / capture-probe 拍照探针
+│   ├── measurement/     # 电流对照表、24 h 预算模型、区间 CSV、阶段切分、自检与回归测试
+│   ├── process_logs/    # 过程记录：时序 CSV、表盘照片、6 段录屏与抽帧
+│   └── iterations/      # 迭代记录：固件 F1–F3 与测量口径 M1–M4
+└── 03-AI-Collaboration/ # 关键 AI 提问排障对话记录（README + 7 张截图）
 ```
 
 ---

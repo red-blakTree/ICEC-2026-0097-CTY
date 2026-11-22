@@ -10,7 +10,7 @@ predict_svm.py 面向无真值的新数据，只输出判决与概率。
 
 输出：output/svm/blind_<tag>/report.txt、windows.csv（含真值，供审计）
 用法：MPLCONFIGDIR=/tmp/mplcfg .venv/bin/python src/svm/blind_svm.py \
-          --input data/blind/2026-10-25
+          --input raw_data/blind/2026-10-25
 """
 import argparse
 import csv

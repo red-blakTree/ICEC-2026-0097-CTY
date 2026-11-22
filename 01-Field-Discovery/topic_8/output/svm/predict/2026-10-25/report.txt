@@ -2,7 +2,7 @@ v7 RBF-SVM 预测（v6 特征，8 s 窗 / 1 s 步长）
 模型：output/svm/model_rbf.joblib
   训练：2026-10-30、2026-10-31、2026-11-01，36 段 2785 窗；sklearn 1.9.1
 输入：
-  /home/binarytree/.fedora/ICEC-2026-0097-CTY/01-Field-Discovery/topic_8/data/blind/2026-10-25
+  /home/binarytree/.fedora/ICEC-2026-0097-CTY/01-Field-Discovery/topic_8/raw_data/blind/2026-10-25
 段数 9，窗数 704
 测试时无真值；段级判决 = 每段窗级多数票；概率为 Platt 校准（probability=True，内部 5 折），仅作参考。
 

@@ -48,7 +48,7 @@ def real_signals():
     from features import moving_average
     from gait_analysis_v2 import load_record
 
-    root = os.path.join(ROOT, "data", "calib", "data_2")
+    root = os.path.join(ROOT, "raw_data", "calib", "data_2")
     out = []
     for sub in ("walk-1", "go_upstairs", "go_downstairs", "stand"):
         path = os.path.join(root, sub)

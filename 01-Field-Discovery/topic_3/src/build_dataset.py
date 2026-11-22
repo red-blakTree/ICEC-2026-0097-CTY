@@ -2,12 +2,12 @@
 """课题 3 汇总表生成脚本（仅标准库）。
 
 输入
-    data/results.json   SpeedMeasurement 原始记录，只读不改
+    raw_data/results.json   SpeedMeasurement 原始记录，只读不改
     SIGNAL              下面的人工转录表：PureHub 截图逐张读数（第三方 App 不并入）
 
 输出
-    data/measurements.csv   一次测速一行：点位 + 标签 + 延迟 / 速率
-    data/signal.csv         一张截图一行：RSSI / SIR / 信道 / BSSID / 链路速率
+    raw_data/measurements.csv   一次测速一行：点位 + 标签 + 延迟 / 速率
+    raw_data/signal.csv         一张截图一行：RSSI / SIR / 信道 / BSSID / 链路速率
 
 口径
     - 点位编号见 POINTS；seq 在点内按时间戳升序编号，标签写入 raw_label（列名沿用旧名，存已更正的点位名称）。
@@ -161,7 +161,7 @@ SIGNAL_FIELDS = [
 
 
 def load_items():
-    with (ROOT / "data" / "results.json").open(encoding="utf-8") as handle:
+    with (ROOT / "raw_data" / "results.json").open(encoding="utf-8") as handle:
         return json.load(handle)["items"]
 
 
@@ -237,8 +237,8 @@ def main():
     items = load_items()
     measurements = build_measurements(items)
     signal = build_signal()
-    write_csv(ROOT / "data" / "measurements.csv", MEASUREMENT_FIELDS, measurements)
-    write_csv(ROOT / "data" / "signal.csv", SIGNAL_FIELDS, signal)
+    write_csv(ROOT / "raw_data" / "measurements.csv", MEASUREMENT_FIELDS, measurements)
+    write_csv(ROOT / "raw_data" / "signal.csv", SIGNAL_FIELDS, signal)
     print(f"measurements.csv: {len(measurements)} 行")
     print(f"signal.csv: {len(signal)} 行")
 

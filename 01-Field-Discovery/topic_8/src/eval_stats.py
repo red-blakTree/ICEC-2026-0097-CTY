@@ -10,7 +10,7 @@
 
 输出：output/reports/stats_2026-10-25/report.txt
 用法：MPLCONFIGDIR=/tmp/mplcfg .venv/bin/python src/eval_stats.py
-     换新数据：--test data/blind/2026-10-26
+     换新数据：--test raw_data/blind/2026-10-26
 """
 import argparse
 import os
@@ -98,8 +98,8 @@ def stride_rows(rows, stride=STRIDE):
 
 
 def collect_predictions(test_dir):
-    d2 = v2.collect(os.path.join(ROOT, "data", "calib", "data_2"), 8.0, 1.0)
-    rt = v2.collect(os.path.join(ROOT, "data", "calib", "2026-10-24"), 8.0, 1.0)
+    d2 = v2.collect(os.path.join(ROOT, "raw_data", "calib", "data_2"), 8.0, 1.0)
+    rt = v2.collect(os.path.join(ROOT, "raw_data", "calib", "2026-10-24"), 8.0, 1.0)
     t2 = v2.collect(test_dir, 8.0, 1.0)
     th2 = v2.calibrate(d2)
     th3 = v3.calibrate(d2)
@@ -116,8 +116,8 @@ def collect_predictions(test_dir):
         for r in rows:
             r["m3s"] = r["pred_smooth"]
 
-    d2v = v4.collect(os.path.join(ROOT, "data", "calib", "data_2"))
-    rtv = v4.collect(os.path.join(ROOT, "data", "calib", "2026-10-24"))
+    d2v = v4.collect(os.path.join(ROOT, "raw_data", "calib", "data_2"))
+    rtv = v4.collect(os.path.join(ROOT, "raw_data", "calib", "2026-10-24"))
     t2v = v4.collect(test_dir)
     th4 = v4.calibrate(d2v + rtv)
     v4groups = (("data_2", d2v), ("data_routine", rtv), ("blind", t2v))
@@ -130,8 +130,8 @@ def collect_predictions(test_dir):
         for r in rows:
             r["m4s"] = r["pred_smooth"]
 
-    d2v5 = v5.collect(os.path.join(ROOT, "data", "calib", "data_2"))
-    rtv5 = v5.collect(os.path.join(ROOT, "data", "calib", "2026-10-24"))
+    d2v5 = v5.collect(os.path.join(ROOT, "raw_data", "calib", "data_2"))
+    rtv5 = v5.collect(os.path.join(ROOT, "raw_data", "calib", "2026-10-24"))
     t2v5 = v5.collect(test_dir)
     th5 = v5.calibrate(d2v5 + rtv5)
     v5groups = (("data_2", d2v5), ("data_routine", rtv5), ("blind", t2v5))
@@ -180,7 +180,7 @@ def block(title, entries):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--test", default=os.path.join(ROOT, "data", "blind", "2026-10-25"))
+    ap.add_argument("--test", default=os.path.join(ROOT, "raw_data", "blind", "2026-10-25"))
     ap.add_argument("--out", default=os.path.join(ROOT, "output", "reports", "stats_2026-10-25"))
     a = ap.parse_args()
     test_dir = a.test if os.path.isabs(a.test) else os.path.join(ROOT, a.test)

@@ -1,4 +1,4 @@
-v4 波形检测：阈值在 data/calib/data_2 + data_routine（均为本人数据）上标定
+v4 波形检测：阈值在 raw_data/calib/data_2 + data_routine（均为本人数据）上标定
 留一记录（data_2，run-1,run-2,walk-1,walk-2）: 181/189 = 0.9577
 
 == 本人 data_2 ==

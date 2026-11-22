@@ -1,11 +1,11 @@
 == 数据独立性检查 ==
-测试目录: data/blind/2026-10-25（9 段）
+测试目录: raw_data/blind/2026-10-25（9 段）
 测试设备: PKG110
 测试采集日期: 2026-10-25
 训练集设备: PKG110；测试设备 PKG110 与训练集相同
 结论：与训练集（data_2 + data_routine）无时间重叠，可按跨日/跨时段盲测解读。
 
-盲测：v2/v3 训练 data/calib/data_2；v4 训练 data_2 + data_routine；测试 data/blind/2026-10-25（9 段 704 窗）
+盲测：v2/v3 训练 raw_data/calib/data_2；v4 训练 data_2 + data_routine；测试 raw_data/blind/2026-10-25（9 段 704 窗）
 
 v2 阈值: stand=1.217, run_sd=5.566, run_peak=36.169, down_sv=4.214, up_p99=10.322
 v3 阈值: stand=1.217, run_sd=5.566, run_peak=36.169, fd_up=1.687, fd_down=1.750, r_down=1.540

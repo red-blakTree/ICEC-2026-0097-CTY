@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """课题 08 —— 多姿态步态加速度特征采集与对比：清洗、特征提取与阈值判定。
 
-输入：data/legacy/data_1/<记录名>/Raw Data.csv（Phyphox 原始导出，列：t, ax, ay, az, |a|）
+输入：raw_data/legacy/data_1/<记录名>/Raw Data.csv（Phyphox 原始导出，列：t, ax, ay, az, |a|）
 输出：output/v1/features/windows.csv（4 s 滑窗特征 + 判定结果）
       output/v1/features/summary.csv （每段记录的统计汇总）
       output/v1/features/eval.txt    （阈值规则的窗口级准确率）
@@ -17,7 +17,7 @@ import shutil
 import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-DATA = os.path.join(ROOT, "data", "legacy", "data_1")
+DATA = os.path.join(ROOT, "raw_data", "legacy", "data_1")
 OUT = os.path.join(ROOT, "output", "v1", "features")
 
 # 记录名 -> (状态键, 说明)
@@ -38,7 +38,7 @@ SUBMISSION = [
 ]
 STATE_CN = {"walk": "平地慢走", "run": "快跑", "stairs": "上下楼梯", "stand": "静止"}
 
-# ---- 阈值（由 data/legacy/data_1/ 全部 11 段记录标定）----
+# ---- 阈值（由 raw_data/legacy/data_1/ 全部 11 段记录标定）----
 T_STAND_SD = 0.30    # |a| 标准差 < 0.30 m/s^2 -> 静止
 T_RUN_SD = 8.00      # |a| 标准差 > 8.00 m/s^2 -> 快跑
 T_RUN_PEAK = 40.0    # 峰值 |a| > 40 m/s^2 作为快跑的辅助判据

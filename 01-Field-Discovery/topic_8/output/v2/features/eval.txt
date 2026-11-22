@@ -1,4 +1,4 @@
-阈值 (data/calib/data_2, 8 s 窗 / 1.0 s 步长):
+阈值 (raw_data/calib/data_2, 8 s 窗 / 1.0 s 步长):
   stand     =    1.217
   run_sd    =    5.566
   run_peak  =   36.169

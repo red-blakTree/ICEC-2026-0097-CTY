@@ -2,8 +2,8 @@
 """课题 3 分析图生成脚本（matplotlib）。
 
 输入
-    data/measurements.csv   点位级 RSSI / SIR + 每轮延迟 / 吞吐
-    data/signal.csv          逐张截图的读数（用于「另一页」RSSI）
+    raw_data/measurements.csv   点位级 RSSI / SIR + 每轮延迟 / 吞吐
+    raw_data/signal.csv          逐张截图的读数（用于「另一页」RSSI）
 
 输出
     picture/analysis/fig1_rssi_sir.png       两页 RSSI 对照 + SIR
@@ -71,7 +71,7 @@ plt.rcParams.update({
 
 
 def load_data():
-    with (ROOT / "data" / "measurements.csv").open(encoding="utf-8-sig") as f:
+    with (ROOT / "raw_data" / "measurements.csv").open(encoding="utf-8-sig") as f:
         rows = list(csv.DictReader(f))
     stats = {}
     for pid, _ in POINTS:
@@ -85,7 +85,7 @@ def load_data():
             "down": [float(r["down_mbps"]) for r in rs],
             "up": [float(r["up_mbps"]) for r in rs],
         }
-    with (ROOT / "data" / "signal.csv").open(encoding="utf-8-sig") as f:
+    with (ROOT / "raw_data" / "signal.csv").open(encoding="utf-8-sig") as f:
         signal = {r["source_file"].split("/", 1)[1]: r for r in csv.DictReader(f)}
     return stats, signal
 

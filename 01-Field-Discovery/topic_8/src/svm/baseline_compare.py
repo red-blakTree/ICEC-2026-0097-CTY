@@ -2,7 +2,7 @@
 """四个基线（LR / LinearSVC / RBF-SVM / RF）的最小对照。
 
 口径：
-  - 数据：data/blind/2026-10-30、10-31、11-01 共 36 段、2785 窗（8 s / 1 s）；
+  - 数据：raw_data/blind/2026-10-30、10-31、11-01 共 36 段、2785 窗（8 s / 1 s）；
   - 特征：复用 src/v6/features.py 的 11 个窗特征（rob_skew/acp/ac_lag/zcr/
           n_steps/cadence/i_cv/std/bias/sigma），不另造特征；
   - 验证：StratifiedGroupKFold(5) 按 (日期, 记录) 分组，取折外预测；
@@ -44,7 +44,7 @@ OUT = os.path.join(ROOT, "output", "svm")
 def load():
     rows = []
     for day in DAYS:
-        rows += v6f.collect(os.path.join(ROOT, "data", "blind", day), tag=day)
+        rows += v6f.collect(os.path.join(ROOT, "raw_data", "blind", day), tag=day)
     return rows
 
 

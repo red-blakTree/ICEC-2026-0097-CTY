@@ -2,7 +2,7 @@
 """在任意数据目录上批量运行阈值规则（用于新数据 / 测试集回归）。
 
 用法：
-    .venv/bin/python src/v1/eval_folder.py --dir data/legacy/data_1 [--truth stairs]
+    .venv/bin/python src/v1/eval_folder.py --dir raw_data/legacy/data_1 [--truth stairs]
 
 目录约定：`--dir` 下任意深度的子目录中，凡含 `Raw Data.csv` 的都算一段记录。
 真值（--truth）缺省时按目录名猜测：含 stair/upstairs/downstairs → 上下楼梯，
@@ -74,7 +74,7 @@ def evaluate(dirs, forced_truth, root):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--dir", default="data/legacy/data_1")
+    ap.add_argument("--dir", default="raw_data/legacy/data_1")
     ap.add_argument("--truth", default=None, choices=sorted(STATE_CN) + ["unknown"])
     a = ap.parse_args()
 

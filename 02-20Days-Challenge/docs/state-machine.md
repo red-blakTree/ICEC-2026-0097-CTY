@@ -1,6 +1,6 @@
 # 省电版固件状态机与源码映射
 
-> 一句话：这是**省电版固件**（源码 [powersave.ino](../firmware/esp32cam-powersave/powersave/powersave.ino)，588 行，esp32 core 3.3.12）的状态机；实机运行证据在 [powersave-15h-2026-11-10](../evidence/powersave-15h-2026-11-10/README.md)（15.20 h、21 张照片、50 行 `POWER.CSV`）和 [powersave-meter-2026-11-10](../evidence/powersave-meter-2026-11-10/README.md)（5 V 输入侧表直读 + 录屏）。
+> 一句话：这是**省电版固件**（源码 [powersave.ino](../firmware/esp32cam-powersave/powersave/powersave.ino)，588 行，esp32 core 3.3.12）的状态机；实机运行证据在 [powersave-15h-2026-11-10](../process_logs/powersave-15h-2026-11-10/README.md)（15.20 h、21 张照片、50 行 `POWER.CSV`）和 [powersave-meter-2026-11-10](../process_logs/powersave-meter-2026-11-10/README.md)（5 V 输入侧表直读 + 录屏）。
 >
 > 行号以当前源码为准（`grep -n` 核对，命令见第 8 节）。基线对照固件为 [viewer.ino](../firmware/esp32cam-viewer/viewer/viewer.ino)（WiFi 常开，无深睡）。
 
@@ -65,7 +65,7 @@ stateDiagram-v2
 | 摄像头 / SD 句柄 | 外设掉电 | 睡前主动 `esp_camera_deinit()` + `SD_MMC.end()`，醒来重新 init |
 | `time()` 连续性 | 唤醒后可能回退/跳变 | `s_rtc_epoch` 兜底 `settimeofday` |
 
-设计取舍：RTC 慢速内存小、且只有 RTC 域供电才保持，所以只放两项"无法从外部恢复"的量——能耗是累计值，丢了 `e_mwh` 每小时归零；墙钟跨深睡不可靠。编号、文件、窗口状态都能从 SD 或本次启动重算，不占 RTC。**代价**：真正断电（RTC 域掉电）后 `e_mwh` 仍归零，15.20 h 证据就是 9 段各从 0 累计（[证据 README 第 3 节](../evidence/powersave-15h-2026-11-10/README.md)）。
+设计取舍：RTC 慢速内存小、且只有 RTC 域供电才保持，所以只放两项"无法从外部恢复"的量——能耗是累计值，丢了 `e_mwh` 每小时归零；墙钟跨深睡不可靠。编号、文件、窗口状态都能从 SD 或本次启动重算，不占 RTC。**代价**：真正断电（RTC 域掉电）后 `e_mwh` 仍归零，15.20 h 证据就是 9 段各从 0 累计（[证据 README 第 3 节](../process_logs/powersave-15h-2026-11-10/README.md)）。
 
 ## 4. 24 h 占空比时间账
 
@@ -80,7 +80,7 @@ stateDiagram-v2
 
 - 与 `python3 measurement/theory.py` 默认输出逐项对齐：`23.75 / 1.35 / 142.44 mAh`，`167.5 mAh`、`6.98 mA`；深睡取表上界 10 mA 时 `262.5 mAh / 10.94 mA`（`--i-sleep 10`）。
 - 口径提醒：`t_wake` 是"复位→再入睡"的整段，随卡上照片数从 1.4 s 涨到 2.1 s；按 2.1 s 算 `50.4 s`、唤醒段 `2.03 mAh`，合计 `168.2 mAh → 7.01 mA`（+0.4 %）。
-- 窗口电流敏感性：全程刷页面按 `0.18 A` → `45 mAh`，合计 `188.8 mAh → 7.87 mA`（+12.7 %）；按峰值 `0.22 A` → `55 mAh → 8.28 mA`（+18.6 %），与 [meter 证据第 2 节](../evidence/powersave-meter-2026-11-10/README.md) 一致。
+- 窗口电流敏感性：全程刷页面按 `0.18 A` → `45 mAh`，合计 `188.8 mAh → 7.87 mA`（+12.7 %）；按峰值 `0.22 A` → `55 mAh → 8.28 mA`（+18.6 %），与 [meter 证据第 2 节](../process_logs/powersave-meter-2026-11-10/README.md) 一致。
 - `P1`（冷启动约 6 s，`0.09–0.15 A`）没有单独建模，被并进 900 s 窗口项，误差 <0.1 mAh；`theory.py` 的 V 只影响 Wh，不影响 mAh 与 mA。
 
 ## 5. 失败模式
@@ -88,11 +88,11 @@ stateDiagram-v2
 | 失败模式 | 固件怎么处理 | 代码依据 | 证据 |
 |---|---|---|---|
 | WiFi 连不上 | 20 s 超时 → `online=false` → 不开网页，照拍一张后直接深睡；`[WIFI] 连接失败，跳过网页服务` | [L311-L325](../firmware/esp32cam-powersave/powersave/powersave.ino#L311-L325)、[L551-L566](../firmware/esp32cam-powersave/powersave/powersave.ino#L551-L566) | 未实测单独注入（15.2 h 里无纯 WiFi 失败会话） |
-| NTP 失败 | 10 s 超时后继续；`fmtTime()` 输出"无时间戳"；`s_rtc_epoch` 置 0，下次唤醒不 `settimeofday`，但拍照照跑 | [L327-L333](../firmware/esp32cam-powersave/powersave/powersave.ino#L327-L333)、[L112-L122](../firmware/esp32cam-powersave/powersave/powersave.ino#L112-L122)、[L375](../firmware/esp32cam-powersave/powersave/powersave.ino#L375) | 间接：`IMG_00019` 时间戳为"无时间戳"（[证据 README 第 2 节](../evidence/powersave-15h-2026-11-10/README.md)），说明未同步仍完成拍照 |
+| NTP 失败 | 10 s 超时后继续；`fmtTime()` 输出"无时间戳"；`s_rtc_epoch` 置 0，下次唤醒不 `settimeofday`，但拍照照跑 | [L327-L333](../firmware/esp32cam-powersave/powersave/powersave.ino#L327-L333)、[L112-L122](../firmware/esp32cam-powersave/powersave/powersave.ino#L112-L122)、[L375](../firmware/esp32cam-powersave/powersave/powersave.ino#L375) | 间接：`IMG_00019` 时间戳为"无时间戳"（[证据 README 第 2 节](../process_logs/powersave-15h-2026-11-10/README.md)），说明未同步仍完成拍照 |
 | SD 初始化失败 | `while(!initSdCard())` 每 5 s 重试，**永不入睡**；`[WARN] SD 卡初始化失败，5 秒后重试` | [L538-L542](../firmware/esp32cam-powersave/powersave/powersave.ino#L538-L542) | 未实测 |
 | 摄像头初始化失败 | `[FATAL]` + `while(true)` 死循环：不睡、不连 WiFi、不拍照，停在约 240 MHz 空转 + LDO 的电流档（模型 45 mA） | [L530-L535](../firmware/esp32cam-powersave/powersave/powersave.ino#L530-L535) | 未实测；无看门狗兜底，是风险最高的失败态 |
-| 窗口内断电 | 只有 `CAPTURE`+`WEB_ON`，没有 `WEB_CLOSE`；重新上电后窗口从 900 s 重新计时，`e_mwh` 从 0 累计 | [L497](../firmware/esp32cam-powersave/powersave/powersave.ino#L497)（`WEB_CLOSE` 只在正常关闭时写） | 会话 4/5/8/9 事件集（[证据 README 第 2 节](../evidence/powersave-15h-2026-11-10/README.md)） |
-| 意外复位 | `ESP_RST_POWERON` 先自动 `ESP.restart()` 一次（保留 SD 数据）；重启后唤醒原因为 UNDEFINED → 走冷启动，重开 15 min 窗口，整点重锚 | [L515-L519](../firmware/esp32cam-powersave/powersave/powersave.ino#L515-L519)、[L500-L502](../firmware/esp32cam-powersave/powersave/powersave.ino#L500-L502) | 07:34→08:23、22:23→22:34 冷启动重锚，10:27/10:29/10:31 连续冷启动（[证据 README 第 2 节](../evidence/powersave-15h-2026-11-10/README.md)） |
+| 窗口内断电 | 只有 `CAPTURE`+`WEB_ON`，没有 `WEB_CLOSE`；重新上电后窗口从 900 s 重新计时，`e_mwh` 从 0 累计 | [L497](../firmware/esp32cam-powersave/powersave/powersave.ino#L497)（`WEB_CLOSE` 只在正常关闭时写） | 会话 4/5/8/9 事件集（[证据 README 第 2 节](../process_logs/powersave-15h-2026-11-10/README.md)） |
+| 意外复位 | `ESP_RST_POWERON` 先自动 `ESP.restart()` 一次（保留 SD 数据）；重启后唤醒原因为 UNDEFINED → 走冷启动，重开 15 min 窗口，整点重锚 | [L515-L519](../firmware/esp32cam-powersave/powersave/powersave.ino#L515-L519)、[L500-L502](../firmware/esp32cam-powersave/powersave/powersave.ino#L500-L502) | 07:34→08:23、22:23→22:34 冷启动重锚，10:27/10:29/10:31 连续冷启动（[证据 README 第 2 节](../process_logs/powersave-15h-2026-11-10/README.md)） |
 | 拍照失败（fb 为 NULL / 写卡不完整） | 返回 `false`，`s_next_index` 不递增，不写 `CAPTURE` 行，本周期不重试，继续睡 | [L273-L309](../firmware/esp32cam-powersave/powersave/powersave.ino#L273-L309) | 未实测 |
 
 复位与断电在现有证据里同时发生，软复位是否保留 RTC 域（`e_mwh` 是否连续）未单独实测。
@@ -160,11 +160,11 @@ grep -c "setCpuFrequencyMhz" firmware/esp32cam-powersave/powersave/powersave.ino
 #    异常:   [WIFI] 连接失败 / [WARN] SD 卡初始化失败 / [FATAL] 摄像头初始化失败
 
 # 5) POWER.CSV 事件行样例（来自 15.20 h 证据，生成于常量回填之前，故 i_ma=165）
-head -6 evidence/powersave-15h-2026-11-10/POWER.CSV
-grep -n "WEB_CLOSE" evidence/powersave-15h-2026-11-10/POWER.CSV | head -3
+head -6 process_logs/powersave-15h-2026-11-10/POWER.CSV
+grep -n "WEB_CLOSE" process_logs/powersave-15h-2026-11-10/POWER.CSV | head -3
 ```
 
-样例（[POWER.CSV](../evidence/powersave-15h-2026-11-10/POWER.CSV)）：
+样例（[POWER.CSV](../process_logs/powersave-15h-2026-11-10/POWER.CSV)）：
 
 ```text
 uptime_s,event,window_s,v5_mv,i_ma,p_mw,e_mwh

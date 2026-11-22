@@ -9,7 +9,7 @@ USB 表是一个真实积分器：累计 `mWh` 是测量值，瞬时 `A` 只是�
   - 设备拔掉后的鼠标续测（note 含「鼠标」）；
   - 终点显示停顿（16384 → 16384，7 min 内没有进位）。
 
-输入: evidence/baseline-24h-meter-2026-11-10/meter-readings.csv
+输入: process_logs/baseline-24h-meter-2026-11-10/meter-readings.csv
 输出: measurement/24h-meter-series.csv
 
 用法:
@@ -22,7 +22,7 @@ from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-READINGS = ROOT / "evidence" / "baseline-24h-meter-2026-11-10" / "meter-readings.csv"
+READINGS = ROOT / "process_logs" / "baseline-24h-meter-2026-11-10" / "meter-readings.csv"
 OUT = ROOT / "measurement" / "24h-meter-series.csv"
 
 FIELDS = [

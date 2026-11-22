@@ -2,11 +2,11 @@
 """课题 3 的 24 组交付明细（仅标准库）。
 
 输入
-    data/measurements.csv   一次测速一行（build_dataset.py 生成）
-    data/results.json       原始记录，用于回填记录 id 便于回查
+    raw_data/measurements.csv   一次测速一行（build_dataset.py 生成）
+    raw_data/results.json       原始记录，用于回填记录 id 便于回查
 
 输出
-    data/delivery_24.csv    8 个测试点位 × 每点位前 3 轮 = 24 组
+    raw_data/delivery_24.csv    8 个测试点位 × 每点位前 3 轮 = 24 组
 
 口径
     - 只取 8 个测试点位（不含 3 个本地零点），每点位取 seq 最小的 3 轮，
@@ -36,7 +36,7 @@ def load(path):
 
 
 def record_ids():
-    with (ROOT / "data" / "results.json").open(encoding="utf-8") as handle:
+    with (ROOT / "raw_data" / "results.json").open(encoding="utf-8") as handle:
         items = json.load(handle)["items"]
     return {item["label"]: item["id"] for item in items}
 
@@ -72,14 +72,14 @@ def build(measurements):
 
 
 def main():
-    measurements = load(ROOT / "data" / "measurements.csv")
+    measurements = load(ROOT / "raw_data" / "measurements.csv")
     rows = build(measurements)
     if len(rows) != len(TEST_POINTS) * ROUNDS:
         raise SystemExit(f"交付组数 {len(rows)} 不等于 {len(TEST_POINTS) * ROUNDS}")
     if any(not row["record_id"] for row in rows):
         missing = [row["point_id"] for row in rows if not row["record_id"]]
         raise SystemExit(f"以下点位无法回填记录 id：{missing}")
-    out = ROOT / "data" / "delivery_24.csv"
+    out = ROOT / "raw_data" / "delivery_24.csv"
     with out.open("w", encoding="utf-8-sig", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=FIELDS)
         writer.writeheader()

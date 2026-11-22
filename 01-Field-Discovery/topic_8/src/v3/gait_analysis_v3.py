@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """课题 08 v3 —— 步频阶梯 + 竖向能量比。
 
-`data/calib/data_2`（7 段）上 v2 的 σ_v / p99 同集 97.4 %、留一 90.5 %，但跨到
+`raw_data/calib/data_2`（7 段）上 v2 的 σ_v / p99 同集 97.4 %、留一 90.5 %，但跨到
 `data_routine` 只有 73.9 %；而 f_dom（步频）在两套数据上都稳：
 
     上楼 1.63 Hz ／ 慢走 1.75 Hz ／ 下楼 1.88–2.00 Hz
@@ -18,7 +18,7 @@
 
 用法：
     .venv/bin/python src/v3/gait_analysis_v3.py
-    .venv/bin/python src/v3/gait_analysis_v3.py --eval data/calib/data_2 data/calib/2026-10-24
+    .venv/bin/python src/v3/gait_analysis_v3.py --eval raw_data/calib/data_2 raw_data/calib/2026-10-24
 """
 import argparse
 import csv
@@ -159,7 +159,7 @@ def write_outputs(all_rows, th, train_names, eval_names, loro_hit):
     else:
         lines.append("留一记录：没有可留出的记录（每类都只有 1 段）")
     lines.append("")
-    tag = "" if train_names == ["data/calib/data_2"] else "_multi"
+    tag = "" if train_names == ["raw_data/calib/data_2"] else "_multi"
     path = os.path.join(OUT, "eval%s.txt" % tag)
     with open(path, "w") as f:
         f.write("\n".join(lines) + "\n")
@@ -186,8 +186,8 @@ def collect_all(dirs):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--train", nargs="+", default=["data/calib/data_2"])
-    ap.add_argument("--eval", nargs="+", default=["data/calib/data_2"])
+    ap.add_argument("--train", nargs="+", default=["raw_data/calib/data_2"])
+    ap.add_argument("--eval", nargs="+", default=["raw_data/calib/data_2"])
     a = ap.parse_args()
 
     train = collect_all(a.train)
@@ -197,7 +197,7 @@ def main():
         r["pred"] = classify(r, th)
     smooth(all_rows)
     write_outputs(all_rows, th, a.train, a.eval, loro(train))
-    write_submission_csvs(os.path.join(ROOT, "data", "calib", "data_2"),
+    write_submission_csvs(os.path.join(ROOT, "raw_data", "calib", "data_2"),
                           os.path.join(ROOT, "output", "v3", "csv"))
 
 

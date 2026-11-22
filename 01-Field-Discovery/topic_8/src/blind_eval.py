@@ -2,17 +2,17 @@
 """课题 08 通用盲测脚本：一条命令评估 v2 / v3 / v4 / v5，不用改代码。
 
 标定集与测试集都用命令行传：
-    --calib       v4/v5 的标定目录（默认 data/calib/data_2 + data/calib/2026-10-24）
-    --calib-v23   v2/v3 的标定目录（默认只用 data/calib/data_2，保持原协议）
+    --calib       v4/v5 的标定目录（默认 raw_data/calib/data_2 + raw_data/calib/2026-10-24）
+    --calib-v23   v2/v3 的标定目录（默认只用 raw_data/calib/data_2，保持原协议）
     --test        测试目录（目录下每段一个子目录，含 Accelerometer.csv / Gravity.csv）
 
 示例：
     MPLCONFIGDIR=/tmp/mplcfg .venv/bin/python src/blind_eval.py \
-        --test data/blind/2026-10-25 --out output/blind_2026-10-25
+        --test raw_data/blind/2026-10-25 --out output/blind_2026-10-25
 
     # 新采一天（本人）：
     MPLCONFIGDIR=/tmp/mplcfg .venv/bin/python src/blind_eval.py \
-        --test data/blind/2026-10-26 --out output/reports/blind_2026-10-26
+        --test raw_data/blind/2026-10-26 --out output/reports/blind_2026-10-26
 
 输出：
     <out>/report.txt     逐方法、逐记录、逐类、混淆矩阵、置信区间
@@ -48,8 +48,8 @@ CN = v2.STATE_CN
 WIN_S, HOP_S = 8.0, 1.0
 BOOT = 2000
 STRIDE = 8
-DEFAULT_CALIB = ("data/calib/data_2", "data/calib/2026-10-24")
-DEFAULT_CALIB_V23 = ("data/calib/data_2",)
+DEFAULT_CALIB = ("raw_data/calib/data_2", "raw_data/calib/2026-10-24")
+DEFAULT_CALIB_V23 = ("raw_data/calib/data_2",)
 
 
 def resolve(path):
@@ -207,7 +207,7 @@ def main():
     ap = argparse.ArgumentParser(description="v2/v3/v4/v5 通用盲测")
     ap.add_argument("--test", required=True, help="测试目录（每段一个子目录）")
     ap.add_argument("--calib", nargs="+", default=list(DEFAULT_CALIB),
-                    help="v4/v5 标定目录，默认 data_2 + data/calib/2026-10-24")
+                    help="v4/v5 标定目录，默认 data_2 + raw_data/calib/2026-10-24")
     ap.add_argument("--calib-v23", nargs="+", default=list(DEFAULT_CALIB_V23),
                     help="v2/v3 标定目录，默认只用 data_2")
     ap.add_argument("--out", default=None, help="输出目录，默认 output/blind_<测试目录名>")

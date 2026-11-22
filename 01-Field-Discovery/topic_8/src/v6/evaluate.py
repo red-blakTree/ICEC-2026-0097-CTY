@@ -4,13 +4,13 @@
     MPLCONFIGDIR=/tmp/mplcfg .venv/bin/python src/v6/evaluate.py
     # 换盲测集只改 --blind-day
     MPLCONFIGDIR=/tmp/mplcfg .venv/bin/python src/v6/evaluate.py \
-        --blind-day data/blind/2026-10-26
+        --blind-day raw_data/blind/2026-10-26
 
-口径（标定集固定为 data/calib/data_2 + data/calib/2026-10-24，均为本人 PKG110）：
+口径（标定集固定为 raw_data/calib/data_2 + raw_data/calib/2026-10-24，均为本人 PKG110）：
   同集            标定集自身，只看拟合度
   留一记录        16 段全部轮留，每折重标定（最严格的同人同机协议）
   留一 walk/run   只留 data_2 的 4 段 walk/run（与 v4 协议一致，便于对照）
-  跨日盲测        data/blind/2026-10-25（严格盲测，不参与阈值 / 权重选择）
+  跨日盲测        raw_data/blind/2026-10-25（严格盲测，不参与阈值 / 权重选择）
   段级解码对照    none / ±2 多数票 / Viterbi，penalty 只在留一上选
   因果模式        只用过去窗的解码（在线可用）
   去重叠          每段每 8 窗取 1 窗，降低重叠窗对点准确率的放大
@@ -31,8 +31,8 @@ import features as F  # noqa: E402
 import model as M  # noqa: E402
 from features import ROOT, STATES, collect  # noqa: E402
 
-DEFAULT_CALIB = ("data/calib/data_2", "data/calib/2026-10-24")
-DEFAULT_BLIND_DAY = "data/blind/2026-10-25"
+DEFAULT_CALIB = ("raw_data/calib/data_2", "raw_data/calib/2026-10-24")
+DEFAULT_BLIND_DAY = "raw_data/blind/2026-10-25"
 OUT = os.path.join(ROOT, "output", "v6")
 CN = F.STATE_CN
 STRIDE = 8

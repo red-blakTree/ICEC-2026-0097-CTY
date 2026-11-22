@@ -64,18 +64,18 @@ USB-TTL  ── 只接 TX / RX / GND（不接 5V、不接 3V3，避免绕开电�
 
 | 视频 | 内容 | 时长 |
 |---|---|---|
-| [`meter_sleep_vs_capture.mp4`](evidence/powersave-meter-2026-11-10/meter_sleep_vs_capture.mp4) | 深睡 ↔ 拍照，表始终 `0.00 A`：证明变化小于表分辨率 | 60.7 s |
-| [`meter_window_idle.mp4`](evidence/powersave-meter-2026-11-10/meter_window_idle.mp4) | 省电版窗口空闲 `0.09–0.10 A` | 38.9 s |
-| [`meter_window_web_load.mp4`](evidence/powersave-meter-2026-11-10/meter_window_web_load.mp4) | 省电版窗口内开网页：`0.09 → 0.18 A`，峰值 `0.22 A` | 35.0 s |
-| [`video_20261110_212524772.mp4`](evidence/baseline-viewer-meter-2026-11-10/video_20261110_212524772.mp4) | 基线常开空闲 `0.09 A`，开网页 `0.11–0.14 A` | 49.4 s |
-| [`video_20261111_120804103.mp4`](evidence/baseline-24h-meter-2026-11-10/video_20261111_120804103.mp4) | 24 h 轮次中 12:08 WiFi 重连：`0.10 → 0.09 A` | 10.5 s |
-| [`video_20261116_184118896.mp4`](evidence/baseline-viewer-meter-2026-11-16/video_20261116_184118896.mp4) | 基线 P3：24 s 内 10 次 `/capture`，1 s 表读 `0.09 → 0.10–0.13 A` | 36.4 s |
+| [`meter_sleep_vs_capture.mp4`](process_logs/powersave-meter-2026-11-10/meter_sleep_vs_capture.mp4) | 深睡 ↔ 拍照，表始终 `0.00 A`：证明变化小于表分辨率 | 60.7 s |
+| [`meter_window_idle.mp4`](process_logs/powersave-meter-2026-11-10/meter_window_idle.mp4) | 省电版窗口空闲 `0.09–0.10 A` | 38.9 s |
+| [`meter_window_web_load.mp4`](process_logs/powersave-meter-2026-11-10/meter_window_web_load.mp4) | 省电版窗口内开网页：`0.09 → 0.18 A`，峰值 `0.22 A` | 35.0 s |
+| [`video_20261110_212524772.mp4`](process_logs/baseline-viewer-meter-2026-11-10/video_20261110_212524772.mp4) | 基线常开空闲 `0.09 A`，开网页 `0.11–0.14 A` | 49.4 s |
+| [`video_20261111_120804103.mp4`](process_logs/baseline-24h-meter-2026-11-10/video_20261111_120804103.mp4) | 24 h 轮次中 12:08 WiFi 重连：`0.10 → 0.09 A` | 10.5 s |
+| [`video_20261116_184118896.mp4`](process_logs/baseline-viewer-meter-2026-11-16/video_20261116_184118896.mp4) | 基线 P3：24 s 内 10 次 `/capture`，1 s 表读 `0.09 → 0.10–0.13 A` | 36.4 s |
 
 6 段合计 `230.9 s`（约 3.8 min）。
 
 表盘原始照片、抽帧与 `manifest.sha256` 在各证据目录的 `README.md` 中；图 1 是
-[`baseline-viewer-meter-2026-11-10/frame_meter_zoom.jpg`](evidence/baseline-viewer-meter-2026-11-10/frame_meter_zoom.jpg)
-与 [`powersave-meter-2026-11-10/frame_meter_zoom.jpg`](evidence/powersave-meter-2026-11-10/frame_meter_zoom.jpg)
+[`baseline-viewer-meter-2026-11-10/frame_meter_zoom.jpg`](process_logs/baseline-viewer-meter-2026-11-10/frame_meter_zoom.jpg)
+与 [`powersave-meter-2026-11-10/frame_meter_zoom.jpg`](process_logs/powersave-meter-2026-11-10/frame_meter_zoom.jpg)
 的并排裁剪（不改读数，只做旋转/缩放）。
 
 ### 1.4 P3 的口径（不互换）
@@ -96,12 +96,12 @@ USB-TTL  ── 只接 TX / RX / GND（不接 5V、不接 3V3，避免绕开电�
 
 | 文件 / 目录 | 固件 | 跨度 | 规模 | 性质 |
 |---|---|---|---|---|
-| [`POWER.CSV`](evidence/baseline-24h-meter-2026-11-10/POWER.CSV) | viewer | 24.00 h | 317 行（289 SAMPLE + 28 CAPTURE） | 设备侧连续日志；电流字段为固件模型值 |
-| [`POWER.CSV`](evidence/baseline-24h-2026-11-09/POWER.CSV) | viewer | 24.00 h 主体（+1.15 h 复位后残行） | 322 行 + 26 张照片（24 整点，00:22 缺 1 张；另 2 张复位后） | 设备侧连续日志；独立复盘轮次 |
+| [`POWER.CSV`](process_logs/baseline-24h-meter-2026-11-10/POWER.CSV) | viewer | 24.00 h | 317 行（289 SAMPLE + 28 CAPTURE） | 设备侧连续日志；电流字段为固件模型值 |
+| [`POWER.CSV`](process_logs/baseline-24h-2026-11-09/POWER.CSV) | viewer | 24.00 h 主体（+1.15 h 复位后残行） | 322 行 + 26 张照片（24 整点，00:22 缺 1 张；另 2 张复位后） | 设备侧连续日志；独立复盘轮次 |
 | [`24h-meter-series.csv`](measurement/24h-meter-series.csv) | —— | 24.00 h | 4 个实测区间 | **表累计 `mWh` 差分出的实测平均功率/电流** |
-| [`meter-readings.csv`](evidence/baseline-24h-meter-2026-11-10/meter-readings.csv) | —— | 24.0 h | 10 个表盘点 | 表盘读数转写（含照片文件名） |
-| [`baseline-24h-meter-2026-11-10/`](evidence/baseline-24h-meter-2026-11-10/README.md) | viewer | 24.00 h | 端点/断连/续测照片 + 视频 | 24 h 表端点与异常段证据 |
-| [`powersave-15h-2026-11-10/`](evidence/powersave-15h-2026-11-10/README.md) | powersave | 15.20 h | 50 行 + 21 张照片 | 省电版运行片段；**不是 24 h** |
+| [`meter-readings.csv`](process_logs/baseline-24h-meter-2026-11-10/meter-readings.csv) | —— | 24.0 h | 10 个表盘点 | 表盘读数转写（含照片文件名） |
+| [`baseline-24h-meter-2026-11-10/`](process_logs/baseline-24h-meter-2026-11-10/README.md) | viewer | 24.00 h | 端点/断连/续测照片 + 视频 | 24 h 表端点与异常段证据 |
+| [`powersave-15h-2026-11-10/`](process_logs/powersave-15h-2026-11-10/README.md) | powersave | 15.20 h | 50 行 + 21 张照片 | 省电版运行片段；**不是 24 h** |
 
 ### 2.2 24 h 表实测能量曲线
 
@@ -117,7 +117,7 @@ USB-TTL  ── 只接 TX / RX / GND（不接 5V、不接 3V3，避免绕开电�
 
 数据由 [`build_meter_series.py`](measurement/build_meter_series.py) 从表盘锚点自动差分生成，
 `verify.py` 会检查 CSV 与重算结果逐字段一致；读数来源照片在
-[`meter-readings.csv`](evidence/baseline-24h-meter-2026-11-10/meter-readings.csv) 中逐行标注。
+[`meter-readings.csv`](process_logs/baseline-24h-meter-2026-11-10/meter-readings.csv) 中逐行标注。
 
 ### 2.3 设备侧连续日志
 
@@ -280,7 +280,7 @@ python3 measurement/build_meter_series.py --check
 
 # 全量自检 + 回归测试
 python3 measurement/verify.py
-python3 measurement/verify.py --manifest   # 额外校验 evidence 的 SHA256
+python3 measurement/verify.py --manifest   # 额外校验 process_logs 的 SHA256
 python3 -m unittest discover -s measurement -p 'test_*.py' -v
 
 # 串口日志切阶段（可选）
@@ -302,36 +302,40 @@ arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-powe
 
 ```text
 02-20Days-Challenge/
-├── README.md                        # 本页：项目说明与证据索引
+├── README.md                                  # 本页：项目说明与证据索引
 ├── docs/
 │   ├── ESP32-CAM-Ultra-Low-Power-Solution.md  # 方案：功耗测算、架构、sdkconfig、陷阱
 │   ├── power-budget-model.md                  # 三段式预算推导、敏感性、不确定度
 │   ├── state-machine.md                       # 状态机、源码行号、失败模式、降频评估
 │   ├── figures/                               # 5 张实测证据图（本页引用）
 │   └── FreeRTOS-V11.3.1-Source-Analysis.md    # 内核源码分析（附功耗专题）
-├── firmware/
-│   ├── esp32cam-viewer/             # 主基线：WiFi 常开 + 每小时一张 + 网页
-│   ├── esp32cam-powersave/          # 省电版：15 min 窗口 + 深睡占空比（状态机源码）
-│   └── esp32cam-capture-probe/      # 拍照电流标定探针（连拍放大占空比）
-├── measurement/
-│   ├── current-comparison.csv       # P1–P6 + 24 h 全量对照表
-│   ├── 24h-meter-series.csv         # 24 h 表实测能量区间（4 段）
-│   ├── theory.py                    # 24 h 功耗预算推导
-│   ├── build_meter_series.py        # 表盘锚点 → 区间 CSV
-│   ├── make_figures.py              # 5 张证据图（纯 PIL，宿主机运行）
-│   ├── verify.py                    # 34 项自检
-│   ├── test_power_model.py          # 7 个回归测试
-│   ├── README.md                    # 测量方案、接线、表限制、已知误差
-│   ├── phases.py                    # 串口日志切 P1–P6
-│   ├── serial_capture.py            # 宿主机抓串口（带时间戳、--reset）
-│   └── measure-record.csv           # 每阶段实测打点原始记录
-└── evidence/                        # 证据：时序 CSV + 视频 + 照片
-    ├── baseline-24h-2026-11-09/          # 基线 24.00 h：26 张照片 + 模型 CSV
-    ├── baseline-24h-meter-2026-11-10/    # 基线 24 h 表端点 + api 清单（照片未入库）
-    ├── baseline-viewer-meter-2026-11-10/ # 基线常开直读 + 开网页录屏
-    ├── baseline-viewer-meter-2026-11-16/ # 基线 P3 24 s/10 次连拍录屏（已静音）
-    ├── powersave-15h-2026-11-10/         # 省电版 15.20 h 运行片段（模型 CSV）
-    └── powersave-meter-2026-11-10/       # 省电版三段录屏 + 抽帧 + 拍照抽样
+├── firmware/                                  # 阶段二源码
+│   ├── esp32cam-viewer/                       # 主基线：WiFi 常开 + 每小时一张 + 网页
+│   ├── esp32cam-powersave/                    # 省电版：15 min 窗口 + 深睡占空比（状态机源码）
+│   └── esp32cam-capture-probe/                # 拍照电流标定探针（连拍放大占空比）
+├── measurement/                               # 测量脚本与表
+│   ├── current-comparison.csv                 # P1–P6 + 24 h 全量对照表
+│   ├── 24h-meter-series.csv                   # 24 h 表实测能量区间（4 段）
+│   ├── theory.py                              # 24 h 功耗预算推导
+│   ├── build_meter_series.py                  # 表盘锚点 → 区间 CSV
+│   ├── make_figures.py                        # 5 张证据图（纯 PIL，宿主机运行）
+│   ├── verify.py                              # 34 项自检
+│   ├── test_power_model.py                    # 7 个回归测试
+│   ├── README.md                              # 测量方案、接线、表限制、已知误差
+│   ├── phases.py                              # 串口日志切 P1–P6
+│   ├── serial_capture.py                      # 宿主机抓串口（带时间戳、--reset）
+│   └── measure-record.csv                     # 每阶段实测打点原始记录
+├── process_logs/                              # 过程记录：时序 CSV + 视频 + 照片
+│   ├── baseline-24h-2026-11-09/               # 基线 24.00 h：26 张照片 + 模型 CSV
+│   ├── baseline-24h-meter-2026-11-10/         # 基线 24 h 表端点 + api 清单（照片未入库）
+│   ├── baseline-viewer-meter-2026-11-10/      # 基线常开直读 + 开网页录屏
+│   ├── baseline-viewer-meter-2026-11-16/      # 基线 P3 24 s/10 次连拍录屏（已静音）
+│   ├── powersave-15h-2026-11-10/              # 省电版 15.20 h 运行片段（模型 CSV）
+│   └── powersave-meter-2026-11-10/            # 省电版三段录屏 + 抽帧 + 拍照抽样
+└── iterations/                                # 迭代记录：固件 F1–F3 与测量口径 M1–M4
+    ├── README.md                              # 索引：每轮改了什么、怎么验证
+    ├── firmware.md                            # 固件三轮的改动、动机、验证与未落地项
+    └── measurement.md                         # 测量口径四次修正（深睡 / 窗口 / 基线 / 24 h 区间）
 ```
 
 ## 7. 相关文档

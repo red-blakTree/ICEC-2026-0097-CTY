@@ -153,6 +153,6 @@ python3 -m unittest discover -s measurement -p 'test_*.py' -v
 ## 9. 不在这页里的东西
 
 - 24 h 实测能量区间序列：[`measurement/24h-meter-series.csv`](../measurement/24h-meter-series.csv)，
-  推导见 [证据 README](../evidence/baseline-24h-meter-2026-11-10/README.md)。
+  推导见 [证据 README](../process_logs/baseline-24h-meter-2026-11-10/README.md)。
 - 状态机与源码映射：[`state-machine.md`](state-machine.md)。
 - 测量方案、表限制与接线：[`measurement/README.md`](../measurement/README.md)。

@@ -56,10 +56,10 @@ export ARDUINO_DIRECTORIES_DATA=$PWD/.arduino/data ARDUINO_DIRECTORIES_USER=$PWD
 
 | 证据 | 内容 |
 |---|---|
-| [baseline-viewer-meter-2026-11-10](../../evidence/baseline-viewer-meter-2026-11-10/README.md) | 常开空闲 `0.09 A` 直读 + 开网页 `0.11–0.14 A` 录屏 |
-| [baseline-24h-2026-11-09](../../evidence/baseline-24h-2026-11-09/README.md) | 24.00 h、24 张逐小时照片、322 行模型 `POWER.CSV` |
-| [baseline-24h-meter-2026-11-10](../../evidence/baseline-24h-meter-2026-11-10/README.md) | 24 h 表端点、10 个表盘点、WiFi 断连段 `0.18 A` |
-| [baseline-viewer-meter-2026-11-16](../../evidence/baseline-viewer-meter-2026-11-16/README.md) | P3 24 s/10 次连拍视频（1 s 表读 `0.10–0.13 A`） |
+| [baseline-viewer-meter-2026-11-10](../../process_logs/baseline-viewer-meter-2026-11-10/README.md) | 常开空闲 `0.09 A` 直读 + 开网页 `0.11–0.14 A` 录屏 |
+| [baseline-24h-2026-11-09](../../process_logs/baseline-24h-2026-11-09/README.md) | 24.00 h、24 张逐小时照片、322 行模型 `POWER.CSV` |
+| [baseline-24h-meter-2026-11-10](../../process_logs/baseline-24h-meter-2026-11-10/README.md) | 24 h 表端点、10 个表盘点、WiFi 断连段 `0.18 A` |
+| [baseline-viewer-meter-2026-11-16](../../process_logs/baseline-viewer-meter-2026-11-16/README.md) | P3 24 s/10 次连拍视频（1 s 表读 `0.10–0.13 A`） |
 
 ## 6. 时间与凭据
 

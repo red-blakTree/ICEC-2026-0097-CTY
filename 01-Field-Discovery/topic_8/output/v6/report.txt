@@ -1,5 +1,5 @@
 v6 评估：不变核 + 分位标定 + 段级解码
-标定：data/calib/data_2, data/calib/2026-10-24
+标定：raw_data/calib/data_2, raw_data/calib/2026-10-24
 阈值：stand(sigma)=1.100  run(sigma)=4.121  down(rob_skew)=+0.1108  up(score)=+0.633
 解码：viterbi，penalty=1.00（只在留一上选，不进盲测）
 

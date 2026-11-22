@@ -9,7 +9,7 @@
 
 用法:
   python3 measurement/verify.py
-  python3 measurement/verify.py --manifest   # 额外校验 evidence 的 SHA256
+  python3 measurement/verify.py --manifest   # 额外校验 process_logs 的 SHA256
 """
 import argparse
 import csv
@@ -104,9 +104,9 @@ def check_comparison():
 
 def check_power_logs():
     specs = {
-        "evidence/baseline-24h-2026-11-09/POWER.CSV": (322, 86400),
-        "evidence/baseline-24h-meter-2026-11-10/POWER.CSV": (317, 86400),
-        "evidence/powersave-15h-2026-11-10/POWER.CSV": (50, 900),
+        "process_logs/baseline-24h-2026-11-09/POWER.CSV": (322, 86400),
+        "process_logs/baseline-24h-meter-2026-11-10/POWER.CSV": (317, 86400),
+        "process_logs/powersave-15h-2026-11-10/POWER.CSV": (50, 900),
     }
     for rel, (n, uptime_min) in specs.items():
         path = ROOT / rel
@@ -146,7 +146,7 @@ def check_links():
 
 
 def check_manifest():
-    for manifest in ROOT.glob("evidence/*/manifest.sha256"):
+    for manifest in ROOT.glob("process_logs/*/manifest.sha256"):
         r = subprocess.run(["sha256sum", "-c", manifest.name],
                            cwd=manifest.parent, capture_output=True, text=True)
         ok = r.returncode == 0

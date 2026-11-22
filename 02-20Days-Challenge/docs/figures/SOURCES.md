@@ -1,6 +1,6 @@
 # docs/figures 证据图：源文件、数据点与生成方式
 
-> 本目录 5 张 PNG 全部由 `measurement/make_figures.py` 用**纯 PIL**生成，只读取 `evidence/` 下的原始证据与仓库现有 CSV/README，不改动原图、CSV、固件和 README。
+> 本目录 5 张 PNG 全部由 `measurement/make_figures.py` 用**纯 PIL**生成，只读取 `process_logs/` 下的原始证据与仓库现有 CSV/README，不改动原图、CSV、固件和 README。
 > 图中所有数值都来自仓库实测；`12.9×` 是 `2160 ÷ 167.5` 的计算值，不是营销话术。
 
 ## 1. 生成命令
@@ -26,9 +26,9 @@ distrobox-host-exec python3 /home/binarytree/.fedora/ICEC-2026-0097-CTY/02-20Day
 
 **源文件**
 
-- `evidence/baseline-viewer-meter-2026-11-10/frame_meter_zoom.jpg`（1240×1400，原图整体旋转 90°）
-- `evidence/powersave-meter-2026-11-10/frame_meter_zoom.jpg`（1032×282，原图直接使用）
-- 读数背景：`evidence/baseline-viewer-meter-2026-11-10/README.md`、`evidence/powersave-meter-2026-11-10/README.md`
+- `process_logs/baseline-viewer-meter-2026-11-10/frame_meter_zoom.jpg`（1240×1400，原图整体旋转 90°）
+- `process_logs/powersave-meter-2026-11-10/frame_meter_zoom.jpg`（1032×282，原图直接使用）
+- 读数背景：`process_logs/baseline-viewer-meter-2026-11-10/README.md`、`process_logs/powersave-meter-2026-11-10/README.md`
 
 **处理（只做旋转/裁剪/等比缩放，没有改读数像素）**
 
@@ -50,8 +50,8 @@ distrobox-host-exec python3 /home/binarytree/.fedora/ICEC-2026-0097-CTY/02-20Day
 
 **源文件**
 
-- `evidence/baseline-24h-meter-2026-11-10/meter-readings.csv`
-- `evidence/baseline-24h-meter-2026-11-10/README.md`
+- `process_logs/baseline-24h-meter-2026-11-10/meter-readings.csv`
+- `process_logs/baseline-24h-meter-2026-11-10/README.md`
 - 对应照片：`start-1/3/5.jpg`、`no_network.jpg`、`frame_wifi_1208.jpg`、`start-4.jpg`（= `end-1.jpg`）
 
 **实测锚点（5 点）**
@@ -82,8 +82,8 @@ distrobox-host-exec python3 /home/binarytree/.fedora/ICEC-2026-0097-CTY/02-20Day
 
 **源文件 / 口径**
 
-- `evidence/baseline-viewer-meter-2026-11-10/README.md`（基线常开 90 mA）
-- `evidence/powersave-meter-2026-11-10/README.md`（窗口 95 mA、唤醒 145 mA、深睡 6 mA）
+- `process_logs/baseline-viewer-meter-2026-11-10/README.md`（基线常开 90 mA）
+- `process_logs/powersave-meter-2026-11-10/README.md`（窗口 95 mA、唤醒 145 mA、深睡 6 mA）
 - `measurement/current-comparison.csv`
 
 **计算**
@@ -139,4 +139,4 @@ distrobox-host-exec python3 /home/binarytree/.fedora/ICEC-2026-0097-CTY/02-20Day
 - 中文字体已用 `msyh.ttc`（index=0）实测，5 张图无方框/乱码。
 - 逐张 `read_image` 检查：标题、副标题、数值、图例、脚注无重叠；图 1 表盘读数可读；图 5 对数刻度与范围条数值完整。
 - 5 张 PNG 均 < 500 KB；脚本可重复运行（先清空旧图再画）。
-- 数据点均可回溯到 `evidence/` 原始照片或 `meter-readings.csv`；未新增实测数据。
+- 数据点均可回溯到 `process_logs/` 原始照片或 `meter-readings.csv`；未新增实测数据。

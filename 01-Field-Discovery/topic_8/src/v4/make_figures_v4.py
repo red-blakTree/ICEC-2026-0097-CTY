@@ -45,9 +45,9 @@ def setup():
 
 
 def fig13_steps():
-    items = [("data/calib/data_2", "walk-1", "平地慢走"),
-             ("data/calib/data_2", "go_upstairs", "上楼"),
-             ("data/calib/data_2", "run-2", "快跑")]
+    items = [("raw_data/calib/data_2", "walk-1", "平地慢走"),
+             ("raw_data/calib/data_2", "go_upstairs", "上楼"),
+             ("raw_data/calib/data_2", "run-2", "快跑")]
     fig, axes = plt.subplots(3, 1, figsize=(11, 8.8))
     for ax, (root, name, label) in zip(axes, items):
         t, ax_, ay, az, gx, gy, gz = v2.load_record(os.path.join(ROOT, root, name))
@@ -82,9 +82,9 @@ def fig13_steps():
 
 
 def fig14_acp():
-    d2 = v4.collect(os.path.join(ROOT, "data", "calib", "data_2"))
-    t2 = v4.collect(os.path.join(ROOT, "data", "blind", "2026-10-25"))
-    th = v4.calibrate(d2 + v4.collect(os.path.join(ROOT, "data", "calib")))
+    d2 = v4.collect(os.path.join(ROOT, "raw_data", "calib", "data_2"))
+    t2 = v4.collect(os.path.join(ROOT, "raw_data", "blind", "2026-10-25"))
+    th = v4.calibrate(d2 + v4.collect(os.path.join(ROOT, "raw_data", "calib")))
     fig, ax = plt.subplots(figsize=(9.4, 5.4))
     for rows, marker, dy, label in ((d2, "o", -0.14, "data_2"), (t2, "^", 0.14, "2026-10-25")):
         for st in ORDER:
@@ -107,8 +107,8 @@ def fig14_acp():
 
 
 def fig15_blind():
-    d2_v2 = v2.collect(os.path.join(ROOT, "data", "calib", "data_2"), 8.0, 1.0)
-    t2_v2 = v2.collect(os.path.join(ROOT, "data", "blind", "2026-10-25"), 8.0, 1.0)
+    d2_v2 = v2.collect(os.path.join(ROOT, "raw_data", "calib", "data_2"), 8.0, 1.0)
+    t2_v2 = v2.collect(os.path.join(ROOT, "raw_data", "blind", "2026-10-25"), 8.0, 1.0)
     th2 = v2.calibrate(d2_v2)
     th3 = v3.calibrate(d2_v2)
     for r in t2_v2:
@@ -120,9 +120,9 @@ def fig15_blind():
     acc2 = sum(r["p2"] == r["state"] for r in t2_v2) / len(t2_v2)
     acc3 = sum(r["pred_smooth"] == r["state"] for r in t2_v2) / len(t2_v2)
 
-    d2_v4 = v4.collect(os.path.join(ROOT, "data", "calib", "data_2"))
-    t2_v4 = v4.collect(os.path.join(ROOT, "data", "blind", "2026-10-25"))
-    th4 = v4.calibrate(d2_v4 + v4.collect(os.path.join(ROOT, "data", "calib")))
+    d2_v4 = v4.collect(os.path.join(ROOT, "raw_data", "calib", "data_2"))
+    t2_v4 = v4.collect(os.path.join(ROOT, "raw_data", "blind", "2026-10-25"))
+    th4 = v4.calibrate(d2_v4 + v4.collect(os.path.join(ROOT, "raw_data", "calib")))
     for r in t2_v4:
         r["p4"] = v4.classify(r, th4)
         r["pred"] = r["p4"]
@@ -177,9 +177,9 @@ def fig15_blind():
 
 
 def fig16_v4_blind():
-    d2 = v4.collect(os.path.join(ROOT, "data", "calib", "data_2"))
-    routine = v4.collect(os.path.join(ROOT, "data", "calib"))
-    t2 = v4.collect(os.path.join(ROOT, "data", "blind", "2026-10-25"))
+    d2 = v4.collect(os.path.join(ROOT, "raw_data", "calib", "data_2"))
+    routine = v4.collect(os.path.join(ROOT, "raw_data", "calib"))
+    t2 = v4.collect(os.path.join(ROOT, "raw_data", "blind", "2026-10-25"))
     th = v4.calibrate(d2 + routine)
     for r in t2:
         r["pred"] = v4.classify(r, th)

@@ -1,5 +1,5 @@
 2026-10-25 跨日盲测（704 窗 / 9 段）
-标定：v2/v3 = data_2；v4/v5 = data_2 + data/calib/2026-10-24
+标定：v2/v3 = data_2；v4/v5 = data_2 + raw_data/calib/2026-10-24
 
 v2       窗口 0.4276  记录 5/9  go_downstairs-1:OK  go_downstairs-2:OK  run-1:OK  run-2:OK  stand:OK  go_upstairs-1:X  go_upstairs-2:X  walk-1:X  walk-2:X
 v3+平滑    窗口 0.4531  记录 7/9  go_downstairs-1:OK  go_downstairs-2:OK  run-1:OK  run-2:OK  stand:OK  go_upstairs-1:OK  go_upstairs-2:OK  walk-1:X  walk-2:X

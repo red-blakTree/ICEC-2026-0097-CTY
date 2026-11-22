@@ -2,7 +2,7 @@
 """课题 08 v7：RBF-SVM 有监督分支的训练、复核与外部抽样检查。
 
 口径：
-  - 数据：data/blind/2026-10-30、10-31、11-01 共 36 段 2785 窗（8 s / 1 s）；
+  - 数据：raw_data/blind/2026-10-30、10-31、11-01 共 36 段 2785 窗（8 s / 1 s）；
   - 特征：复用 src/v6/features.py 的 10 维窗特征，不另造特征；
   - 模型：Pipeline(StandardScaler, SVC(rbf, C=10, gamma=scale,
           class_weight=balanced, probability=True))；
@@ -96,7 +96,7 @@ def confusion_block(lines, title, rows, pred):
 
 def external_check(model, lines):
     """2026-10-25 外部抽样检查，返回逐窗 CSV 行。"""
-    day_dir = os.path.join(base.ROOT, "data", "blind", EXTERNAL_DAY)
+    day_dir = os.path.join(base.ROOT, "raw_data", "blind", EXTERNAL_DAY)
     rows, _ = svm_data.collect_checked([day_dir])
     n = len(rows)
     X = np.array([[r[f] for f in FEATS] for r in rows], dtype=float)

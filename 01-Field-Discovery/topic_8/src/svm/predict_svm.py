@@ -2,9 +2,9 @@
 """课题 08 v7：用训练好的 RBF-SVM 做逐窗预测 + 段级多数票。
 
 两种用法：
-  一个一个测：--input data/blind/2026-10-30/walk-1/
-  一起测：    --input data/blind/2026-11-02/
-              --input data/blind/2026-10-30/walk-1 data/blind/2026-10-31/stand
+  一个一个测：--input raw_data/blind/2026-10-30/walk-1/
+  一起测：    --input raw_data/blind/2026-11-02/
+              --input raw_data/blind/2026-10-30/walk-1 raw_data/blind/2026-10-31/stand
 
 输入是解压后的段目录（Accelerometer.csv + Gravity.csv + meta/）。不足 8 s、清洗后为空、
 缺 CSV 都会显式报错，不静默跳过。测试时无真值，不输出 state。
@@ -12,7 +12,7 @@
 输出：output/svm/predict/<tag>/windows.csv（day, record, t0, pred, prob）
       output/svm/predict/<tag>/report.txt（逐段多数票 + 平均概率 + 汇总）
 用法：MPLCONFIGDIR=/tmp/mplcfg .venv/bin/python src/svm/predict_svm.py \
-          --input data/blind/2026-10-30/walk-1/
+          --input raw_data/blind/2026-10-30/walk-1/
 """
 import argparse
 import csv

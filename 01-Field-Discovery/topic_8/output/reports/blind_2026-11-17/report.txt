@@ -1,7 +1,7 @@
-盲测评估：/home/binarytree/.fedora/ICEC-2026-0097-CTY/01-Field-Discovery/topic_8/data/blind/2026-11-17
+盲测评估：/home/binarytree/.fedora/ICEC-2026-0097-CTY/01-Field-Discovery/topic_8/raw_data/blind/2026-11-17
 设备：PKG110；最早 START：2026-11-17 08:47:22.462 UTC+08:00
-标定（v2/v3）：data/calib/data_2
-标定（v4/v5）：data/calib/data_2, data/calib/2026-10-24
+标定（v2/v3）：raw_data/calib/data_2
+标定（v4/v5）：raw_data/calib/data_2, raw_data/calib/2026-10-24
 测试：1078 窗 / 13 段；静止 18，平地慢走 161，快跑 166，上楼 388，下楼 345
 
 v2: stand=1.217, run_sd=5.566, run_peak=36.169, down_sv=4.214, up_p99=10.322

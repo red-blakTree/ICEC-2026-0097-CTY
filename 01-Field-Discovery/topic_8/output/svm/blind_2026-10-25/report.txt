@@ -1,6 +1,6 @@
-v7 盲测：data/blind/2026-10-25（RBF-SVM，v6 特征，8 s 窗 / 1 s 步长）
+v7 盲测：raw_data/blind/2026-10-25（RBF-SVM，v6 特征，8 s 窗 / 1 s 步长）
 模型：output/svm/model_rbf.joblib（训练 2026-10-30、2026-10-31、2026-11-01，36 段 2785 窗；训练设备 PKG110（OnePlus））
-输入：/home/binarytree/.fedora/ICEC-2026-0097-CTY/01-Field-Discovery/topic_8/data/blind/2026-10-25
+输入：/home/binarytree/.fedora/ICEC-2026-0097-CTY/01-Field-Discovery/topic_8/raw_data/blind/2026-10-25
 段数 9，窗数 704；输入设备：PKG110（OnePlus）×9
 真值由段目录名推断；记录级 = 每段多数票；macro-F1 按实际出现的 5 类计算。
 

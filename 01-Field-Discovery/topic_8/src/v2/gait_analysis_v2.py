@@ -17,7 +17,7 @@ v2 改用 Phyphox 同时导出的 Gravity 传感器（硬件融合，|g| 恒为 
 输出：output/v2/features/{windows,summary}.csv、eval.txt
 
 用法：
-    .venv/bin/python src/v2/gait_analysis_v2.py                 # 主数据集 data/calib/data_2
+    .venv/bin/python src/v2/gait_analysis_v2.py                 # 主数据集 raw_data/calib/data_2
     .venv/bin/python src/v2/gait_analysis_v2.py --win 4 --hop 0.5
     .venv/bin/python src/v2/gait_analysis_v2.py --sweep         # 窗长对比
 """
@@ -399,7 +399,7 @@ def sweep(root, wins, hop_s):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--dir", default="data/calib/data_2")
+    ap.add_argument("--dir", default="raw_data/calib/data_2")
     ap.add_argument("--win", type=float, default=WIN_S)
     ap.add_argument("--hop", type=float, default=HOP_S)
     ap.add_argument("--sweep", action="store_true")

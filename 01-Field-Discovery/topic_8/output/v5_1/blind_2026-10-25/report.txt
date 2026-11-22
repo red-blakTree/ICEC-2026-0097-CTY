@@ -1,6 +1,6 @@
 v5.1 零偏校正 + 分位标定 + acp/zcr 等权打分
 下楼/非下楼判决量: rob_skew
-标定集: data/calib/data_2 + data/calib/2026-10-24（本人 PKG110）；盲测: 2026-10-25
+标定集: raw_data/calib/data_2 + raw_data/calib/2026-10-24（本人 PKG110）；盲测: 2026-10-25
 分位标定 q=0.02；up 打分权重固定 1（不在测试集上调）
 
 特征间隔（2 %/98 % 分位，越大越稳）:
@@ -30,7 +30,7 @@ walk-2             truth=walk  windows= 95 raw= 92/95  smooth= 92/95  majority=�
 上楼          0      3      0     53      0
 下楼          0      0      0      0     35
 
-== 本人 data/calib/2026-10-24（in-sample） ==
+== 本人 raw_data/calib/2026-10-24（in-sample） ==
 阈值: stand=1.100, run=4.121, down=0.111, up=0.633
 打分归一化: acp (0.729, 0.129), zcr (3.796, 0.512)
 

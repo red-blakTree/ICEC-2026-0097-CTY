@@ -142,9 +142,9 @@ WiFi 连接失败时不开网页，拍完直接睡到下个周期。
 
 | 证据 | 内容 |
 |---|---|
-| [powersave-15h-2026-11-10](../../evidence/powersave-15h-2026-11-10/README.md) | 15.20 h 运行片段，50 行 `POWER.CSV`（模型值），21 张照片 |
-| [powersave-meter-2026-11-10](../../evidence/powersave-meter-2026-11-10/README.md) | 深睡↔拍照 `0.00 A` 录屏、窗口空闲 `0.09–0.10 A`、开网页 `0.12–0.19 A` |
-| [基线 P3 视频对照](../../evidence/baseline-viewer-meter-2026-11-16/README.md) | 基线 P3 连拍 1 s 表读，用于对照 |
+| [powersave-15h-2026-11-10](../../process_logs/powersave-15h-2026-11-10/README.md) | 15.20 h 运行片段，50 行 `POWER.CSV`（模型值），21 张照片 |
+| [powersave-meter-2026-11-10](../../process_logs/powersave-meter-2026-11-10/README.md) | 深睡↔拍照 `0.00 A` 录屏、窗口空闲 `0.09–0.10 A`、开网页 `0.12–0.19 A` |
+| [基线 P3 视频对照](../../process_logs/baseline-viewer-meter-2026-11-16/README.md) | 基线 P3 连拍 1 s 表读，用于对照 |
 
 ## 9. 局限
 

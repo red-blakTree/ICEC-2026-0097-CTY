@@ -79,16 +79,16 @@ md5 与源文件逐字节一致：`01` `c539aebd…`、`02` `175fdc76…`、`03`
 
 | 数据集 | 日期 / 时段 | 段数 | 8 s 窗 | 角色 |
 |---|---|---|---|---|
-| `data/legacy/data_1/` | 10-23 15:33–16:25 | 11 | —（4 s 窗 1058） | v1 的 4 类验证 |
-| `data/calib/data_2/` | 10-24 17:51–18:33 | 7 | 302 | 主标定集 |
-| `data/calib/2026-10-24/` | 10-24 07:58–08:38 | 9 | 640 | 标定集 |
-| `data/blind/2026-10-25/` | 10-25 09:42–10:06 | 9 | 704 | 跨日 1（曾参与 v5.1/v6 方向） |
-| `data/blind/2026-10-30/`、`10-31/`、`11-01/` | 10-30～11-01 | 36 | 2785 | 跨日 2；v7 训练集 |
-| `data/blind/2026-11-17/` | 11-17 08:47–09:20 | 13 | 1078 | 跨日 3（完全未参与选型） |
+| `raw_data/legacy/data_1/` | 10-23 15:33–16:25 | 11 | —（4 s 窗 1058） | v1 的 4 类验证 |
+| `raw_data/calib/data_2/` | 10-24 17:51–18:33 | 7 | 302 | 主标定集 |
+| `raw_data/calib/2026-10-24/` | 10-24 07:58–08:38 | 9 | 640 | 标定集 |
+| `raw_data/blind/2026-10-25/` | 10-25 09:42–10:06 | 9 | 704 | 跨日 1（曾参与 v5.1/v6 方向） |
+| `raw_data/blind/2026-10-30/`、`10-31/`、`11-01/` | 10-30～11-01 | 36 | 2785 | 跨日 2；v7 训练集 |
+| `raw_data/blind/2026-11-17/` | 11-17 08:47–09:20 | 13 | 1078 | 跨日 3（完全未参与选型） |
 
 每段保留原始 CSV 与 `meta/device.csv`、`meta/time.csv`；每个数据集目录下另有 `_zips/`（每段一个 zip 原始导出）。`data_1`、`data_2` 另有现场照片与 Phyphox 截图。
 
-> 历史版本脚本与产物中的 `data_routine` 标签即上表 `data/calib/2026-10-24/`（640 窗 / 9 段）；取数路径已写死为该目录。
+> 历史版本脚本与产物中的 `data_routine` 标签即上表 `raw_data/calib/2026-10-24/`（640 窗 / 9 段）；取数路径已写死为该目录。
 
 ![v1 图 1](output/v1/figures/fig1_raw_overview.png)
 
@@ -218,8 +218,8 @@ Accelerometer + Gravity
 
 # v7：训练 + 外部盲测（10-25 / 11-17）
 .venv/bin/python src/svm/train_svm.py
-.venv/bin/python src/svm/blind_svm.py --input data/blind/2026-10-25
-.venv/bin/python src/svm/blind_svm.py --input data/blind/2026-11-17
+.venv/bin/python src/svm/blind_svm.py --input raw_data/blind/2026-10-25
+.venv/bin/python src/svm/blind_svm.py --input raw_data/blind/2026-11-17
 
 # 版本对比图 A–F
 .venv/bin/python src/make_comparison_figures.py
@@ -227,7 +227,7 @@ Accelerometer + Gravity
 
 ```
 topic_8/
-├── data/{calib,blind,legacy}/      ← 标定 / 跨日 / 早期数据
+├── raw_data/{calib,blind,legacy}/  ← 标定 / 跨日 / 早期数据
 ├── picture/                        ← 现场照片与 Phyphox 截图
 ├── src/
 │   ├── v1/ … v6/                   ← 各版本规则与作图

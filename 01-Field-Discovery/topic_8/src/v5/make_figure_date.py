@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """课题 08 v5 —— 2026-10-25 跨日盲测图与对比表。
 
-协议：v2/v3 用 data/calib/data_2 标定；v4/v5 用 data_2 + data/calib/2026-10-24 标定；
-`data/blind/2026-10-25` 只做测试，不参与任何阈值/权重选择。
+协议：v2/v3 用 raw_data/calib/data_2 标定；v4/v5 用 data_2 + raw_data/calib/2026-10-24 标定；
+`raw_data/blind/2026-10-25` 只做测试，不参与任何阈值/权重选择。
 
 输出：output/v5_2026-10-25/{compare.txt,fig21_date_blind.png}
 用法：MPLCONFIGDIR=/tmp/mplcfg .venv/bin/python src/v5/make_figure_date.py
@@ -60,7 +60,7 @@ def collect_v2(root):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--test", default=os.path.join(ROOT, "data", "blind", "2026-10-25"))
+    ap.add_argument("--test", default=os.path.join(ROOT, "raw_data", "blind", "2026-10-25"))
     ap.add_argument("--out", default=os.path.join(ROOT, "output", "v5", "blind_2026-10-25"))
     a = ap.parse_args()
     test_dir = a.test if os.path.isabs(a.test) else os.path.join(ROOT, a.test)
@@ -70,7 +70,7 @@ def main():
     test_name = os.path.basename(os.path.normpath(test_dir))
 
     # v2 / v3：data_2 标定
-    d2_2 = collect_v2(os.path.join(ROOT, "data", "calib", "data_2"))
+    d2_2 = collect_v2(os.path.join(ROOT, "raw_data", "calib", "data_2"))
     te_2 = collect_v2(test_dir)
     th2, th3 = v2.calibrate(d2_2), v3.calibrate(d2_2)
     for r in te_2:
@@ -83,8 +83,8 @@ def main():
         r["pred_smooth_m2"] = r["m2"]
 
     # v4 / v5：data_2 + 2026-10-24 标定
-    d2_4 = tag(v4.collect(os.path.join(ROOT, "data", "calib", "data_2")), "data_2")
-    r24_4 = tag(v4.collect(os.path.join(ROOT, "data", "calib", "2026-10-24")), "data_routine")
+    d2_4 = tag(v4.collect(os.path.join(ROOT, "raw_data", "calib", "data_2")), "data_2")
+    r24_4 = tag(v4.collect(os.path.join(ROOT, "raw_data", "calib", "2026-10-24")), "data_routine")
     te_4 = tag(v4.collect(test_dir), test_name)
     th4 = v4.calibrate(d2_4 + r24_4)
     for r in te_4:
@@ -94,8 +94,8 @@ def main():
     for r in te_4:
         r["m4s"] = r["pred_smooth"]
 
-    d2_5 = tag(v5.collect(os.path.join(ROOT, "data", "calib", "data_2"), "data_2"), "data_2")
-    r24_5 = tag(v5.collect(os.path.join(ROOT, "data", "calib", "2026-10-24"), "data_routine"), "data_routine")
+    d2_5 = tag(v5.collect(os.path.join(ROOT, "raw_data", "calib", "data_2"), "data_2"), "data_2")
+    r24_5 = tag(v5.collect(os.path.join(ROOT, "raw_data", "calib", "2026-10-24"), "data_routine"), "data_routine")
     te_5 = tag(v5.collect(test_dir), test_name)
     th5 = v5.calibrate(d2_5 + r24_5)
     for r in te_5:
@@ -126,7 +126,7 @@ def main():
         return sum(r[key] == r["state"] for r in rws) / len(rws)
 
     lines = ["%s 跨日盲测（%d 窗 / %d 段）" % (test_name, len(rows), len(recs)),
-             "标定：v2/v3 = data_2；v4/v5 = data_2 + data/calib/2026-10-24", ""]
+             "标定：v2/v3 = data_2；v4/v5 = data_2 + raw_data/calib/2026-10-24", ""]
     for label, rws, key in methods:
         pr = per_record(rws, key)
         lines.append("%-8s 窗口 %.4f  记录 %d/%d  %s" % (

@@ -5,7 +5,7 @@
 运行（宿主机有 PIL 12.3 和中文字体）：
   distrobox-host-exec python3 /home/binarytree/.fedora/ICEC-2026-0097-CTY/02-20Days-Challenge/measurement/make_figures.py
 
-只读取 evidence/ 下的原始证据，只写 docs/figures/*.png。
+只读取 process_logs/ 下的原始证据，只写 docs/figures/*.png。
 fig1 的两张表盘照片只做旋转/裁剪/等比缩放，不改动读数像素。
 """
 
@@ -15,7 +15,7 @@ import math
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parent.parent
-EVID = ROOT / "evidence"
+EVID = ROOT / "process_logs"
 OUT = ROOT / "docs" / "figures"
 
 FONT_CN = "/home/binarytree/.local/share/fonts/minecraft/msyh.ttc"

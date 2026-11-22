@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """课题 08 盲测：v2 / v3 / v4 在指定测试目录上的对比 + 数据独立性检查。
 
-训练：v2 / v3 用 data/calib/data_2；v4 用 data/calib/data_2 + data_routine（均本人）
-测试：默认 data/blind/2026-10-25（本人，9 段 704 窗，PKG110），不参与任何标定
+训练：v2 / v3 用 raw_data/calib/data_2；v4 用 raw_data/calib/data_2 + data_routine（均本人）
+测试：默认 raw_data/blind/2026-10-25（本人，9 段 704 窗，PKG110），不参与任何标定
 
 v2：绝对能量（σ_v / p99）
 v3：f_dom / r + ±2 窗平滑
@@ -11,7 +11,7 @@ v4：峰/谷检测 + acp 阈值 + ±2 窗平滑
 输出：<out>/report.txt、<out>/blind_test.png
 用法：
     MPLCONFIGDIR=/tmp/mplcfg .venv/bin/python src/blind_test.py
-    MPLCONFIGDIR=/tmp/mplcfg .venv/bin/python src/blind_test.py --test data/blind/2026-10-26 --out output/reports/blind_2026-10-26
+    MPLCONFIGDIR=/tmp/mplcfg .venv/bin/python src/blind_test.py --test raw_data/blind/2026-10-26 --out output/reports/blind_2026-10-26
 """
 import argparse
 import csv
@@ -35,10 +35,10 @@ import gait_analysis_v3 as v3  # noqa: E402
 import gait_analysis_v4 as v4  # noqa: E402
 
 ROOT = v2.ROOT
-TRAIN = os.path.join(ROOT, "data", "calib", "data_2")
+TRAIN = os.path.join(ROOT, "raw_data", "calib", "data_2")
 # 2026-10-25 起 data_routine 下多了一个日期；旧脚本的标定/对照仍只用 10-24。
-ROUTINE = os.path.join(ROOT, "data", "calib", "2026-10-24")
-DEFAULT_TEST = os.path.join(ROOT, "data", "blind", "2026-10-25")
+ROUTINE = os.path.join(ROOT, "raw_data", "calib", "2026-10-24")
+DEFAULT_TEST = os.path.join(ROOT, "raw_data", "blind", "2026-10-25")
 DEFAULT_OUT = os.path.join(ROOT, "output", "reports", "blind_test")
 ORDER = ["stand", "walk", "run", "up", "down"]
 CJK = "/run/host/usr/share/fonts/google-droid-sans-fonts/DroidSansFallbackFull.ttf"
@@ -190,7 +190,7 @@ def rec_ok(rows, key):
 
 
 def report(test2, test4, th2, th3, th4, label):
-    lines = ["盲测：v2/v3 训练 data/calib/data_2；v4 训练 data_2 + data_routine；"
+    lines = ["盲测：v2/v3 训练 raw_data/calib/data_2；v4 训练 data_2 + data_routine；"
              "测试 %s（%d 段 %d 窗）" % (label, len(set(r["record"] for r in test2)), len(test2)), "",
              "v2 阈值: " + ", ".join("%s=%.3f" % (k, v) for k, v in th2.items()),
              "v3 阈值: " + ", ".join("%s=%.3f" % (k, v) for k, v in th3.items()),

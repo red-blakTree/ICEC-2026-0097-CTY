@@ -24,8 +24,8 @@ v5 的改动（只改这三处）：
   - i_cv / cadence 进打分：有涨有跌、无稳定增益，故只作为诊断量输出。
   - 幅值缩放类"设备对齐"：v5 的判决特征全是比值/无量纲量，不做缩放。
 
-标定：data/calib/data_2 + data_routine（均为本人 PKG110）
-盲测：data/blind/2026-10-25（跨日，本人 PKG110），不参与任何阈值/权重选择。
+标定：raw_data/calib/data_2 + data_routine（均为本人 PKG110）
+盲测：raw_data/blind/2026-10-25（跨日，本人 PKG110），不参与任何阈值/权重选择。
 输出：output/v5/features/{windows.csv,report.txt}、output/v5/figures/
 用法：MPLCONFIGDIR=/tmp/mplcfg .venv/bin/python src/v5/gait_analysis_v5.py
 """
@@ -46,10 +46,10 @@ from gait_analysis_v2 import (  # noqa: E402
 from gait_analysis_v4 import detect_peaks, moving_average, smooth  # noqa: E402
 
 OUT = os.path.join(ROOT, "output", "v5", "features")
-TRAIN = os.path.join(ROOT, "data", "calib", "data_2")
+TRAIN = os.path.join(ROOT, "raw_data", "calib", "data_2")
 # 2026-10-25 起，data_routine 下出现新日期；新日期留作跨日盲测，标定只用 10-24。
-ROUTINE = os.path.join(ROOT, "data", "calib", "2026-10-24")
-BLIND = os.path.join(ROOT, "data", "blind", "2026-10-25")
+ROUTINE = os.path.join(ROOT, "raw_data", "calib", "2026-10-24")
+BLIND = os.path.join(ROOT, "raw_data", "blind", "2026-10-25")
 STATES = ("stand", "walk", "run", "up", "down")
 QUANT = 0.02  # 标定用 2 % / 98 % 分位，避开极值
 
@@ -321,11 +321,11 @@ def main(asym="ptn", default_out=OUT, title="v5"):
 
     lines = ["%s 零偏校正 + 分位标定 + acp/zcr 等权打分" % title,
              "下楼/非下楼判决量: %s" % a.asym,
-             "标定集: data/calib/data_2 + data/calib/2026-10-24（本人 PKG110）；盲测: %s" % os.path.basename(os.path.normpath(a.blind)),
+             "标定集: raw_data/calib/data_2 + raw_data/calib/2026-10-24（本人 PKG110）；盲测: %s" % os.path.basename(os.path.normpath(a.blind)),
              "分位标定 q=%.2f；up 打分权重固定 1（不在测试集上调）" % QUANT, ""]
     lines += margins(train, th)
     lines += report(d2, th, "本人 data_2（in-sample）") + [""]
-    lines += report(routine, th, "本人 data/calib/2026-10-24（in-sample）") + [""]
+    lines += report(routine, th, "本人 raw_data/calib/2026-10-24（in-sample）") + [""]
     lines += report(blind, th, "盲测 %s" % os.path.basename(os.path.normpath(a.blind))) + [""]
 
     # 先把 in-sample 判决落盘，再做留一/跨数据集（后者会覆盖 pred 字段）
