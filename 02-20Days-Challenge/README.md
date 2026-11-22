@@ -293,7 +293,11 @@ python3 measurement/phases.py <串口日志> --summary
 export ARDUINO_DIRECTORIES_DATA=$PWD/.arduino/data ARDUINO_DIRECTORIES_USER=$PWD/.arduino/user
 arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-viewer    firmware/esp32cam-viewer/viewer
 arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-powersave firmware/esp32cam-powersave/powersave
+arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-demo     firmware/esp32cam-sleep-demo/sleep_demo
 ```
+
+睡眠模式演示（网页切换正常 / WiFi modem sleep / 浅睡 / 深睡）的说明见
+[`firmware/esp32cam-sleep-demo/README.md`](firmware/esp32cam-sleep-demo/README.md)。
 
 30 s 短周期测量档的编译宏、烧录与串口抓取见 [`measurement/README.md`](measurement/README.md)；
 烧录/看串口在本机走宿主机（`distrobox-host-exec`），板子 DTR/RTS 已接 GPIO0/EN。
@@ -312,7 +316,8 @@ arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-powe
 ├── firmware/                                  # 阶段二源码
 │   ├── esp32cam-viewer/                       # 主基线：WiFi 常开 + 每小时一张 + 网页
 │   ├── esp32cam-powersave/                    # 省电版：15 min 窗口 + 深睡占空比（状态机源码）
-│   └── esp32cam-capture-probe/                # 拍照电流标定探针（连拍放大占空比）
+│   ├── esp32cam-capture-probe/                # 拍照电流标定探针（连拍放大占空比）
+│   └── esp32cam-sleep-demo/                   # 演示：网页切 4 种模式，2 min 会话
 ├── measurement/                               # 测量脚本与表
 │   ├── current-comparison.csv                 # P1–P6 + 24 h 全量对照表
 │   ├── 24h-meter-series.csv                   # 24 h 表实测能量区间（4 段）

@@ -14,7 +14,7 @@ help:
 	@echo "make data      重跑课题 3 建表脚本，并校验产物与已提交版本一致"
 	@echo "make topic8    课题 8 不变性自检（需 topic_8/.venv）"
 	@echo "make speedtest 测速服务 Rust 测试（需 cargo 与网络取依赖）"
-	@echo "make firmware  编译两个 ESP32-CAM 固件（需 arduino-cli 与 .arduino/，较慢）"
+	@echo "make firmware  编译三个 ESP32-CAM 固件（需 arduino-cli 与 .arduino/，较慢）"
 
 check:
 	$(PYTHON) tools/check_repo.py
@@ -36,3 +36,4 @@ speedtest:
 firmware:
 	cd 02-20Days-Challenge && $(ARDUINO_ENV) ./arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-viewer firmware/esp32cam-viewer/viewer
 	cd 02-20Days-Challenge && $(ARDUINO_ENV) ./arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-powersave firmware/esp32cam-powersave/powersave
+	cd 02-20Days-Challenge && $(ARDUINO_ENV) ./arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-demo firmware/esp32cam-sleep-demo/sleep_demo
