@@ -10,12 +10,12 @@
 - **连带推导**：「10 倍」的临界条件由三段式 `I_avg ≈ 1.05 + 0.989 × I_sleep` 反解为深睡 `≤ 8.04 mA`，而不是「平均 ≤ 9 mA」直接读。
 - **依据**：提交 `9b17642`；模型见 [`../measurement/theory.py`](../measurement/theory.py) 与 [`../docs/power-budget-model.md`](../docs/power-budget-model.md)。
 
-## M2 窗口段模型 vs 实测
+## M2 窗口段模型（95 mA 是假设，不是实测）
 
 - **改前**：窗口空闲段用模型 `165 mA`。
-- **改后**：实测 `0.09–0.10 A @ 4.90 V`，取 `95 mA`。模型高估约 1.7 倍。
-- **影响**：窗口段在 24 h 里只占 1.04 %，修正后对总平均影响有限，但对照表不能再用模型值。
-- **依据**：[`../process_logs/powersave-meter-2026-11-10/`](../process_logs/powersave-meter-2026-11-10/README.md) 的录屏与抽帧。
+- **改后**：模型假设 `95 mA`（未实测）；旧模型 `165 mA` 高估约 1.7 倍。
+- **影响**：窗口段在 24 h 里只占 1.04 %；`95 mA` 仍是假设，不能当实测。
+- **依据**：[`../process_logs/powersave-meter-2026-11-10/`](../process_logs/powersave-meter-2026-11-10/README.md) 的录屏与抽帧；作为历史记录，未作为实测。
 
 ## M3 基线 POWER.CSV 的口径
 

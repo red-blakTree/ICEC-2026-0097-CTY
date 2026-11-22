@@ -13,7 +13,7 @@
 
 - **改动**：冷启动连 WiFi + NTP → 拍照 → 开 15 min 网页窗口 → 停网页、`WiFi.disconnect(true)` + `WIFI_OFF` → `esp_camera_deinit()` 后 PWDN 拉高并 `gpio_hold` → `SD_MMC.end()` → 深睡 1 h；定时唤醒释放 PWDN、恢复时间与累计能耗，拍照后继续深睡，**不连 WiFi**。
 - **动机**：常开空闲 `0.09 A` 里射频占大头，把射频从 24 h 压到 15 min，比抠 CPU 频率更划算（活跃段仅 33.6–50.4 s/天）。
-- **验证**：24 h 平均 `6.98 / 10.94 mA` 是模型输出；实测锚点只有基线 `90/140 mA` 与深睡 `<0.01 A`；窗口 `95 mA` / 唤醒 `145 mA` / `1.4 s` 是模型假设，不是实测。15.20 h 设备日志见 [`../process_logs/powersave-15h-2026-11-10/README.md`](../process_logs/powersave-15h-2026-11-10/README.md)。状态机与源码行号映射见 [`../docs/state-machine.md`](../docs/state-machine.md)。
+- **验证**：24 h 平均 `6.98 / 10.94 mA` 是模型输出；实测锚点只有基线 `90/140 mA`；深睡 `<0.01 A` 是表上界（省电版测不出来）；窗口 `95 mA` / 唤醒 `145 mA` / `1.4 s` 是模型假设，不是实测。15.20 h 设备日志见 [`../process_logs/powersave-15h-2026-11-10/README.md`](../process_logs/powersave-15h-2026-11-10/README.md)。状态机与源码行号映射见 [`../docs/state-machine.md`](../docs/state-machine.md)。
 - **未做（有原因的）**：
 
 | 项 | 结论 |

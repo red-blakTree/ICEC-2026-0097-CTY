@@ -69,7 +69,7 @@ stateDiagram-v2
 
 ## 4. 24 h 占空比时间账
 
-> 这些是模型输入，不是实测；实测锚点只有基线 `90/140 mA` 与深睡 `<0.01 A`。
+> 这些是模型输入，不是实测；实测锚点只有基线 `90/140 mA`；深睡 `<0.01 A` 是表上界（省电版测不出来）。
 
 模型口径来自 [measurement/README.md 第 5 节](../measurement/README.md) 与 [theory.py](../measurement/theory.py)：`i_win=95 mA`、`i_wake=145 mA`、`t_wake=1.4 s`、`i_sleep=6 mA`、`V=4.9 V`；窗口 900 s/天，唤醒 24 次/天。
 

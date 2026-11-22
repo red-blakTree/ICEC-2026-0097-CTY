@@ -16,7 +16,7 @@
 
 1. **课题 3 · 2.4 GHz 无线信号测绘**：我对网络有基础，链路、信道、关联这些概念日常就在用，缺的是把「这里信号差」变成数字的经验。所以自己配一台热点当信号源，8 个点位 × 3 轮采延迟 / 吞吐，另采点位级 RSSI / SIR 快照，再在组内算相对于 1 m 零点的衰减。做完更清楚这个结论有多窄：同一点位换页就能差 0–17 dB，小于 4 dB 的相对差异在这批数据上不可分辨。
 2. **课题 8 · 多姿态步态加速度判别**：我想真正做一次机器学习，而不是停在概念上，所以挑了一个能自己采数据、自己定特征的小问题——只用一个手机加速度计分静止 / 慢走 / 快跑 / 上下楼梯。做下去发现难点不在模型而在泛化：同集 98 %、跨日一度只有 79.7 %，把对零偏敏感的 `ptn` 换成 `rob_skew` 后回到 94.6 %，最后用 RBF-SVM 补上不摆臂场景。
-3. **20 天挑战 · ESP32-CAM 极致省电**：我在 Linux 上做过省电相关的事，对「功耗主要是时间占比问题」有直觉，想把它落到一块真板子上。于是给了各阶段电流口径（实测 + 模型假设）、24 h 时间占比、三段式预算模型和状态机源码，得到**模型估算** `90 mA → 6.98 mA`（12.9×）；实测锚点只有基线 `90/140 mA` 与深睡 `<0.01 A`，深睡 6 mA 来自手册、10 mA 是表的上界，两个口径并列不合并。
+3. **20 天挑战 · ESP32-CAM 极致省电**：我在 Linux 上做过省电相关的事，对「功耗主要是时间占比问题」有直觉，想把它落到一块真板子上。于是给了各阶段电流口径（实测 + 模型假设）、24 h 时间占比、三段式预算模型和状态机源码，得到**模型估算** `90 mA → 6.98 mA`（12.9×）；实测锚点只有基线 `90/140 mA`，省电版测不出来，深睡 `<0.01 A` 只是表上界；深睡 6 mA 来自手册、10 mA 是表的上界，两个口径并列不合并。
 
 AI 排障记录不是第四个课题：它收的是上面三个模块真正卡住的提问——什么时候该换模型、什么时候该怀疑数据、含 g 的加速度为什么定不出重力方向。只有能落回报告和代码的判断才留下。
 
@@ -30,7 +30,7 @@ AI 排障记录不是第四个课题：它收的是上面三个模块真正卡�
 |---|---|---|---|
 | 01 现场发现 | 课题 3：2.4 GHz 无线信号测绘 | 8 点位 × 3 轮 = **24 组主数据**（共 40 轮）/ 43 条 PureHub 读数（29 扫描 + 14 概览）；宿舍隔墙净损耗 13–19 dB、电梯轿厢 18–24 dB；走廊衰减指数四个口径 0.22 / 2.86 / 1.35 / 0.58；盲区只列候选 | [topic_3/README.md](01-Field-Discovery/topic_3/README.md) |
 | 01 现场发现 | 课题 8：多姿态步态加速度判别 | 4 类交付 97.5 %（记录级 4/4）；5 类跨日 86.8–94.6 %（记录级全对）；2026-11-17 完全未参与选型，v7 94.5 %（v6 87.8 %），不摆臂段 v7 94.5 %（v6 37.1 %） | [topic_8/README.md](01-Field-Discovery/topic_8/README.md) |
-| 02 20 天挑战 | ESP32-CAM 极致省电 | **模型估算** `90 mA → 6.98 mA`（12.9 倍，深睡按手册 6 mA）/ `10.94 mA`（8.2 倍，表上界 10 mA）；实测锚点只有基线 `90/140 mA` 与深睡 `<0.01 A`；窗口/唤醒是模型输入；三项均有交付，① 与 ② 各有受限项（见 2.1） | [02-20Days-Challenge/README.md](02-20Days-Challenge/README.md) |
+| 02 20 天挑战 | ESP32-CAM 极致省电 | **模型估算** `90 mA → 6.98 mA`（12.9 倍，深睡按手册 6 mA）/ `10.94 mA`（8.2 倍，表上界 10 mA）；实测锚点只有基线 `90/140 mA`；省电版测不出来，深睡 `<0.01 A` 只是表上界；窗口/唤醒是模型输入；三项均有交付，① 与 ② 各有受限项（见 2.1） | [02-20Days-Challenge/README.md](02-20Days-Challenge/README.md) |
 | 02 20 天挑战 | FreeRTOS V11.3.1 源码分析 | 以「一条链表 + 一种同步对象」为主线，附功耗专题 | [docs/FreeRTOS-V11.3.1-Source-Analysis.md](02-20Days-Challenge/docs/FreeRTOS-V11.3.1-Source-Analysis.md) |
 | 03 AI 排障记录 | 7 张关键提问排障对话截图 | 课题 3 归因、课题 8 选型 / 对照 / 采集协议三类排障 | [03-AI-Collaboration/](03-AI-Collaboration/README.md) |
 
@@ -117,13 +117,13 @@ AI 排障记录不是第四个课题：它收的是上面三个模块真正卡�
 
 | 交付项 | 内容 | 状态 |
 |---|---|---|
-| ① 优化前后各阶段实测电流对照表与视频 | P1–P6 对照表 + [current-comparison.csv](02-20Days-Challenge/measurement/current-comparison.csv) + 6 段录屏（合计约 3.8 min）；另有 sleep-demo 扩展演示，normal/deep 实测、modem/light 未实测，不计入这 6 段 | 🟡 部分实测：基线 90/140 mA、深睡 <0.01 A；窗口/唤醒/拍照是模型输入 |
+| ① 优化前后各阶段实测电流对照表与视频 | P1–P6 对照表 + [current-comparison.csv](02-20Days-Challenge/measurement/current-comparison.csv) + 6 段录屏（合计约 3.8 min）；另有 sleep-demo 扩展演示，normal/deep 实测、modem/light 未实测，不计入这 6 段 | 🟡 部分实测：基线 90/140 mA；省电版测不出来（深睡 <0.01 A 只是表上界）；窗口/唤醒/拍照是模型输入 |
 | ② 连续 24 h 以上电压 / 功耗时序 CSV | 3 份 `POWER.CSV` + [24 h 表实测能量区间](02-20Days-Challenge/measurement/24h-meter-series.csv) + 10 个表盘点 + 5 点能量曲线 | 🟡 24 h 数据齐套（设备日志 + 表实测区间）；省电版连续电压 / 电流曲线受 0.01 A 表限制不可得（见 02 README 2.5） |
 | ③ 功耗预算推导模型与状态机源码 | [theory.py](02-20Days-Challenge/measurement/theory.py) + [power-budget-model.md](02-20Days-Challenge/docs/power-budget-model.md) + [state-machine.md](02-20Days-Challenge/docs/state-machine.md) + [powersave.ino](02-20Days-Challenge/firmware/esp32cam-powersave/powersave/powersave.ino) | ✅ 模型可复跑（`verify.py` 34 项自检 + 7 个回归测试），状态机源码 / 行号映射完整 |
 
 **图**：[图 1 表盘对比](02-20Days-Challenge/docs/figures/fig1-meter-compare.png) · [图 2 24 h 能量曲线](02-20Days-Challenge/docs/figures/fig2-24h-energy.png) · [图 3 占空比](02-20Days-Challenge/docs/figures/fig3-duty-cycle.png) · [图 4 电量预算](02-20Days-Challenge/docs/figures/fig4-energy-budget.png) · [图 5 分组电流](02-20Days-Challenge/docs/figures/fig5-stage-current.png)（源文件与口径见 [SOURCES.md](02-20Days-Challenge/docs/figures/SOURCES.md)）。
 
-**结论（模型估算）**：24 h 平均电流 `90 mA → 6.98 mA`（12.9 倍，深睡按手册 6 mA）；按表上界 10 mA 记则 `10.94 mA`（8.2 倍）。**`6.98 / 10.94` 是模型输出；窗口 95 mA / 唤醒 145 mA / 1.4 s 是假设，不是实测。实测锚点只有基线 `90/140 mA` 与深睡 `<0.01 A`（表下限）。** 10 倍判据 `I_avg ≤ 9.0 mA`，按模型得临界深睡 `≤ 8.04 mA`；两种口径并列，不把上界当实测。
+**结论（模型估算）**：24 h 平均电流 `90 mA → 6.98 mA`（12.9 倍，深睡按手册 6 mA）；按表上界 10 mA 记则 `10.94 mA`（8.2 倍）。**`6.98 / 10.94` 是模型输出；窗口 95 mA / 唤醒 145 mA / 1.4 s 是假设，不是实测。实测锚点只有基线 `90/140 mA`；省电版测不出来，深睡 `<0.01 A` 只是表上界。** 10 倍判据 `I_avg ≤ 9.0 mA`，按模型得临界深睡 `≤ 8.04 mA`；两种口径并列，不把上界当实测。
 
 **各阶段电流（USB 表串在 5 V 输入端，0.01 A 分辨率；标“模型”的是假设）**
 
