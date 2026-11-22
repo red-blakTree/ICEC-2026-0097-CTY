@@ -260,7 +260,7 @@ I_avg ≈ 1.05 + 0.989 × I_sleep  (mA)
 | 硬件改造（换 LDO、MOSFET、去 LED）未做 | 深睡上限受 AMS1117 限制 | [`docs/ESP32-CAM-Ultra-Low-Power-Solution.md`](docs/ESP32-CAM-Ultra-Low-Power-Solution.md) |
 | 时钟降频未启用 | 三项策略落地 2/3，已给收益/风险表 | 3.3、[`state-machine.md`](docs/state-machine.md) |
 | 供电是充电宝/充电器，不是电池 | “续航 N 天”是 1600 mAh 预算值，不是实测放电 | 2.5 |
-| 2026-11-11 有约 12.6 h WiFi 断连 | 异常日单列，不进倍数表 | 2.4 |
+| 2026-11-11 有约 12.6 h 处于 0.18 A 异常档 | 异常日单列，不进倍数表 | 2.4 |
 
 这些不是“补白”，而是测量口径的一部分：能证明的写进结论，不能证明的留在边界里。
 
