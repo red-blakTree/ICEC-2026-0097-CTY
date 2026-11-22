@@ -1,13 +1,13 @@
 stage,quantity,baseline_value,baseline_unit,baseline_v,powersave_value,powersave_unit,powersave_v,method,evidence
-P1 冷启动（上电→WiFi/NTP→首拍）,平均电流,90–150,mA,5.04,90–150,mA,4.90,USB 表直读（上电瞬间波动；表盘读 0.09/0.15/0.09 A，取 0.09–0.15 A）,../README.md
-P1 冷启动（上电→WiFi/NTP→首拍）,时长,未单列,—,—,约 6,s,4.90,串口时间戳,../README.md
-P2 窗口空闲（仅省电版）,平均电流,不适用,—,—,95,mA,4.90,USB 表直读（窗口空闲 0.09–0.10 A）,../process_logs/powersave-meter-2026-11-10/README.md
-P6 常开空闲（WiFi 关联、无页面请求）,平均电流,90,mA,5.04,不适用（窗口外深睡）,—,—,viewer 持续空闲直读；省电版窗口内空闲见 P2,../process_logs/baseline-viewer-meter-2026-11-10/README.md
-P6 开网页（浏览器翻图）,平均电流,110–140,mA,5.04,120–190,mA,4.90,USB 表直读 + 录屏,../process_logs/baseline-viewer-meter-2026-11-10/README.md;../process_logs/powersave-meter-2026-11-10/README.md
-P3 拍照 + 写卡（连拍放大占空比）,平均电流,100–130,mA,5.04,130–160,mA,4.90,基线只有 1 s 表读 100–130 mA（不是 60–90 ms 平均）；省电版为连拍实测 130–160 mA；两者不互换,../process_logs/powersave-meter-2026-11-10/README.md;../process_logs/baseline-viewer-meter-2026-11-16/README.md
+P1 冷启动（上电→WiFi/NTP→首拍）,平均电流,90–150,mA,5.04,90–150,mA,4.90,观察值（上电瞬间波动；未逐点实测）,../README.md
+P1 冷启动（上电→WiFi/NTP→首拍）,时长,未单列,—,—,约 6,s,4.90,观察值（串口）,../README.md
+P2 窗口空闲（仅省电版）,平均电流,不适用,—,—,95,mA,4.90,模型假设 95 mA（未实测）,../process_logs/powersave-meter-2026-11-10/README.md
+P6 常开空闲（WiFi 关联、无页面请求）,平均电流,90,mA,5.04,不适用（窗口外深睡）,—,—,基线实测 90 mA；省电版窗口内空闲是模型假设,../process_logs/baseline-viewer-meter-2026-11-10/README.md
+P6 开网页（浏览器翻图）,平均电流,110–140,mA,5.04,120–190,mA,4.90,基线 0.14 A 上限实测；省电版 120–190 mA 为模型,../process_logs/baseline-viewer-meter-2026-11-10/README.md;../process_logs/powersave-meter-2026-11-10/README.md
+P3 拍照 + 写卡（连拍放大占空比）,平均电流,100–130,mA,5.04,130–160,mA,4.90,基线只有 1 s 表读 100–130 mA；省电版 130–160 mA 为模型/探针推断，不是实测,../process_logs/powersave-meter-2026-11-10/README.md;../process_logs/baseline-viewer-meter-2026-11-16/README.md
 P4 深睡,平均电流,不适用（WiFi 常开、不休眠）,—,—,≤10,mA,4.90,USB 表上界（0.01 A 分辨率）；官方手册 Deep-Sleep 6 mA @5V,../process_logs/powersave-meter-2026-11-10/README.md
-P5 单次唤醒（复位→再入睡）,时长,不适用,—,—,1.4–2.1,s,4.90,串口 [CAP]/[SLEEP] 时间戳,../README.md
-24 h 平均电流,平均电流,90 / 135.4,mA,5.04,6.98–10.94,mA,4.90,基线端点直读 / 省电版按实测段推算,../process_logs/baseline-24h-meter-2026-11-10/README.md
-24 h 电量,电量,2160 / 3250,mAh,5.04,167.5–262.5,mAh,4.90,基线端点直读 / 省电版按实测段推算,../process_logs/baseline-24h-meter-2026-11-10/README.md
-相对基线,倍数,1.0,×,5.04,8.2–12.9,×,4.90,24 h 平均电流之比,../README.md
-续航（1600 mAh 可用）,续航,0.74,天,5.04,6.1–9.5,天,4.90,24 h 电量 ÷ 1600 mAh,../README.md
+P5 单次唤醒（复位→再入睡）,时长,不适用,—,—,1.4–2.1,s,4.90,模型假设 1.4 s（未实测）,../README.md
+24 h 平均电流,平均电流,90 / 135.4,mA,5.04,6.98–10.94,mA,4.90,基线端点/累计实测；省电版 6.98–10.94 为模型,../process_logs/baseline-24h-meter-2026-11-10/README.md
+24 h 电量,电量,2160 / 3250,mAh,5.04,167.5–262.5,mAh,4.90,基线端点/累计实测；省电版为模型,../process_logs/baseline-24h-meter-2026-11-10/README.md
+相对基线,倍数,1.0,×,5.04,8.2–12.9,×,4.90,模型输出（6.98–10.94 vs 90）,../README.md
+续航（1600 mAh 可用）,续航,0.74,天,5.04,6.1–9.5,天,4.90,模型输出（电量 ÷ 1600 mAh）,../README.md

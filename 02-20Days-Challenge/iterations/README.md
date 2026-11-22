@@ -22,7 +22,7 @@
 | 轮次 | 口径 | 改了什么 | 为什么必须改 | 明细 |
 |---|---|---|---|---|
 | M1 | 深睡电流 | 主口径由「表读 `0.00 A`」改为官方手册 `6 mA`，表上界 `10 mA` 并列 | 深睡低于表的 0.01 A 分辨率，表只能给上界，不能当实测 | [measurement.md](measurement.md) |
-| M2 | 窗口段模型 | 模型 `165 mA` → 实测 `95 mA`（高估 1.7×） | 模型值不能直接进结论表 | [measurement.md](measurement.md) |
+| M2 | 窗口段模型 | 模型 `165 mA` → 模型假设 `95 mA`（未实测；高估 1.7×） | 模型值不能直接进结论表，95 mA 也不是实测 | [measurement.md](measurement.md) |
 | M3 | 基线 `POWER.CSV` | 固件模型 `45 mA` 不含 WiFi，实测 `90 mA`（2×）；`POWER.CSV` 只证明时间线，不能当电量 | 把模型日志当实测会虚报省电倍数 | [measurement.md](measurement.md) |
 | M4 | 24 h 能量区间 | 10 个表盘锚点取 5 个（`0 → 64 → 8508 → 8567 → 16384 mWh`）建 4 段差分，异常断连段单列 | 只画端点会被断连段稀释成一个平均 | [measurement.md](measurement.md) |
 

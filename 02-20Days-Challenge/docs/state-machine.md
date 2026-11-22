@@ -69,6 +69,8 @@ stateDiagram-v2
 
 ## 4. 24 h 占空比时间账
 
+> 这些是模型输入，不是实测；实测锚点只有基线 `90/140 mA` 与深睡 `<0.01 A`。
+
 模型口径来自 [measurement/README.md 第 5 节](../measurement/README.md) 与 [theory.py](../measurement/theory.py)：`i_win=95 mA`、`i_wake=145 mA`、`t_wake=1.4 s`、`i_sleep=6 mA`、`V=4.9 V`；窗口 900 s/天，唤醒 24 次/天。
 
 | 段 | 每天 | 秒/天 | 时间占比 | 电流 | mAh/天 | 能量占比 |
@@ -79,7 +81,7 @@ stateDiagram-v2
 | 合计 | — | 86400 | 100 % | 平均 6.98 mA | 167.54 | 100 % |
 
 - 与 `python3 measurement/theory.py` 默认输出逐项对齐：`23.75 / 1.35 / 142.44 mAh`，`167.5 mAh`、`6.98 mA`；深睡取表上界 10 mA 时 `262.5 mAh / 10.94 mA`（`--i-sleep 10`）。
-- 口径提醒：`t_wake` 是"复位→再入睡"的整段，随卡上照片数从 1.4 s 涨到 2.1 s；按 2.1 s 算 `50.4 s`、唤醒段 `2.03 mAh`，合计 `168.2 mAh → 7.01 mA`（+0.4 %）。
+- 口径提醒：`t_wake` 取模型假设 `1.4 s`（未实测）；按 `2.1 s` 的敏感性算 `50.4 s`、唤醒段 `2.03 mAh`，合计 `168.2 mAh → 7.01 mA`（+0.4 %）。
 - 窗口电流敏感性：全程刷页面按 `0.18 A` → `45 mAh`，合计 `188.8 mAh → 7.87 mA`（+12.7 %）；按峰值 `0.22 A` → `55 mAh → 8.28 mA`（+18.6 %），与 [meter 证据第 2 节](../process_logs/powersave-meter-2026-11-10/README.md) 一致。
 - `P1`（冷启动约 6 s，`0.09–0.15 A`）没有单独建模，被并进 900 s 窗口项，误差 <0.1 mAh；`theory.py` 的 V 只影响 Wh，不影响 mAh 与 mA。
 
