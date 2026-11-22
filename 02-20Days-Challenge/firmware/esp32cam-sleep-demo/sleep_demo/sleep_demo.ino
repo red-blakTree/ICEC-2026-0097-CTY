@@ -38,12 +38,7 @@ static const uint32_t kLightWakeReserveMs = 700;
 // 网页时间与 NTP 都用东八区；deep sleep 后 TZ 会丢，需要每次启动重设
 static const char *kTzString = "CST-8";
 
-// 固定 IP：网关 192.168.16.1；DNS 用于解析 NTP 域名
-static const IPAddress kStaticIp(192, 168, 16, 50);
-static const IPAddress kGateway(192, 168, 16, 1);
-static const IPAddress kSubnet(255, 255, 255, 0);
-static const IPAddress kDns1(192, 168, 16, 1);
-static const IPAddress kDns2(223, 5, 5, 5);
+// 网络配置（SSID/密码/静态 IP/网关/DNS）全部来自 secrets.h：换 Wi-Fi 或换网段只改那一个文件
 
 // AI-Thinker ESP32-CAM 引脚定义
 #define CAM_PIN_PWDN   32
