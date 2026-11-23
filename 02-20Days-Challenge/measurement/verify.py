@@ -52,7 +52,7 @@ def check_meter_series():
     avg_ma = (mwh / (minutes / 60.0)) / 5.04
     check("24 h 跨度", abs(minutes - 1440) < 1, f"{minutes:.0f} min")
     check("累计能量", mwh == 16384, f"{mwh} mWh")
-    check("24 h 平均电流", abs(avg_ma - 135.4) < 0.2, f"{avg_ma:.1f} mA @5.04 V")
+    check("24 h 平均电流", abs(avg_ma - 135.4) < 0.2, f"{avg_ma:.1f} mA @5.04 V（≈140）")
 
 
 def check_budget():
