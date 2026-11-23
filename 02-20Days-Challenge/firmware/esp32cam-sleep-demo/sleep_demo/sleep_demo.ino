@@ -66,7 +66,7 @@ static const int kSdD0  = 2;
 // ── 功耗日志（5 V 输入端的模型电流，不是实测值）──
 // 正常/modem 的绝对值受 WiFi 省电档位影响；本演示只用于模式间相对比较。
 static const float kModelNormalMa = 110.0f;  // 正常模式：WiFi 常开、不进入 modem sleep
-static const float kModelModemMa  = 95.0f;   // modem sleep：参考 powersave 窗口实测 95 mA
+static const float kModelModemMa  = 95.0f;   // modem sleep：参考 powersave 窗口模型假设 95 mA
 static const float kModelAwakeMa  = 45.0f;   // 醒着但 WiFi 关：240 MHz 空转 + AMS1117 静态电流
 static const float kModelShotMa   = 180.0f;  // 摄像头 init + JPEG 捕获
 static const float kModelSaveMa   = 50.0f;   // SD 卡写入

@@ -233,6 +233,8 @@ stateDiagram-v2
 | Deep-Sleep 深度休眠唤醒 | 每小时 timer 唤醒，唤醒只拍照、不连 WiFi；状态与能耗存 `RTC_DATA_ATTR` | `sleepUntil()`、`kCaptureIntervalMs` | ✅ 实机运行 |
 | 时钟降频 | 定量评估后**未启用**：活跃段仅 33.6–50.4 s/天，上限收益 `≤0.42 mAh/天`（<0.25 %），却给 OV2640 XCLK / SDMMC 时序引入风险 | [`state-machine.md` 第 6 节](docs/state-machine.md#6-时钟降频专项点名要求但未落地) | ⚠ 未落地（有定量取舍） |
 
+> “实机运行”指固件跑通并完成拍照/计时，不等于电流实测；省电版窗口/唤醒电流测不出来，见第 4 节。
+
 ### 3.4 代码与复核
 
 | 文件 | 职责 |
@@ -273,7 +275,7 @@ I_avg ≈ 1.05 + 0.989 × I_sleep  (mA)
 | 深睡电流无单板实测，取手册 `6 mA` + 表上界 `10 mA` | 倍数区间 `8.2–12.9×` | 2.5、[`measurement/README.md`](measurement/README.md) |
 | 省电版没有 24 h 表曲线（深睡停表） | 24 h 平均为“模型段 + 深睡点值”推算 | 2.5 |
 | 窗口 95 / 唤醒 145 / 1.4 s 未实测 | `6.98 / 12.9×` 是模型估算，不是实测 | 3.1、3.5 |
-| 基线 P3 的 60–90 ms 平均未单测 | P3 对照用同条件推断 + 1 s 视频旁证 | 1.4 |
+| 基线 P3 的 60–90 ms 平均未单测 | P3 只给定性判断 + 1 s 视频旁证，不写定量实测 | 1.4 |
 | 拍照峰值、P1 稳定均值测不到 | 只给区间/上界，不写单点值 | 1.2、2.5 |
 | 硬件改造（换 LDO、MOSFET、去 LED）未做 | 深睡上限受 AMS1117 限制 | [`docs/ESP32-CAM-Ultra-Low-Power-Solution.md`](docs/ESP32-CAM-Ultra-Low-Power-Solution.md) |
 | 时钟降频未启用 | 三项策略落地 2/3，已给收益/风险表 | 3.3、[`state-machine.md`](docs/state-machine.md) |

@@ -5,7 +5,7 @@
 
 ## 1. 它解决什么
 
-基线 `esp32cam-viewer` 的 WiFi 常开空闲是 `0.09 A`（实测），24 h 平均 `90 mA`。本固件把 WiFi 射频压到每天 15 min，其余时间 deep sleep；拍照仍每小时一次，照片存 SD。24 h 平均电流**模型估算** `6.98–10.94 mA`（官方 6 mA / 表上界 10 mA），相对基线 `8.2–12.9×`；实测锚点只有 `90/140 mA`，深睡 `<0.01 A` 是表上界（省电版测不出来，见 [主 README](../../README.md) 第 4 节）。
+基线 `esp32cam-viewer` 的 WiFi 常开空闲是 `0.09 A`（实测，90 mA）；本轮 24 h 表累计 `16.38 Wh / 135.4 mA`（≈140，含异常档）。本固件把 WiFi 射频压到每天 15 min，其余时间 deep sleep；拍照仍每小时一次，照片存 SD。24 h 平均电流**模型估算** `6.98–10.94 mA`（官方 6 mA / 表上界 10 mA），相对基线 `8.2–12.9×`；实测锚点只有 `90/140 mA`，深睡 `<0.01 A` 是表上界（省电版测不出来，见 [主 README](../../README.md) 第 4 节）。
 
 ## 2. 行为与状态机
 
@@ -78,14 +78,14 @@ static const uint32_t kWebWindowMs = 15UL * 60UL * 1000UL;  // WiFi 窗口
 | event | 含义 |
 |---|---|
 | `CAPTURE` | 拍照，`i_ma` 是该采集周期（含深睡）的平均电流模型值 |
-| `SAMPLE` | 窗口期间每 5 分钟一次，WiFi 开着时按 **95 mA（2026-11-10 实测）** 记 |
+| `SAMPLE` | 窗口期间每 5 分钟一次，WiFi 开着时按 **95 mA（模型假设，未实测）** 记 |
 | `WEB_ON` | 窗口开始（`window_s=0` 表示瞬时事件） |
-| `WEB_CLOSE` | 窗口结束，`window_s=900` 是这 15 分钟的平均电流（同样按实测 95 mA） |
+| `WEB_CLOSE` | 窗口结束，`window_s=900` 是这 15 分钟的平均电流（同样按模型假设 95 mA） |
 
 两点必须知道：
 
 - **深睡期间不写日志**（SD 已卸载），所以 `SAMPLE` 只在窗口内出现；`e_mwh` 把深睡能耗按 `kModelSleepMa`（已按官方手册整板 6 mA 回填；表只能给 ≤10 mA 上界，不是实测值）在入睡时一次性补上。
-- 常量口径：窗口段 `kModelWindowMa = 95 mA` 是 2026-11-10 实测；`kModelSleepMa = 6 mA` 按官方手册整板值回填；`kModelIdleMa` / `kModelShotMa` / `kModelSaveMa` 仍是模型值，等低阻分流补测后回填（万用表无法从源头串入）。
+- 常量口径：窗口段 `kModelWindowMa = 95 mA` 是模型假设（未实测）；`kModelSleepMa = 6 mA` 按官方手册整板值回填；`kModelIdleMa` / `kModelShotMa` / `kModelSaveMa` 仍是模型值，等低阻分流补测后回填（万用表无法从源头串入）。
 - 历史日志不回改：`process_logs/powersave-15h-2026-11-10/POWER.CSV` 生成于回填之前，深睡仍记 5 mA。
 - **冷启动那一小时的 `CAPTURE` 行偏低**：它按“1 小时 − 15 分钟窗口”的模型算，没算窗口本身的电流。看窗口能耗请看 `WEB_CLOSE` 行。
 

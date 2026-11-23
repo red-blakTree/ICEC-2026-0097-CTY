@@ -250,7 +250,7 @@ def fig2():
 def fig3():
     img = Image.new("RGB", (W, H), WHITE)
     d = ImageDraw.Draw(img)
-    header(d, "24h 占空比：基线 WiFi 常开 100%，省电版深睡 98.92%",
+    header(d, "24h 占空比（模型）：基线 WiFi 常开 100%，省电版深睡 98.92%",
            "省电版 24 h = 15 min 窗口 + 24 次唤醒（1.4 s/次）+ 深睡 · 5 V 输入侧实测/推算", 3)
     footer(d)
 
@@ -322,7 +322,7 @@ def fig3():
 def fig4():
     img = Image.new("RGB", (W, H), WHITE)
     d = ImageDraw.Draw(img)
-    header(d, "24h 电量预算：2160 mAh → 167.5 mAh（12.9×）",
+    header(d, "24h 电量预算（模型）：2160 mAh → 167.5 mAh（12.9×）",
            "按 24 h 平均电流折算（5 V 输入侧）· 省电版 = 窗口 23.75 + 唤醒 1.36 + 深睡 142.4 mAh", 4)
     footer(d)
 

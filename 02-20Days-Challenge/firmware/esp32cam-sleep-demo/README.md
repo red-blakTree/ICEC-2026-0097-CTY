@@ -4,7 +4,7 @@
 > 作用：网页上切换 4 种模式，对比「正常基线 / WiFi modem sleep / 浅睡 / 深睡」在
 > 同一「30 s 一张、共 5 张」拍照节奏下的网页可达性与 `POWER.CSV` 事件。
 >
-> 口径：2 min 会话是 24 h 的压缩示意，不是真实占空比；省电数字仍以 powersave 的 24 h 实测为准。
+> 口径：2 min 会话是 24 h 的压缩示意，不是真实占空比；省电数字仍以 powersave 的 24 h 模型估算为准。
 > 现场演示脚本与预检见 [DEMO.md](DEMO.md)。
 
 ## 1. 它做什么
@@ -119,7 +119,7 @@ uptime_s,event,window_s,v5_mv,i_ma,p_mw,e_mwh
 | 常量 | 值 | 说明 |
 |---|---|---|
 | `kModelNormalMa` | `110.0` | 正常模式，WiFi 不睡；绝对值仅作上界参考 |
-| `kModelModemMa` | `95.0` | 参考 powersave 窗口实测 `95 mA` 的口径 |
+| `kModelModemMa` | `95.0` | 参考 powersave 窗口模型假设 `95 mA` 的口径 |
 | `kModelAwakeMa` | `45.0` | 醒着但 WiFi 关，240 MHz 空转 + AMS1117 |
 | `kModelShotMa` | `180.0` | 摄像头 init + JPEG 捕获 |
 | `kModelSaveMa` | `50.0` | SD 写入 |

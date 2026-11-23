@@ -9,9 +9,9 @@
 
 | 轮次 | 固件 | 相对上一轮改了什么 | 动机 | 验证 | 明细 |
 |---|---|---|---|---|---|
-| F1 | [`esp32cam-viewer`](../firmware/esp32cam-viewer/README.md) | 建立基线：每小时一张 JPEG 存 SD，WiFi 全程常开，网页可查图 / 下载 `POWER.CSV` | 没有可比基线就判不出「省了多少」 | 24.00 h 表端点 `2.16 Ah / 10.8 Wh`（`90 mA`）；常开直读 `0.09 A / 5.04 V` | [firmware.md](firmware.md) |
-| F2 | [`esp32cam-powersave`](../firmware/esp32cam-powersave/README.md) | 冷启动开 15 min WiFi 窗口，窗口结束断射频进深睡；定时唤醒只拍照不联网；关摄像头、卸载 SD、睡眠能耗记账 | 常开态的主要负载是射频，不是 CPU | 24 h 平均 `90 mA → 6.98–10.94 mA`；15.20 h 实跑；窗口 `95 mA`；单次唤醒 `1.4–2.1 s` | [firmware.md](firmware.md) |
-| F3 | [`esp32cam-capture-probe`](../firmware/esp32cam-capture-probe/README.md) | 不连 WiFi、不睡眠、按秒连拍写卡，把拍照占空比拉满 | 单次拍照只有 60–90 ms，秒级表抓不到 | 连拍 `0.13–0.16 A`（WiFi 关联下，偏保守的 P3 值） | [firmware.md](firmware.md) |
+| F1 | [`esp32cam-viewer`](../firmware/esp32cam-viewer/README.md) | 建立基线：每小时一张 JPEG 存 SD，WiFi 全程常开，网页可查图 / 下载 `POWER.CSV` | 没有可比基线就判不出「省了多少」 | 健康段 `2.16 Ah / 10.8 Wh`（`90 mA`）；本轮 24 h 表累计 `16.38 Wh / 135.4 mA`（≈140，含异常档）；常开直读 `0.09 A / 5.04 V` | [firmware.md](firmware.md) |
+| F2 | [`esp32cam-powersave`](../firmware/esp32cam-powersave/README.md) | 冷启动开 15 min WiFi 窗口，窗口结束断射频进深睡；定时唤醒只拍照不联网；关摄像头、卸载 SD、睡眠能耗记账 | 常开态的主要负载是射频，不是 CPU | 15.20 h 设备日志；深睡 `<0.01 A` 上界；24 h 平均 `6.98–10.94 mA` / 窗口 `95 mA` / 唤醒 `1.4 s` 为模型（未实测） | [firmware.md](firmware.md) |
+| F3 | [`esp32cam-capture-probe`](../firmware/esp32cam-capture-probe/README.md) | 不连 WiFi、不睡眠、按秒连拍写卡，把拍照占空比拉满 | 单次拍照只有 60–90 ms，秒级表抓不到 | 连拍 `0.13–0.16 A` 是模型/探针推断（WiFi 关联，偏保守；未作为实测） | [firmware.md](firmware.md) |
 
 未落地：CPU 降频（收益上限 `≤0.42 mAh/天`，<0.25 %，但给 OV2640 XCLK / SDMMC 时序引入风险），取舍见 [firmware.md](firmware.md)。
 

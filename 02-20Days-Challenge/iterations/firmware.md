@@ -6,7 +6,7 @@
 
 - **改动**：`kCaptureIntervalMs = 60 min`，开机先拍一张；WiFi 全程常开；网页提供 `/api.json`、`/IMG_xxxxx.jpg`、`/POWER.CSV`、`/capture`、`/reset`；每 5 分钟向 `POWER.CSV` 追加一行。
 - **动机**：省电版要保留「同样开 WiFi 能查图」的能力才可比，否则会变成拿「不联网」比「联网」。
-- **验证**：24.00 h 表端点 `2.16 Ah / 10.8 Wh`，平均 `90 mA`；常开直读 `0.09 A / 5.04 V`；开网页 `0.11–0.14 A`。原始记录见 [`../process_logs/baseline-viewer-meter-2026-11-10/`](../process_logs/baseline-viewer-meter-2026-11-10/README.md) 与 [`../process_logs/baseline-24h-2026-11-09/`](../process_logs/baseline-24h-2026-11-09/README.md)。
+- **验证**：健康段 `2.16 Ah / 10.8 Wh`，平均 `90 mA`；本轮 24 h 表累计 `16.38 Wh / 135.4 mA`（≈140，含异常档）；常开直读 `0.09 A / 5.04 V`；开网页 `0.11–0.14 A`。原始记录见 [`../process_logs/baseline-viewer-meter-2026-11-10/`](../process_logs/baseline-viewer-meter-2026-11-10/README.md) 与 [`../process_logs/baseline-24h-2026-11-09/`](../process_logs/baseline-24h-2026-11-09/README.md)。
 - **边界**：`POWER.CSV` 按 `kModelIdleMa = 45 mA` 记账且不含 WiFi，是低估值；只能证明拍照时间线，不能当电量。
 
 ## F2 省电版 powersave
