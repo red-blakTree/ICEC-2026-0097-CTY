@@ -69,7 +69,7 @@
 `/api.json` 关键字段：
 
 ```json
-{"ip":"192.168.16.50","now":"...","uptime":123,"mode":"deep",
+{"ip":"10.73.19.50","now":"...","uptime":123,"mode":"deep",
  "mode_label":"深睡","session":"running","shots_done":2,"shots_total":5,
  "next_in_ms":12000,"wifi":true,"temp_c":49.4,"rssi":-63,"files":[...],"count":5}
 ```
@@ -83,12 +83,11 @@
 - 照片越多，`/api.json` 遍历 SD 目录越慢（59 张时 TTFB 约 `0.95 s`，清空后约 `0.2 s`）。
 - `temp_c` / `rssi` 是 2026-11-22 加的，网页顶部显示为 `IP · dBm · °C`。
 
-SSID、密码、静态 IP、网关、DNS 全部在 `sleep_demo/secrets.h`（已被 `.gitignore` 忽略，不入库）：
-换 Wi-Fi 或换网段只改这一个文件，不用动 sketch。
+SSID、密码在 `sleep_demo/secrets.h`（已被 `.gitignore` 忽略，不入库）。
+**IP 由 DHCP 自动分配**，不写死；换 Wi-Fi 只改 SSID / 密码，不用动 sketch。
+当前地址看串口 `[WIFI] 已连接，IP ...`，或网页顶部显示的 IP。
 
-本机示例是家庭网 `192.168.16.50`（网关 `192.168.16.1`）；2026-11-22 晚上实测切到
-手机热点后改成了 `10.77.67.50`（网关 `10.77.67.199`），固件本身没改。新克隆先
-`cp sleep_demo/secrets.example.h sleep_demo/secrets.h`，再填入自己的 SSID / 密码 / 静态 IP。
+新克隆先 `cp sleep_demo/secrets.example.h sleep_demo/secrets.h`，再填入自己的 SSID / 密码。
 
 ## 4. POWER.CSV 事件
 
@@ -159,7 +158,7 @@ cd 02-20Days-Challenge
 export ARDUINO_DIRECTORIES_DATA=$PWD/.arduino/data ARDUINO_DIRECTORIES_USER=$PWD/.arduino/user
 # 新克隆先创建本机凭据（secrets.h 已被 .gitignore 忽略）
 cp firmware/esp32cam-sleep-demo/sleep_demo/secrets.example.h firmware/esp32cam-sleep-demo/sleep_demo/secrets.h
-# 再编辑 secrets.h，填入 SSID / 密码 / 静态 IP
+# 再编辑 secrets.h，填入 SSID / 密码（IP 走 DHCP）
 
 # 只编译本演示
 ./arduino-cli compile --fqbn esp32:esp32:esp32cam --build-path .arduino/build-demo \
@@ -180,6 +179,8 @@ distrobox-host-exec 02-20Days-Challenge/firmware/esp32cam-sleep-demo/flash_demo.
 DTR/RTS 复位板子，验证主体仍以网页/API 为准。
 ## 7. 串口预期输出（关键行）
 
+> IP 由 DHCP 分配，下面的 `10.73.19.50` 只是示例；以串口/网页实际值为准。
+
 冷启动：
 
 ```text
@@ -188,13 +189,13 @@ DTR/RTS 复位板子，验证主体仍以网页/API 为准。
 [OK] SD 卡初始化完成
 [OK] 下一张编号 IMG_00001.jpg
 [TEMP] boot 56.1 C
-[WIFI] 连接 B-LINK_601（modem sleep=off）...
-[WIFI] 已连接，IP 192.168.16.50
+[WIFI] 连接 <SSID>（modem sleep=off）...
+[WIFI] 已连接，IP 10.73.19.50 RSSI -40 dBm，PS=NONE
 [TIME] 2026-11-22 20:30:00
 [PWR] ... WEB_ON ...
-[WEB] http://192.168.16.50/
+[WEB] http://10.73.19.50/
 [IDLE] 摄像头已关闭，WiFi 转 MIN_MODEM
-[HB] up=10s temp=58.9C mode=normal session=0 shots=0
+[HB] up=10s temp=58.9C rssi=-40 mode=normal session=0 shots=0
 ```
 
 深睡会话：
@@ -211,8 +212,8 @@ DTR/RTS 复位板子，验证主体仍以网页/API 为准。
 [CAP] /IMG_00002.jpg ...
 ...
 [MODE] 会话结束，已回到空闲（摄像头关闭、WiFi MIN_MODEM）
-[WIFI] 已连接，IP 192.168.16.50
-[WEB] http://192.168.16.50/
+[WIFI] 已连接，IP 10.73.19.50 RSSI -40 dBm，PS=NONE
+[WEB] http://10.73.19.50/
 ```
 
 浅睡会话：不重启，串口连续输出 `LIGHT_SLEEP` / `LIGHT_WAKE` / `[CAP]` 交替 5 次，

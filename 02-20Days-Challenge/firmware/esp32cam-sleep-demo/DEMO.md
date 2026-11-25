@@ -18,11 +18,11 @@ USB 表只给累计 mWh，不给连续曲线；用**锚点差分**，不需要�
 
 ## 1. 演示前 5 分钟
 
-- 网络：手机热点或 2.4 GHz AP，RSSI ≥ −60 dBm；确认 `secrets.h` 的静态 IP / 网关与热点同网段。
+- 网络：手机热点或 2.4 GHz AP，RSSI ≥ −60 dBm；IP 由 DHCP 分配，确认 `secrets.h` 的 SSID / 密码正确。
 - 供电：USB 表串在 5 V 输入；USB-TTL 只接 TX / RX / GND（不接 5 V / 3V3）。
 - 数据：清空旧照片和 `POWER.CSV`（`POST /admin/reset`），确认 `/api.json` 的 `count=0`。
 - 烧录：容器内编译，宿主机执行 [`flash_demo.sh`](flash_demo.sh)；串口只做短时抓取（DTR/RTS 会复位板子）。
-- 页面：打开 `http://<静态IP>/`，确认 4 个按钮、`POWER.CSV` 链接、`/api.json` 正常。
+- 页面：打开 `http://<DHCP IP>/`（串口或页面顶部显示），确认 4 个按钮、`POWER.CSV` 链接、`/api.json` 正常。
 
 ## 2. 四模式顺序与时间（modem / light 未实测）
 
@@ -46,7 +46,7 @@ USB 表只给累计 mWh，不给连续曲线；用**锚点差分**，不需要�
 
 ## 4. 回退
 
-- WiFi 连不上：换手机热点，改 `secrets.h` 的静态 IP / 网关，重烧；或先跑 normal / modem。
+- WiFi 连不上：换手机热点，改 `secrets.h` 的 SSID / 密码，重烧（IP 走 DHCP）；或先跑 normal / modem。
 - 页面卡住：断电或按 EN，照片和 `POWER.CSV` 仍在 SD；重新打开页面。
 - 串口打开后板子停在下载态：关串口，按 EN 复位；验证以页面 / API 为准。
 - 清空失败：会话中返回 409，先 `POST /stop` 或等会话结束。

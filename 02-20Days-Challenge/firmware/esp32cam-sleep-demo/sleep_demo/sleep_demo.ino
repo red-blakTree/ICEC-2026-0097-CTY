@@ -38,7 +38,7 @@ static const uint32_t kLightWakeReserveMs = 700;
 // 网页时间与 NTP 都用东八区；deep sleep 后 TZ 会丢，需要每次启动重设
 static const char *kTzString = "CST-8";
 
-// 网络配置（SSID/密码/静态 IP/网关/DNS）全部来自 secrets.h：换 Wi-Fi 或换网段只改那一个文件
+// 网络凭据（SSID/密码）来自 secrets.h；IP 由 DHCP 自动分配，换 Wi-Fi 只改 secrets.h
 
 // AI-Thinker ESP32-CAM 引脚定义
 #define CAM_PIN_PWDN   32
@@ -362,7 +362,6 @@ static bool connectWifi(bool modem_sleep) {
                 modem_sleep ? "on" : "off");
   WiFi.mode(WIFI_STA);
   WiFi.setSleep(modem_sleep);
-  WiFi.config(kStaticIp, kGateway, kSubnet, kDns1, kDns2);
   WiFi.begin(kWifiSsid, kWifiPass);
   for (int i = 0; i < 40 && WiFi.status() != WL_CONNECTED; i++) {
     delay(500);
